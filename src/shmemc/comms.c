@@ -126,9 +126,11 @@ get_remote_key_and_addr(uint64_t local_addr, int pe,
  * -- ordering -----------------------------------------------------------
  */
 
-void
+shmemx_status_t
 shmemc_ctx_fence(shmem_ctx_t ctx)
 {
+    shmemx_status_t op_status = shmem_default_status;
+
     shmemc_context_h ch = (shmemc_context_h) ctx;
 
     if (! ch->attr.nostore) {
@@ -136,11 +138,15 @@ shmemc_ctx_fence(shmem_ctx_t ctx)
 
         assert(s == UCS_OK);
     }
+    
+    return op_status;
 }
 
-void
+shmemx_status_t
 shmemc_ctx_quiet(shmem_ctx_t ctx)
 {
+    shmemx_status_t op_status = shmem_default_status;
+
     shmemc_context_h ch = (shmemc_context_h) ctx;
 
     if (! ch->attr.nostore) {
@@ -148,6 +154,8 @@ shmemc_ctx_quiet(shmem_ctx_t ctx)
 
         assert(s == UCS_OK);
     }
+
+    return op_status;
 }
 
 /*

@@ -55,16 +55,19 @@ COMMS_TEST_SIZE(32, ge, >=)
 COMMS_TEST_SIZE(64, ge, >=)
 
 #define COMMS_WAIT_SIZE(_size, _opname, _op)                            \
-    void                                                                \
+    shmemx_status_t                                                     \
     shmemc_wait_##_opname##_until##_size(int##_size##_t *var,           \
                                          int##_size##_t value)          \
     {                                                                   \
+        shmemx_status_t op_status = shmem_default_status;               \
+                                                                        \
         shmemc_context_h ch = (shmemc_context_h) SHMEM_CTX_DEFAULT;     \
         ucp_worker_h w = ch->w;                                         \
                                                                         \
         while (shmemc_test_##_opname##_size(var, value) == 0) {         \
             ucp_worker_progress(w);                                     \
         }                                                               \
+        return op_status;                                               \
     }
 
 COMMS_WAIT_SIZE(16, eq, ==)

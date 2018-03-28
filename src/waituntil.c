@@ -45,36 +45,44 @@
  * wait_until with operator dispatchers, type-parameterized.
  */
 #define SHMEM_TYPE_WAIT_UNTIL(_opname, _type, _size)                    \
-    void                                                                \
+    shmemx_status_t                                                     \
     shmem_##_opname##_wait_until(_type *ivar,                           \
                                  int cmp,                               \
                                  _type cmp_value)                       \
     {                                                                   \
+        shmemx_status_t op_status = shmem_default_status;               \
+                                                                        \
         SHMEMT_MUTEX_PROTECT                                            \
             (                                                           \
              switch (cmp) {                                             \
              case SHMEM_CMP_EQ:                                         \
-             shmemc_wait_eq_until##_size((int##_size##_t *) ivar,       \
+                return                                                  \
+                shmemc_wait_eq_until##_size((int##_size##_t *) ivar,    \
                                          cmp_value);                    \
              break;                                                     \
              case SHMEM_CMP_NE:                                         \
-             shmemc_wait_ne_until##_size((int##_size##_t *) ivar,       \
+                return                                                  \
+                shmemc_wait_ne_until##_size((int##_size##_t *) ivar,    \
                                          cmp_value);                    \
              break;                                                     \
              case SHMEM_CMP_GT:                                         \
-             shmemc_wait_gt_until##_size((int##_size##_t *) ivar,       \
+                return                                                  \
+                shmemc_wait_gt_until##_size((int##_size##_t *) ivar,    \
                                          cmp_value);                    \
              break;                                                     \
              case SHMEM_CMP_LE:                                         \
-             shmemc_wait_le_until##_size((int##_size##_t *) ivar,       \
+                return                                                  \
+                shmemc_wait_le_until##_size((int##_size##_t *) ivar,    \
                                          cmp_value);                    \
              break;                                                     \
              case SHMEM_CMP_LT:                                         \
-             shmemc_wait_lt_until##_size((int##_size##_t *) ivar,       \
+                return                                                  \
+                shmemc_wait_lt_until##_size((int##_size##_t *) ivar,    \
                                          cmp_value);                    \
              break;                                                     \
              case SHMEM_CMP_GE:                                         \
-             shmemc_wait_ge_until##_size((int##_size##_t *) ivar,       \
+                op_status =                                             \
+                shmemc_wait_ge_until##_size((int##_size##_t *) ivar,    \
                                          cmp_value);                    \
              break;                                                     \
              default:                                                   \
@@ -83,7 +91,12 @@
                     cmp,                                                \
                     __func__                                            \
                     );                                                  \
-             return;                                                    \
+             /* I'm not sure if I should return successfull here
+             or actualy return another error.
+             what happens if we get to this return? none of the waits
+             above are done?
+             */                                                         \
+             return op_status;                                          \
              /* NOT REACHED */                                          \
              break;                                                     \
              }                                                          \
@@ -233,12 +246,15 @@ SHMEM_TYPE_TEST(ptrdiff, ptrdiff_t, 64)
 #endif /* ENABLE_PSHMEM */
 
 #define SHMEM_TYPE_WAIT(_name, _type, _size)                        \
-        void                                                        \
-            shmem_##_name##_wait(_type *ivar, _type cmp_value)      \
+        shmemx_status_t                                             \
+        shmem_##_name##_wait(_type *ivar, _type cmp_value)          \
         {                                                           \
+            shmemx_status_t op_status = shmem_default_status;       \
+                                                                    \
             deprecate(__func__);                                    \
             shmemc_wait_ne_until##_size((int##_size##_t *) ivar,    \
                                         cmp_value);                 \
+            return op_status;                                       \
         }
 
 SHMEM_TYPE_WAIT(short, short, 16)
