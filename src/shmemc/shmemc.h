@@ -299,8 +299,8 @@ SHMEMC_TEST(16, ge)
 SHMEMC_TEST(32, ge)
 SHMEMC_TEST(64, ge)
 
-#define SHMEMC_WAITUNTIL(_size, _opname)                                \
-    void shmemc_wait_##_opname##_until##_size(int##_size##_t *var,      \
+#define SHMEMC_WAITUNTIL(_size, _opname)                                        \
+    shmemx_status_t shmemc_wait_##_opname##_until##_size(int##_size##_t *var,   \
                                               int##_size##_t value);
 
 SHMEMC_WAITUNTIL(16, eq)
