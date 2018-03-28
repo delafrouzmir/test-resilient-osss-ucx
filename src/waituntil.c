@@ -43,7 +43,7 @@
 #define shmem_ptrdiff_wait_until pshmem_ptrdiff_wait_until
 #endif /* ENABLE_PSHMEM */
 
-shmem_default_status = {-1, SHMEM_SUCCESSFUL};
+shmemx_status_t shmem_default_status = {-1, SHMEM_SUCCESSFUL};
 
 /**
  * wait_until with operator dispatchers, type-parameterized.
@@ -84,7 +84,7 @@ shmem_default_status = {-1, SHMEM_SUCCESSFUL};
                                          cmp_value);                    \
              break;                                                     \
              case SHMEM_CMP_GE:                                         \
-                op_status =                                             \
+                return                                                  \
                 shmemc_wait_ge_until##_size((int##_size##_t *) ivar,    \
                                          cmp_value);                    \
              break;                                                     \
