@@ -43,7 +43,7 @@
 #define shmem_ptrdiff_wait_until pshmem_ptrdiff_wait_until
 #endif /* ENABLE_PSHMEM */
 
-shmem_default_status = = {-1, SHMEM_SUCCESSFUL};
+shmem_default_status = {-1, SHMEM_SUCCESSFUL};
 
 /**
  * wait_until with operator dispatchers, type-parameterized.
@@ -54,7 +54,6 @@ shmem_default_status = = {-1, SHMEM_SUCCESSFUL};
                                  int cmp,                               \
                                  _type cmp_value)                       \
     {                                                                   \
-        shmemx_status_t op_status = shmem_default_status;               \
                                                                         \
         SHMEMT_MUTEX_PROTECT                                            \
             (                                                           \
@@ -100,7 +99,7 @@ shmem_default_status = = {-1, SHMEM_SUCCESSFUL};
              what happens if we get to this return? none of the waits
              above are done?
              */                                                         \
-             return op_status;                                          \
+             return shmem_default_status;                               \
              /* NOT REACHED */                                          \
              break;                                                     \
              }                                                          \
