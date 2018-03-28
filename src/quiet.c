@@ -8,6 +8,8 @@
 
 #include "shmem_mutex.h"
 
+#include "resilience.h"
+
 #ifdef ENABLE_PSHMEM
 #pragma weak shmem_ctx_quiet = pshmem_ctx_quiet
 #define shmem_ctx_quiet pshmem_ctx_quiet

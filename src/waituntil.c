@@ -10,6 +10,8 @@
 #include "shmemc.h"
 #include "shmem/defs.h"
 
+#include "resilience.h"
+
 #ifdef ENABLE_PSHMEM
 #pragma weak shmem_short_wait_until = pshmem_short_wait_until
 #define shmem_short_wait_until pshmem_short_wait_until

@@ -9,6 +9,8 @@
 
 #include "shmem/defs.h"
 
+#include "resilience.h"
+
 #include <unistd.h>
 #include <string.h>
 #include <assert.h>
