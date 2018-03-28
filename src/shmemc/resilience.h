@@ -21,6 +21,6 @@ typedef struct shmemx_status {
  * The default status is that the op was successfull
  * and no PE was source of failue ==> source=-1
 */
-const shmemx_status_t shmem_default_status = {-1, SHMEM_SUCCESSFUL};
+extern shmemx_status_t shmem_default_status;
 
 #endif /* ! _RESILIENCE_H */
