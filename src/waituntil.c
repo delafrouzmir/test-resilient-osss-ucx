@@ -43,7 +43,8 @@
 #define shmem_ptrdiff_wait_until pshmem_ptrdiff_wait_until
 #endif /* ENABLE_PSHMEM */
 
-shmemx_status_t shmem_default_status = {-1, SHMEM_SUCCESSFUL};
+//shmemx_status_t shmem_default_status = {-1, SHMEM_SUCCESSFUL};
+shmem_default_status = {-1, SHMEM_SUCCESSFUL};
 
 /**
  * wait_until with operator dispatchers, type-parameterized.
@@ -94,10 +95,10 @@ shmemx_status_t shmem_default_status = {-1, SHMEM_SUCCESSFUL};
                     cmp,                                                \
                     __func__                                            \
                     );                                                  \
-             /* I'm not sure if I should return successfull here
-             or actualy return another error.
-             what happens if we get to this return? none of the waits
-             above are done?
+             /* I'm not sure if I should return successfull here        \
+             or actualy return another error.                           \
+             what happens if we get to this return? none of the waits   \
+             above are done?                                            \
              */                                                         \
              return shmem_default_status;                               \
              /* NOT REACHED */                                          \
