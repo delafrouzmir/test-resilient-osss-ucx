@@ -9,7 +9,7 @@
 
 #include "shmem/defs.h"
 
-#include "resilience.h"
+#include "././include/shmem/resilience.h"
 
 #include <unistd.h>
 #include <string.h>

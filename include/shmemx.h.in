@@ -117,4 +117,6 @@ extern "C"
 }
 #endif  /* __cplusplus */
 
+#include "shmem/resilience.h"
+
 #endif /* _SHMEMX_H */

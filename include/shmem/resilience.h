@@ -3,6 +3,7 @@
 #ifndef _RESILIENCE_H
 #define _RESILIENCE_H 1
 
+/* Defining different types of error for handling*/
 #define SHMEM_SUCCESSFUL 0
 #define SHMEM_NODE_FAILURE 1
 #define SHMEM_PE_FAILURE 2
@@ -22,5 +23,11 @@ typedef struct shmemx_status {
  * and no PE was source of failue ==> source=-1
 */
 extern shmemx_status_t shmem_default_status;
+
+
+/* Defining different types of PEs used for checkpointing */
+#define ORIGINAL_PE 0
+#define SPARE_PE 1
+#define RESURRECTED_PE 2
 
 #endif /* ! _RESILIENCE_H */
