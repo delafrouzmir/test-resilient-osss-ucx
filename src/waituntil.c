@@ -44,8 +44,6 @@
 #endif /* ENABLE_PSHMEM */
 
 //shmemx_status_t shmem_default_status = {-1, SHMEM_SUCCESSFUL};
-shmem_default_status.source = -1;
-shmem_default_status.error_type = SHMEM_SUCCESSFUL;
 
 /**
  * wait_until with operator dispatchers, type-parameterized.
