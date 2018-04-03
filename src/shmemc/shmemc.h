@@ -8,7 +8,7 @@
 #include "shmemc.h"
 #include "shmem/defs.h"
 
-#include "././include/shmem/resilience.h"
+#include "../../include/shmem/resilience.h"
 
 #include <sys/types.h>          /* size_t */
 #include <stddef.h>             /* ptrdiff_t */
