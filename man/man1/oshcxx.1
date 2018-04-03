@@ -1,0 +1,42 @@
+.\" For license: see LICENSE file at top-level
+.TH oshcxx 1 "" "OSSS"
+.SH NAME
+\fBoshcxx | oshc++\fP \- compile an OpenSHMEM C++ program
+.SH SYNOPSIS
+\fBoshcxx | oshc++\fP
+.RS 4
+.br
+[ underlying compiler flags ]
+.br
+file.cxx [file.cxx ...]
+.RE
+.SH DESCRIPTION
+\fBoshcxx\fP is a wrapper in the vein of mpicxx/mpic++ that compiles
+an OpenSHMEM program.  The wrapper hides implementation details from
+the user.
+.SH EXAMPLES
+The command
+.LP
+.RS 4
+$ oshcxx -g -o foo.exe foo.cxx
+.RE
+.LP
+compiles C++ source code foo.cxx into the OpenSHMEM executable foo.exe.
+.SH ENVIRONMENT
+The underlying compiler/linker invoked by this wrapper is determined
+when the OpenSHMEM library is built.  To override, set the
+.LP
+.RS 4
+\f(CROSH_CXX\fP
+.RE
+.LP
+environment variable.
+.SH NOTES
+The OpenSHMEM specification does not say anything normative about how
+OpenSHMEM programs are compiled, linked and launched.  These wrapper
+programs are supplied as part of the Reference Library for
+convenience.
+.SH SEE ALSO
+osh_intro(1).
+.SH OPENSHMEM
+http://www.openshmem.org/

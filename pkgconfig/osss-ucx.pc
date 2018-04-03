@@ -1,0 +1,14 @@
+# For license: see LICENSE file at top-level
+
+Name: osss-sbu-reference-implementation
+Description: OSSS/SBU Reference Implementation
+Version: 1.0
+URL: https://bitbucket.org/sbuopenshmem/osss-ucx.git
+#
+prefix=/gpfs/home/dmirfenderes/install-location/res-osss-ucx
+exec_prefix=${prefix}
+#
+Libs: -Wl,-rpath,${exec_prefix}/lib -L${exec_prefix}/lib -lshmem -lshmemc-ucx -lshmemu -L/gpfs/home/dmirfenderes/install-location/pmix1.2.3/lib -Wl,-rpath,/gpfs/home/dmirfenderes/install-location/pmix1.2.3/lib -lpmix -L/gpfs/home/dmirfenderes/install-location/ucx/lib -Wl,-rpath,/gpfs/home/dmirfenderes/install-location/ucx/lib -lucp -luct -lucs -lm
+Cflags: -I${prefix}/include
+#
+Provides: osss-sbu-reference-implementation
