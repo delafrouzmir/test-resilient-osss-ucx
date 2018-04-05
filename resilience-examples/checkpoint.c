@@ -138,7 +138,7 @@ main ()
     int res = fenix_init(me,npes, spes);
     if ( me == 0 )
         printf ("init is %d\n", res);
-    printf("I am %d with pe_type= %d\n", pe_type);
+    printf("I am %d with pe_type= %d\n", me, pe_type);
 
     /*
     int *a = (int *) malloc(10*sizeof(int));
