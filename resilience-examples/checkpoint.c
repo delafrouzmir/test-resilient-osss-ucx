@@ -130,8 +130,10 @@ main ()
 
     if ( npes >= 6 )
         spes = 4;
-    else if ( npes >= 4 )
+    else if ( npes == 5 )
         spes = 2;
+    else if ( npes == 4 )
+        spes = 1;
     else
         spes = 0;
 
