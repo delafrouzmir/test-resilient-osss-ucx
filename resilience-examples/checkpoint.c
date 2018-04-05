@@ -67,7 +67,7 @@ int fenix_init(int me, int npes, int spes)
     {
         case ORIGINAL_PE:
             shadow_mem_size = 1;
-            shadow_mem = (void *) malloc(shadow_mem_size * sizeof(void **) );
+            shadow_mem = (void **) malloc(shadow_mem_size * sizeof(void *) );
             break;
 
         case SPARE_PE:
@@ -76,8 +76,8 @@ int fenix_init(int me, int npes, int spes)
             break;
 
         case MSPE:
-            checkpoint_table = (void ***) malloc(opes * sizeof(void **));
-            for (int i=0; i<opes; ++i)
+            checkpoint_table = (void ***) malloc(num_opes * sizeof(void **));
+            for (int i=0; i<num_opes; ++i)
             {
                 checkpoint_table[i] = (void **) malloc (1 * sizeof(void**));
             }
@@ -85,6 +85,7 @@ int fenix_init(int me, int npes, int spes)
 
         default:
             // Nothing here for now, but it may change "if" init is called for subtitute PEs
+            break;
     }
 
     shmem_barrier_all();
@@ -112,6 +113,7 @@ void fenix_checkpoint ( void* mem, int size, int pe_num )
 
         default:
         // nothing here for now
+            break;
     }
 }
 
@@ -135,7 +137,7 @@ main ()
 
     int res = fenix_init(me,npes, spes);
     if ( me == 0 )
-        prinft ("init is %d\n", res);
+        printf ("init is %d\n", res);
     printf("I am %d with pe_type= %d\n", pe_type);
 
     /*
