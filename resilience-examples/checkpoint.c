@@ -286,7 +286,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
         case ORIGINAL_PE:
         case RESURRECTED_PE:
             for ( i=0; i < count; ++i )
-                (int) cpr_shadow_mem[id][i] = mem[i];
+                cpr_shadow_mem[id][i] = mem[i];
 
             carr->id = id;
             carr->count = count;
@@ -317,7 +317,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                 cpr_check_qcarr_head ++;
                 
                 for ( i=0; i< carr-> count; ++i)
-                    (int) cpr_checkpoint_table[carr-> pe_num][carr-> id][i] = carr-> mess[i];
+                    cpr_checkpoint_table[carr-> pe_num][carr-> id][i] = carr-> mess[i];
                 // I'm assuming id = index here
             }
             //return FAILURE;     // if SPAREs are not participated in code, they won't call reserve
