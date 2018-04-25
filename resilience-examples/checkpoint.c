@@ -67,7 +67,7 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes)
         cpr_pe_type = SPARE_PE;
 
     // instead of pe number i, we should use cpr_pe[i]
-    // e.g: shmem_put(dest, &source, nelems, cpr_pe[j]);
+    // e.g: shmem_int_put(dest, &source, nelems, cpr_pe[j]);
     int i=0;
     for (; i<cpr_num_opes; ++i)
         cpr_pe[i] = i;
@@ -231,9 +231,9 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             // and update the cpr_table_size of all spare PEs
             for ( i= cpr_first_spare; i < npes; ++i)
             {
-                // shmem_atomic_fetch_inc returns the amount before increment
-                q_tail = ( shmem_atomic_fetch_inc ( cpr_res_qcarr_tail, i)) % MAX_CARRIER_QSIZE;
-                shmem_put (cpr_res_qcarr[q_tail], carr, 1, i);
+                // shmem_int_atomic_fetch_inc returns the amount before increment
+                q_tail = ( shmem_int_atomic_fetch_inc ( cpr_res_qcarr_tail, i)) % MAX_CARRIER_QSIZE;
+                shmem_int_put (cpr_res_qcarr[q_tail], carr, 1, i);
 
                 printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
             }
@@ -300,9 +300,9 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             // and update the cpr_table_size of all spare PEs
             for ( i= cpr_first_spare; i < npes; ++i)
             {
-                // shmem_atomic_fetch_inc returns the amount before increment
-                q_tail = ( shmem_atomic_fetch_inc ( cpr_check_qcarr_tail, i)) % MAX_CARRIER_QSIZE;
-                shmem_put (cpr_check_qcarr[q_tail], carr, 1, i);
+                // shmem_int_atomic_fetch_inc returns the amount before increment
+                q_tail = ( shmem_int_atomic_fetch_inc ( cpr_check_qcarr_tail, i)) % MAX_CARRIER_QSIZE;
+                shmem_int_put (cpr_check_qcarr[q_tail], carr, 1, i);
                 printf("CHP carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
             }
             // update hashtable
