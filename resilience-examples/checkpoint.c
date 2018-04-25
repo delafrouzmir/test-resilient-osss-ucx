@@ -317,7 +317,9 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                 cpr_check_qcarr_head ++;
                 
                 for ( i=0; i< carr-> count; ++i)
+                {
                     //cpr_checkpoint_table[carr-> pe_num][carr-> id][i] = carr-> mess[i];
+                }
                 // I'm assuming id = index here
             }
             //return FAILURE;     // if SPAREs are not participated in code, they won't call reserve
