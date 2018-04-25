@@ -49,7 +49,7 @@ int cpr_res_qcarr_head, cpr_res_qcarr_tail, cpr_check_qcarr_head, cpr_check_qcar
 int *cpr_pe, *cpr_table_size;
 
 //
-int me, npes,
+int me, npes;
 
 void shmem_cpr_set_pe_type (int me, int npes, int spes)
 {
@@ -180,7 +180,7 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
                 cpr_table_size[i] = 1;
                 cpr_checkpoint_table[i] = (void **) malloc (cpr_table_size[i] * sizeof(void**));
             }
-            cpr_sig = SIG_DISABLE;
+            //cpr_sig = SIG_DISABLE;
             break;
 
         case RESURRECTED_PE:
@@ -286,13 +286,13 @@ int shmem_cpr_checkpoint ( int id, void* mem, int count, int pe_num )
         case ORIGINAL_PE:
         case RESURRECTED_PE:
             for ( i=0; i < count; ++i )
-                cpr_shadow_mem[id][i] = (void) mem[i];
+                cpr_shadow_mem[id][i] = mem[i];
 
             carr->id = id;
             carr->count = count;
             carr->pe_num = pe_num;
             for ( i=0; i < count; ++i )
-                carr -> mess[i] = (void) mem[i];
+                carr -> mess[i] = mem[i];
 
             printf("CHPING from an ORIGINAL:\tid = %d,\tcount = %d, from pe = %d\n", id, count, pe_num);
             
@@ -317,7 +317,7 @@ int shmem_cpr_checkpoint ( int id, void* mem, int count, int pe_num )
                 cpr_check_qcarr_head ++;
                 
                 for ( i=0; i< carr-> count; ++i)
-                    cpr_checkpoint_table[carr-> pe_num][carr-> id][i] = (void) carr-> mess[i];
+                    cpr_checkpoint_table[carr-> pe_num][carr-> id][i] = carr-> mess[i];
                 // I'm assuming id = index here
             }
             //return FAILURE;     // if SPAREs are not participated in code, they won't call reserve
