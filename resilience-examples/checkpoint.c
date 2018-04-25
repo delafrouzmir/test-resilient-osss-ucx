@@ -39,14 +39,17 @@ typedef struct carrier {
     int pe_num;                 // the PE that asked for a reservation or checkpoint
 } cpr_carrier;
 
+// necessary checkpointing declarations
 void **cpr_shadow_mem;
 void ***cpr_checkpoint_table;
 cpr_carrier *mess, *cpr_res_qcarr, *cpr_check_qcarr;
-int cpr_shadow_mem_size, cpr_pe_type, cpr_num_opes;
+int cpr_shadow_mem_size, cpr_pe_type, cpr_num_opes, cpr_first_spare;
 int cpr_num_spes, cpr_checkpointing_mode, cpr_sig, cpr_start;
 int cpr_res_qcarr_head, cpr_res_qcarr_tail, cpr_check_qcarr_head, cpr_check_qcarr_tail;
 int *cpr_pe, *cpr_table_size;
 
+//
+int me, npes,
 
 void shmem_cpr_set_pe_type (int me, int npes, int spes)
 {
@@ -147,6 +150,7 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
     mess = (cpr_carrier *) shmem_malloc (1* sizeof(cpr_carrier));
     cpr_num_spes = spes;
     cpr_num_opes = npes - spes;
+    cpr_first_spare = cpr_num_opes;
     cpr_pe = (int *) shmem_malloc (cpr_num_opes * sizeof(int));
 
     // add an if for different checkpointing mode here
@@ -164,7 +168,7 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
         case ORIGINAL_PE:
             cpr_shadow_mem_size = 1;
             cpr_shadow_mem = (void **) malloc(cpr_shadow_mem_size * sizeof(void *) );
-            cpr_sig = SIG_INACTIVE;
+            //cpr_sig = SIG_INACTIVE;
             break;
 
         case SPARE_PE:
@@ -206,6 +210,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 
     cpr_carrier *carr = (cpr_carrier *) malloc ( sizeof (cpr_carrier*) ); 
     int i, q_tail;
+    int npes = cpr_num_opes + cpr_num_spes;
 
     // for now, I assume id == index or id == cpr_shadow_mem_size-1
     switch (cpr_pe_type)
@@ -213,7 +218,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
         case ORIGINAL_PE:
         case RESURRECTED_PE:
             cpr_shadow_mem_size ++;
-            cpr_shadow_mem = (void **) realloc (cpr_shadow_mem_size * sizeof(void *) );
+            cpr_shadow_mem = (void **) realloc (cpr_shadow_mem, cpr_shadow_mem_size * sizeof(void *) );
             cpr_shadow_mem[cpr_shadow_mem_size - 1] = (void *) malloc (count * sizeof(int));
 
             carr->id = id;
@@ -224,13 +229,13 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 
             // should reserve a place on all spare PEs
             // and update the cpr_table_size of all spare PEs
-            for ( i= npes-spes; i<npes; ++i)
+            for ( i= cpr_first_spare; i < npes; ++i)
             {
                 // shmem_atomic_fetch_inc returns the amount before increment
                 q_tail = ( shmem_atomic_fetch_inc ( cpr_res_qcarr_tail, i)) % MAX_CARRIER_QSIZE;
                 shmem_put (cpr_res_qcarr[q_tail], carr, 1, i);
 
-                printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", i, qtail, pe_num);
+                printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
             }
             // update hashtable
             break;
@@ -245,7 +250,8 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 cpr_res_qcarr_head ++;
                 cpr_table_size[ carr-> pe_num] ++;
                 cpr_checkpoint_table[carr-> pe_num] =
-                            (void **) realloc (cpr_table_size[carr-> pe_num] * sizeof(void**));
+                            (void **) realloc (cpr_checkpoint_table[carr-> pe_num], 
+                                            cpr_table_size[carr-> pe_num] * sizeof(void**));
                 cpr_checkpoint_table[carr-> pe_num][cpr_table_size[carr-> pe_num]-1] =
                             (void *) malloc (carr->count * sizeof(int));
                 // update the hash table. I'm assuming id = index here
@@ -261,7 +267,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 }
 
 // for now, assuming we are checkpointing ints
-int shmem_cpr_checkpoint ( int id, void* mem, int size, int pe_num )
+int shmem_cpr_checkpoint ( int id, void* mem, int count, int pe_num )
 {
     /* TO DO:
     lookup id in hashtable to get the index
@@ -272,6 +278,7 @@ int shmem_cpr_checkpoint ( int id, void* mem, int size, int pe_num )
 
     cpr_carrier *carr = (cpr_carrier *) malloc ( sizeof (cpr_carrier*) ); 
     int i, q_tail;
+    int npes = cpr_num_opes + cpr_num_spes;
 
     // for now, I assume id = index
     switch (cpr_pe_type)
@@ -279,24 +286,24 @@ int shmem_cpr_checkpoint ( int id, void* mem, int size, int pe_num )
         case ORIGINAL_PE:
         case RESURRECTED_PE:
             for ( i=0; i < count; ++i )
-                cpr_shadow_mem[id][i] = mem[i];
+                cpr_shadow_mem[id][i] = (void) mem[i];
 
             carr->id = id;
             carr->count = count;
             carr->pe_num = pe_num;
             for ( i=0; i < count; ++i )
-                carr -> mem[i] = mem[i];
+                carr -> mess[i] = (void) mem[i];
 
             printf("CHPING from an ORIGINAL:\tid = %d,\tcount = %d, from pe = %d\n", id, count, pe_num);
             
             // should reserve a place on all spare PEs
             // and update the cpr_table_size of all spare PEs
-            for ( i= npes-spes; i<npes; ++i)
+            for ( i= cpr_first_spare; i < npes; ++i)
             {
                 // shmem_atomic_fetch_inc returns the amount before increment
                 q_tail = ( shmem_atomic_fetch_inc ( cpr_check_qcarr_tail, i)) % MAX_CARRIER_QSIZE;
                 shmem_put (cpr_check_qcarr[q_tail], carr, 1, i);
-                printf("CHP carrier posted to pe %d with qtail=%d from pe %d\n", i, qtail, pe_num);
+                printf("CHP carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
             }
             // update hashtable
             break;
@@ -310,7 +317,7 @@ int shmem_cpr_checkpoint ( int id, void* mem, int size, int pe_num )
                 cpr_check_qcarr_head ++;
                 
                 for ( i=0; i< carr-> count; ++i)
-                    cpr_checkpoint_table[carr-> pe_num][carr-> id][i] = carr-> mess[i];
+                    cpr_checkpoint_table[carr-> pe_num][carr-> id][i] = (void) carr-> mess[i];
                 // I'm assuming id = index here
             }
             //return FAILURE;     // if SPAREs are not participated in code, they won't call reserve
@@ -324,7 +331,7 @@ int shmem_cpr_checkpoint ( int id, void* mem, int size, int pe_num )
 }
 
 
-int shmem_cpr_restore ( int pe_num )
+int shmem_cpr_restore ( int pe_num, int me )
 {
     /* TO DO:
     lookup id in hashtable to get the index
@@ -366,7 +373,7 @@ int shmem_cpr_restore ( int pe_num )
 
 int main ()
 {
-    int me, npes, spes;
+    int spes;
     int success_init;
     int i, j, array_size;
     int *a;
@@ -384,7 +391,7 @@ int main ()
     else
         spes = 0;
 
-    success_init = shmem_cpr_init(me,npes, spes);
+    success_init = shmem_cpr_init(me,npes, spes, COLLECTIVE_CHECKPOINT);
     if ( me == 0 )
         printf ("init is %d\n", success_init);
     printf("I am %d with cpr_pe_type= %d\n", me, cpr_pe_type);
