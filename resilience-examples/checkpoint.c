@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include <shmem.h>
 
@@ -252,6 +253,9 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 
         case SPARE_PE:
 
+            while ( cpr_resrv_queue_head >= cpr_resrv_queue_tail ){
+                nanosleep(1000, NULL);
+            }
             printf("RESERVING from a SPARE:\treading %d carriers\n", cpr_resrv_queue_tail - cpr_resrv_queue_head);
             while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
             {
@@ -332,7 +336,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
 
         case SPARE_PE:
             while ( cpr_check_queue_head >= cpr_check_queue_tail ){
-                nanosleep(1000);
+                nanosleep(1000, NULL);
             }
             printf("CHPING from a SPARE:\treading %d carriers\n", cpr_check_queue_tail - cpr_check_queue_head);
             while (cpr_check_queue_head < cpr_check_queue_tail)
