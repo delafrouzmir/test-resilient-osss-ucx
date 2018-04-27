@@ -391,43 +391,40 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
 }
 
 
-int shmem_cpr_restore ( int pe_num, int me )
+int shmem_cpr_restore ( int dead_pe, int me )
 {
     /* TO DO:
     lookup id in hashtable to get the index
     update the index-th element in
         original or ressurected: shadow mem
-        spare: cpr_checkpoint_table[pe_num][index]
+        spare: cpr_checkpoint_table[dead_pe][index]
                 update the cpr_pe and next_pe
     */
     int i, j;
 
-    switch (cpr_pe_type)
+    if ( me != dead_pe )
     {
-        case ORIGINAL_PE:
-        case RESURRECTED_PE:
-            // if this PE is not the failed one
-            if ( me != pe_num )
-            {
+        switch (cpr_pe_type)
+        {
+            case ORIGINAL_PE:
+            case RESURRECTED_PE:
                 for ( i=0; i<cpr_shadow_mem_size; ++i)
                 {
 
                 }
-            }
-            break;
+                break;
 
-        case SPARE_PE:
-            // if this PE is not the failed one
-            if ( me != pe_num )
-            {
+            case SPARE_PE:
+                // if this PE is not the failed one
                 
-            }
-            break;
+                break;
 
-        default:
-        // nothing here for now
-            break;
+            default:
+            // nothing here for now
+                break;
+        }
     }
+
     return SUCCESS;
 }
 
@@ -490,11 +487,11 @@ int main ()
     }
 
     shmem_barrier_all ();
-    for ( j=0; j<npes; ++j )
-        if ( me == j )
-        {
+    //for ( j=0; j<npes; ++j )
+    //    if ( me == j )
+    //    {
             printf("I am =%d, called %d reservs and %d checks,\t posted %d reservs and %d checks,\t and read %d reservs and %d checks\n", me, called_resrv, called_check, posted_resrv, posted_check, read_resrv, read_check);
-        }
+    //    }
     /*
     if ( me == 0)
         printf("\nFINALLY\n");
