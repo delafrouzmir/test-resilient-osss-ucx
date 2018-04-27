@@ -324,7 +324,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             {
                 // shmem_int_atomic_fetch_inc returns the amount before increment
                 q_tail = ( shmem_int_atomic_fetch_inc (&cpr_check_queue_tail, i)) % MAX_CARRIER_QSIZE;
-                shmem_putmem (&cpr_check_qcarr[q_tail], carr, 1 * sizeof(cpr_check_carrier), i);
+                shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), i);
                 printf("CHP carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
             }
             // update hashtable
