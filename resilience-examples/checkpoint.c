@@ -22,33 +22,38 @@
 #define MAX_CARRIER_SIZE        1000
 #define MAX_CARRIER_QSIZE       1000
 
-/*
-#define SIG_DISABLE     0
-#define SIG_INACTIVE    1
-#define SIG_RESERVER    2
-#define SIG_CHECKPOINT  3
-#define SIG_RESTORE     4
-*/
 
 // names starting with shmem_cpr_ are reserved for functions
 // names starting with cpr_ are reserved for variable declarations
 typedef struct carrier {
-    int id;                     // ID of memory part that is being reserved or checkpointed
+    int id;                     // ID of memory part that is being reserved
+    int *adr;                   // Address of memory part that is being reserved
     int count;                  // number of data items that needs to be stored
-    int mess[MAX_CARRIER_SIZE]; // an array of data that will be stored, empty in case of reserve
     int pe_num;                 // the PE that asked for a reservation or checkpoint
-} cpr_carrier;
+} cpr_resrv_carrier;
+
+typedef struct carrier {
+    int id;                     // ID of memory part that is being checkpointed
+    int *adr;                   // Address of memory part that is being checkpointed
+    int count;                  // number of data items that needs to be stored
+    int data[MAX_CARRIER_SIZE]; // an array of data that will be stored
+    int pe_num;                 // the PE that asked for a reservation or checkpoint
+} cpr_check_carrier;
 
 // necessary checkpointing declarations
-void **cpr_shadow_mem;
-void ***cpr_checkpoint_table;
-cpr_carrier *mess, *cpr_res_qcarr, *cpr_check_qcarr;
-int cpr_shadow_mem_size, cpr_pe_type, cpr_num_opes, cpr_first_spare;
-int cpr_num_spes, cpr_checkpointing_mode, cpr_sig, cpr_start;
-int cpr_res_qcarr_head, cpr_res_qcarr_tail, cpr_check_qcarr_head, cpr_check_qcarr_tail;
+// Part 1: necessary for keeping checkpoints
+cpr_check_carrier *cpr_shadow_mem;    // a PE's own copy of its checkpoints
+cpr_check_carrier **cpr_checkpoint_table; // a spare PE's copy of all active PE's checkpoints
+int cpr_shadow_mem_size, cpr_pe_type, cpr_num_active_pes, cpr_first_spare;
+int cpr_num_spare_pes, cpr_checkpointing_mode, cpr_sig, cpr_start;
 int *cpr_pe, *cpr_table_size;
+// Part 2: necessary for exchange of data when reserving or checkpointing
+cpr_resrv_carrier *cpr_check_queue;
+int cpr_check_queue_head, cpr_check_queue_tail;
+cpr_check_carrier *cpr_resrv_queue;
+int cpr_resrv_queue_head, cpr_resrv_queue_tail;
 
-//
+// delarrations for the application
 int me, npes;
 
 void shmem_cpr_set_pe_type (int me, int npes, int spes)
@@ -69,7 +74,7 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes)
     // instead of pe number i, we should use cpr_pe[i]
     // e.g: shmem_int_put(dest, &source, nelems, cpr_pe[j]);
     int i=0;
-    for (; i<cpr_num_opes; ++i)
+    for (; i<cpr_num_active_pes; ++i)
         cpr_pe[i] = i;
     
 }
@@ -84,7 +89,7 @@ int shmem_cpr_spare_wait (int me, int npes, int spes)
     while ( cpr_start == 1 )
     {
         // get the signal of every PE and check it needs reservation or checkpointing
-        for ( i=0; i<cpr_num_opes; ++i )
+        for ( i=0; i<cpr_num_active_pes; ++i )
         {
             pe = cpr_pe[i];
             shmem_get(&cpr_sig, &cpr_sig, 1, pe);
@@ -139,19 +144,22 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
         return FAILURE;
     }
 
-    cpr_res_qcarr = (cpr_carrier *) shmem_malloc (MAX_CARRIER_QSIZE * sizeof(cpr_carrier));
-    cpr_check_qcarr = (cpr_carrier *) shmem_malloc (MAX_CARRIER_QSIZE * sizeof(cpr_carrier));
-    cpr_res_qcarr_head = 0;
-    cpr_res_qcarr_tail = 0;
-    cpr_check_qcarr_head = 0;
-    cpr_check_qcarr_tail = 0;
-    cpr_start = 1;
+    // Initializing queues
+    // Checkpointing queue:
+    cpr_check_queue = (cpr_check_carrier *) shmem_malloc (MAX_CARRIER_QSIZE * sizeof(cpr_check_carrier));
+    cpr_check_queue_head = 0;
+    cpr_check_queue_tail = 0;
 
-    mess = (cpr_carrier *) shmem_malloc (1* sizeof(cpr_carrier));
-    cpr_num_spes = spes;
-    cpr_num_opes = npes - spes;
-    cpr_first_spare = cpr_num_opes;
-    cpr_pe = (int *) shmem_malloc (cpr_num_opes * sizeof(int));
+    // Reservation queue:
+    cpr_resrv_queue = (cpr_resrv_carrier *) shmem_malloc (MAX_CARRIER_QSIZE * sizeof(cpr_resrv_carrier));
+    cpr_resrv_queue_head = 0;
+    cpr_resrv_queue_tail = 0;
+
+    // Setting up numbers of active and spare PEs
+    cpr_num_spare_pes = spes;
+    cpr_num_active_pes = npes - spes;
+    cpr_first_spare = cpr_num_active_pes;
+    cpr_pe = (int *) shmem_malloc (cpr_num_active_pes * sizeof(int));
 
     // add an if for different checkpointing mode here
     // if (  )
@@ -167,20 +175,19 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
     {
         case ORIGINAL_PE:
             cpr_shadow_mem_size = 1;
-            cpr_shadow_mem = (void **) malloc(cpr_shadow_mem_size * sizeof(void *) );
+            cpr_shadow_mem = (cpr_check_carrier *) malloc(cpr_shadow_mem_size * sizeof(cpr_check_carrier) );
             //cpr_sig = SIG_INACTIVE;
             break;
 
         case SPARE_PE:
-            cpr_checkpoint_table = (void ***) malloc(cpr_num_opes * sizeof(void **));
-            cpr_table_size = (int *) malloc(cpr_num_opes * sizeof(int *));
+            cpr_checkpoint_table = (cpr_check_carrier **) malloc(cpr_num_active_pes * sizeof(cpr_check_carrier *));
+            cpr_table_size = (int *) malloc(cpr_num_active_pes * sizeof(int *));
             int i;
-            for (i=0; i<cpr_num_opes; ++i)
+            for (i=0; i<cpr_num_active_pes; ++i)
             {
                 cpr_table_size[i] = 1;
-                cpr_checkpoint_table[i] = (void **) malloc (cpr_table_size[i] * sizeof(void**));
+                cpr_checkpoint_table[i] = (cpr_check_carrier *) malloc (cpr_table_size[i] * sizeof(cpr_check_carrier *));
             }
-            //cpr_sig = SIG_DISABLE;
             break;
 
         case RESURRECTED_PE:
@@ -192,7 +199,7 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
     }
 
     shmem_barrier_all();
-
+    cpr_start = 1;
     //  THIS IF IS FOR WHEN SPARES DO NOT PARTICIPATE IN RUNNING THE CODE
     //if ( cpr_pe_type == SPARE_PE )
     //    shmem_cpr_spare_wait(me, npes, spes);
@@ -208,9 +215,9 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
     8- hashtable: id should be unique. look up id. if it already exists, error for user
     */
 
-    cpr_carrier *carr = (cpr_carrier *) malloc ( sizeof (cpr_carrier*) ); 
+    cpr_resrv_carrier *carr = (cpr_resrv_carrier *) malloc ( sizeof (cpr_resrv_carrier*) ); 
     int i, q_tail;
-    int npes = cpr_num_opes + cpr_num_spes;
+    int npes = cpr_num_active_pes + cpr_num_spare_pes;
 
     // for now, I assume id == index or id == cpr_shadow_mem_size-1
     switch (cpr_pe_type)
@@ -218,12 +225,15 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
         case ORIGINAL_PE:
         case RESURRECTED_PE:
             cpr_shadow_mem_size ++;
-            cpr_shadow_mem = (void **) realloc (cpr_shadow_mem, cpr_shadow_mem_size * sizeof(void *) );
-            cpr_shadow_mem[cpr_shadow_mem_size - 1] = (void *) malloc (count * sizeof(int));
+            cpr_shadow_mem = (cpr_check_carrier *) realloc (cpr_shadow_mem,
+                                            cpr_shadow_mem_size * sizeof(cpr_check_carrier) );
+            //USELESS: cpr_shadow_mem[cpr_shadow_mem_size - 1] = (void *) malloc (count * sizeof(int));
 
+            // TODO: if count > 1000, I have to send (count/1000)+1 carriers
             carr->id = id;
             carr->count = count;
             carr->pe_num = pe_num;
+            carr->adr = mem;
 
             printf("RESERVING from an ORIGINAL:\tid = %d,\tcount = %d, from pe = %d\n", id, count, pe_num);
 
@@ -232,8 +242,8 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             for ( i= cpr_first_spare; i < npes; ++i)
             {
                 // shmem_int_atomic_fetch_inc returns the amount before increment
-                q_tail = ( shmem_int_atomic_fetch_inc ( cpr_res_qcarr_tail, i)) % MAX_CARRIER_QSIZE;
-                shmem_int_put (cpr_res_qcarr[q_tail], carr, 1, i);
+                q_tail = ( shmem_int_atomic_fetch_inc ( cpr_resrv_queue_tail, i)) % MAX_CARRIER_QSIZE;
+                shmem_putmem (cpr_resrv_queue[q_tail], (void *) carr, 1 * sizeof(cpr_resrv_carrier), i);
 
                 printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
             }
@@ -242,19 +252,28 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 
         case SPARE_PE:
 
-            printf("RESERVING from a SPARE:\treading %d carriers\n", cpr_res_qcarr_tail - cpr_res_qcarr_head);
-            while (cpr_res_qcarr_head < cpr_res_qcarr_tail)
+            printf("RESERVING from a SPARE:\treading %d carriers\n", cpr_resrv_queue_tail - cpr_resrv_queue_head);
+            while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
             {
                 // head and tail might overflow the int size... add code to check
-                carr = &cpr_res_qcarr[(cpr_res_qcarr_head % MAX_CARRIER_QSIZE)];
-                cpr_res_qcarr_head ++;
+                carr = &cpr_resrv_queue[(cpr_resrv_queue_head % MAX_CARRIER_QSIZE)];
+                cpr_resrv_queue_head ++;
                 cpr_table_size[ carr-> pe_num] ++;
+                // TODO: I should reserve count/1000+1 carriers
                 cpr_checkpoint_table[carr-> pe_num] =
-                            (void **) realloc (cpr_checkpoint_table[carr-> pe_num], 
-                                            cpr_table_size[carr-> pe_num] * sizeof(void**));
-                cpr_checkpoint_table[carr-> pe_num][cpr_table_size[carr-> pe_num]-1] =
-                            (void *) malloc (carr->count * sizeof(int));
-                // update the hash table. I'm assuming id = index here
+                            (cpr_check_carrier *) realloc (cpr_checkpoint_table[carr-> pe_num], 
+                                        cpr_table_size[carr-> pe_num] * sizeof(cpr_check_carrier));
+
+                // Preparing the meta data of this piece of checkpoint for later
+                // e.g: later if they want to checkpoint with id=5, I lookup for id=5 which
+                            // I have assigned here:
+                cpr_checkpoint_table[carr-> pe_num][cpr_table_size[carr-> pe_num]-1].id = carr -> id;
+                cpr_checkpoint_table[carr-> pe_num][cpr_table_size[carr-> pe_num]-1].adr = carr -> adr;
+                cpr_checkpoint_table[carr-> pe_num][cpr_table_size[carr-> pe_num]-1].count = carr -> count;
+                cpr_checkpoint_table[carr-> pe_num][cpr_table_size[carr-> pe_num]-1].pe_num = carr -> pe_num;
+                //USELESS: cpr_checkpoint_table[carr-> pe_num][cpr_table_size[carr-> pe_num]-1] =
+                //            (void *) malloc (carr->count * sizeof(int));
+                // TODO: update the hash table. I'm assuming id = index here
             }
             //return FAILURE;     // if SPAREs are not participated in code, they won't call reserve
             break;
@@ -276,9 +295,9 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
         Spare: cpr_checkpoint_table[pe_num][index]
     */
 
-    cpr_carrier *carr = (cpr_carrier *) malloc ( sizeof (cpr_carrier*) ); 
+    cpr_check_carrier *carr = (cpr_check_carrier *) malloc ( sizeof (cpr_check_carrier) ); 
     int i, q_tail;
-    int npes = cpr_num_opes + cpr_num_spes;
+    int npes = cpr_num_active_pes + cpr_num_spare_pes;
 
     // for now, I assume id = index
     switch (cpr_pe_type)
@@ -286,13 +305,16 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
         case ORIGINAL_PE:
         case RESURRECTED_PE:
             for ( i=0; i < count; ++i )
-                //cpr_shadow_mem[id][i] = mem[i];
+                cpr_shadow_mem[id].data[i] = mem[i];
 
+            // TODO: if count > 1000, I have to send (count/1000)+1 carriers
             carr->id = id;
             carr->count = count;
             carr->pe_num = pe_num;
+            carr->ard = mem;
+
             for ( i=0; i < count; ++i )
-                carr -> mess[i] = mem[i];
+                carr -> data[i] = mem[i];
 
             printf("CHPING from an ORIGINAL:\tid = %d,\tcount = %d, from pe = %d\n", id, count, pe_num);
             
@@ -301,24 +323,24 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             for ( i= cpr_first_spare; i < npes; ++i)
             {
                 // shmem_int_atomic_fetch_inc returns the amount before increment
-                q_tail = ( shmem_int_atomic_fetch_inc ( cpr_check_qcarr_tail, i)) % MAX_CARRIER_QSIZE;
-                shmem_int_put (cpr_check_qcarr[q_tail], carr, 1, i);
+                q_tail = ( shmem_int_atomic_fetch_inc ( cpr_check_queue_tail, i)) % MAX_CARRIER_QSIZE;
+                shmem_putmem (cpr_check_qcarr[q_tail], carr, 1 * sizeof(cpr_check_carrier), i);
                 printf("CHP carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
             }
             // update hashtable
             break;
 
         case SPARE_PE:
-            printf("CHPING from a SPARE:\treading %d carriers\n", cpr_check_qcarr_tail - cpr_check_qcarr_head);
-            while (cpr_check_qcarr_head < cpr_check_qcarr_tail)
+            printf("CHPING from a SPARE:\treading %d carriers\n", cpr_check_queue_tail - cpr_check_queue_head);
+            while (cpr_check_queue_head < cpr_check_queue_tail)
             {
                 // head and tail might overflow the int size... add code to check
-                carr = &cpr_check_qcarr[(cpr_check_qcarr_head % MAX_CARRIER_QSIZE)];
-                cpr_check_qcarr_head ++;
+                carr = &cpr_check_queue[(cpr_check_queue_head % MAX_CARRIER_QSIZE)];
+                cpr_check_queue_head ++;
                 
                 for ( i=0; i< carr-> count; ++i)
                 {
-                    //cpr_checkpoint_table[carr-> pe_num][carr-> id][i] = carr-> mess[i];
+                    cpr_checkpoint_table[carr-> pe_num][carr-> id].data[i] = carr-> data[i];
                 }
                 // I'm assuming id = index here
             }
@@ -403,7 +425,7 @@ int main ()
     for ( i=0; i<array_size; ++i)
         a[i] = me;
 
-    printf("PE %d: array a size:%d\n", me, array_size);
+    printf("PE %d: array of size:%d\n", me, array_size);
 
     // not sure if this is necessary here
     shmem_barrier_all ();
