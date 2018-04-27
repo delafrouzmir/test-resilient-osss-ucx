@@ -331,6 +331,9 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             break;
 
         case SPARE_PE:
+            while ( cpr_check_queue_head >= cpr_check_queue_tail ){
+                nanosleep(1000);
+            }
             printf("CHPING from a SPARE:\treading %d carriers\n", cpr_check_queue_tail - cpr_check_queue_head);
             while (cpr_check_queue_head < cpr_check_queue_tail)
             {
@@ -416,16 +419,16 @@ int main ()
         spes = 0;
 
     success_init = shmem_cpr_init(me,npes, spes, COLLECTIVE_CHECKPOINT);
-    if ( me == 0 )
-        printf ("init is %d\n", success_init);
-    printf("I am %d with cpr_pe_type= %d\n", me, cpr_pe_type);
+    //if ( me == 0 )
+    //    printf ("init is %d\n", success_init);
+    //printf("I am %d with cpr_pe_type= %d\n", me, cpr_pe_type);
 
     array_size = 10 + me;
     a = (int *) malloc((array_size)*sizeof(int));
     for ( i=0; i<array_size; ++i)
         a[i] = me;
 
-    printf("PE %d: array of size:%d\n", me, array_size);
+    //printf("PE %d: array of size:%d\n", me, array_size);
 
     // not sure if this is necessary here
     shmem_barrier_all ();
