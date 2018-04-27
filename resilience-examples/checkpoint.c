@@ -26,20 +26,27 @@
 
 // names starting with shmem_cpr_ are reserved for functions
 // names starting with cpr_ are reserved for variable declarations
-typedef struct res_carrier {
+typedef struct resrv_carrier {
     int id;                     // ID of memory part that is being reserved
     int *adr;                   // Address of memory part that is being reserved
     int count;                  // number of data items that needs to be stored
     int pe_num;                 // the PE that asked for a reservation or checkpoint
 } cpr_resrv_carrier;
 
-typedef struct ch_carrier {
+typedef struct check_carrier {
     int id;                     // ID of memory part that is being checkpointed
     int *adr;                   // Address of memory part that is being checkpointed
     int count;                  // number of data items that needs to be stored
     int data[MAX_CARRIER_SIZE]; // an array of data that will be stored
     int pe_num;                 // the PE that asked for a reservation or checkpoint
 } cpr_check_carrier;
+
+typedef struct restr_carrier {
+    int id;                     // ID of memory part that is being checkpointed
+    int *adr;                   // Address of memory part that is being checkpointed
+    int count;                  // number of data items that needs to be stored
+    int data[MAX_CARRIER_SIZE]; // an array of data that will be stored
+} cpr_restr_carrier;
 
 // necessary checkpointing declarations
 // Part 1: necessary for keeping checkpoints
@@ -53,6 +60,8 @@ cpr_check_carrier *cpr_check_queue;
 int cpr_check_queue_head, cpr_check_queue_tail;
 cpr_resrv_carrier *cpr_resrv_queue;
 int cpr_resrv_queue_head, cpr_resrv_queue_tail;
+// Part 3: necessary for restoration
+
 
 // delarrations for the application and testing
 int me, npes;
@@ -355,8 +364,8 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             // First, we need to check reservation queue is empty. if not, call reservation
             if ( cpr_resrv_queue_head < cpr_resrv_queue_tail )
             {
-                printf("*** entered reservation from checkpointing ***\n");
-                shmem_cpr_reserve(id, mem, count, pe_num);
+                printf("*** entered reservation from checkpointing from pe=%d with %d carriers***\n", pe_num, cpr_resrv_queue_tail-cpr_resrv_queue_head);
+                //shmem_cpr_reserve(id, mem, count, pe_num);
             }
             // waiting to receive the first checkpointing request in the queue:
             while ( cpr_check_queue_head >= cpr_check_queue_tail )
@@ -401,6 +410,7 @@ int shmem_cpr_restore ( int dead_pe, int me )
                 update the cpr_pe and next_pe
     */
     int i, j;
+    cpr_check_carrier *carr;
 
     if ( me != dead_pe )
     {
@@ -410,7 +420,11 @@ int shmem_cpr_restore ( int dead_pe, int me )
             case RESURRECTED_PE:
                 for ( i=0; i<cpr_shadow_mem_size; ++i)
                 {
-
+                    *carr = cpr_shadow_mem[i];
+                    for ( j=0; j < carr->count; ++j )
+                    {
+                        *((carr->adr)+j) = carr->data[j];
+                    }
                 }
                 break;
 
