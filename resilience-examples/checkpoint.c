@@ -25,14 +25,14 @@
 
 // names starting with shmem_cpr_ are reserved for functions
 // names starting with cpr_ are reserved for variable declarations
-typedef struct carrier {
+typedef struct res_carrier {
     int id;                     // ID of memory part that is being reserved
     int *adr;                   // Address of memory part that is being reserved
     int count;                  // number of data items that needs to be stored
     int pe_num;                 // the PE that asked for a reservation or checkpoint
 } cpr_resrv_carrier;
 
-typedef struct carrier {
+typedef struct ch_carrier {
     int id;                     // ID of memory part that is being checkpointed
     int *adr;                   // Address of memory part that is being checkpointed
     int count;                  // number of data items that needs to be stored
@@ -48,9 +48,9 @@ int cpr_shadow_mem_size, cpr_pe_type, cpr_num_active_pes, cpr_first_spare;
 int cpr_num_spare_pes, cpr_checkpointing_mode, cpr_sig, cpr_start;
 int *cpr_pe, *cpr_table_size;
 // Part 2: necessary for exchange of data when reserving or checkpointing
-cpr_resrv_carrier *cpr_check_queue;
+cpr_check_carrier *cpr_check_queue;
 int cpr_check_queue_head, cpr_check_queue_tail;
-cpr_check_carrier *cpr_resrv_queue;
+cpr_resrv_carrier *cpr_resrv_queue;
 int cpr_resrv_queue_head, cpr_resrv_queue_tail;
 
 // delarrations for the application
@@ -242,8 +242,8 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             for ( i= cpr_first_spare; i < npes; ++i)
             {
                 // shmem_int_atomic_fetch_inc returns the amount before increment
-                q_tail = ( shmem_int_atomic_fetch_inc ( cpr_resrv_queue_tail, i)) % MAX_CARRIER_QSIZE;
-                shmem_putmem (cpr_resrv_queue[q_tail], (void *) carr, 1 * sizeof(cpr_resrv_carrier), i);
+                q_tail = ( shmem_int_atomic_fetch_inc ( &cpr_resrv_queue_tail, i)) % MAX_CARRIER_QSIZE;
+                shmem_putmem (&cpr_resrv_queue[q_tail], (void *) carr, 1 * sizeof(cpr_resrv_carrier), i);
 
                 printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
             }
@@ -311,7 +311,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             carr->id = id;
             carr->count = count;
             carr->pe_num = pe_num;
-            carr->ard = mem;
+            carr->adr = mem;
 
             for ( i=0; i < count; ++i )
                 carr -> data[i] = mem[i];
@@ -323,8 +323,8 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             for ( i= cpr_first_spare; i < npes; ++i)
             {
                 // shmem_int_atomic_fetch_inc returns the amount before increment
-                q_tail = ( shmem_int_atomic_fetch_inc ( cpr_check_queue_tail, i)) % MAX_CARRIER_QSIZE;
-                shmem_putmem (cpr_check_qcarr[q_tail], carr, 1 * sizeof(cpr_check_carrier), i);
+                q_tail = ( shmem_int_atomic_fetch_inc (&cpr_check_queue_tail, i)) % MAX_CARRIER_QSIZE;
+                shmem_putmem (&cpr_check_qcarr[q_tail], carr, 1 * sizeof(cpr_check_carrier), i);
                 printf("CHP carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
             }
             // update hashtable
