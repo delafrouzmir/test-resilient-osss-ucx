@@ -493,9 +493,7 @@ int main ()
     for ( j=0; j<npes; ++j )
         if ( me == j )
         {
-            printf("I am =%d, called %d reservs and %d checks,\t posted %d reservs and %d checks,
-                \t and read %d reservs and %d checks\n",
-                me, called_resrv, called_check, posted_resrv, posted_check, read_resrv, read_check);
+            printf("I am =%d, called %d reservs and %d checks,\t posted %d reservs and %d checks,\t and read %d reservs and %d checks\n", me, called_resrv, called_check, posted_resrv, posted_check, read_resrv, read_check);
         }
     /*
     if ( me == 0)
