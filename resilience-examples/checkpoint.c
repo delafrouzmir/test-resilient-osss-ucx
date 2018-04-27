@@ -260,7 +260,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 ts.tv_nsec = 10000;
                 nanosleep(&ts, NULL);
             }
-            printf("RESERVING from a SPARE:\treading %d carriers\n", cpr_resrv_queue_tail - cpr_resrv_queue_head);
+            printf("RESERVING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_resrv_queue_tail - cpr_resrv_queue_head);
             while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
             {
                 // head and tail might overflow the int size... add code to check
@@ -283,6 +283,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 //            (void *) malloc (carr->count * sizeof(int));
                 // TODO: update the hash table. I'm assuming id = index here
             }
+            printf("***at the end SPARE=%d:\thas %d carriers left\n", pe_num, cpr_resrv_queue_tail - cpr_resrv_queue_head);
             //return FAILURE;     // if SPAREs are not participated in code, they won't call reserve
             break;
 
