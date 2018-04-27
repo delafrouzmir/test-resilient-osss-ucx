@@ -236,7 +236,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             carr->pe_num = pe_num;
             carr->adr = mem;
 
-            printf("RESERVING from an ORIGINAL:\tid = %d,\tcount = %d, from pe = %d\n", id, count, pe_num);
+            // printf("RESERVING from an ORIGINAL:\tid = %d,\tcount = %d, from pe = %d\n", id, count, pe_num);
 
             // should reserve a place on all spare PEs
             // and update the cpr_table_size of all spare PEs
@@ -246,7 +246,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 q_tail = ( shmem_int_atomic_fetch_inc ( &cpr_resrv_queue_tail, i)) % MAX_CARRIER_QSIZE;
                 shmem_putmem (&cpr_resrv_queue[q_tail], (void *) carr, 1 * sizeof(cpr_resrv_carrier), i);
 
-                printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
+                // printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
             }
             // update hashtable
             break;
@@ -260,7 +260,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 ts.tv_nsec = 10000;
                 nanosleep(&ts, NULL);
             }
-            printf("RESERVING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_resrv_queue_tail - cpr_resrv_queue_head);
+            // printf("RESERVING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_resrv_queue_tail - cpr_resrv_queue_head);
             while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
             {
                 // head and tail might overflow the int size... add code to check
@@ -283,7 +283,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 //            (void *) malloc (carr->count * sizeof(int));
                 // TODO: update the hash table. I'm assuming id = index here
             }
-            printf("***at the end SPARE=%d:\thas %d carriers left\n", pe_num, cpr_resrv_queue_tail - cpr_resrv_queue_head);
+            // printf("***at the end SPARE=%d:\thas %d carriers left\n", pe_num, cpr_resrv_queue_tail - cpr_resrv_queue_head);
             //return FAILURE;     // if SPAREs are not participated in code, they won't call reserve
             break;
 
@@ -353,7 +353,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                 ts.tv_nsec = 10000;
                 nanosleep(&ts, NULL);
             }
-            printf("CHPING from a SPARE:\treading %d carriers\n", cpr_check_queue_tail - cpr_check_queue_head);
+            printf("CHPING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_check_queue_tail - cpr_check_queue_head);
             while (cpr_check_queue_head < cpr_check_queue_tail)
             {
                 // head and tail might overflow the int size... add code to check
@@ -456,26 +456,27 @@ int main ()
     shmem_cpr_reserve(1, a, array_size, me);
 
     shmem_barrier_all();
-    /*
-    for ( i=0; i<100; ++i )
+    
+    for ( i=0; i<40; ++i )
     {
         if ( i%10 == 0)
         {
-            shmem_cpr_checkpoint(&i, 1, me);
-            shmem_cpr_checkpoint(a, 10, me);
+            shmem_cpr_checkpoint(0, &i, 1, me);
+            shmem_cpr_checkpoint(1, a, array_size, me);
         }
-        for ( j=0; j<10; ++j)
+        for ( j=0; j<array_size; ++j)
             a[j] ++;
+        /*
         if ( i == 25 ){
             shmem_cpr_rollback();
             if ( me == 0)
                 printf("AFTER ROLLBACK:\n");
             printf("PE %d: \t i=%d \t a[0]=%d\n", me, i, a[0]);
-        }
+        }*/
     }
 
     shmem_barrier_all ();
-
+    /*
     if ( me == 0)
         printf("\nFINALLY\n");
     printf("PE %d: \t a[0]=%d\n", me, a[0]);
