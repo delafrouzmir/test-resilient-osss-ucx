@@ -335,7 +335,13 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             break;
 
         case SPARE_PE:
-            while ( cpr_check_queue_head >= cpr_check_queue_tail ){
+            // First, we need to check reservation queue is empty. if not, call reservation
+            if ( cpr_resrv_queue_head < cpr_resrv_queue_tail )
+            {
+                shmem_cpr_reserve(id, mem, count, pe_num);
+            }
+            while ( cpr_check_queue_head >= cpr_check_queue_tail )
+            {
                 nanosleep(1000, NULL);
             }
             printf("CHPING from a SPARE:\treading %d carriers\n", cpr_check_queue_tail - cpr_check_queue_head);
