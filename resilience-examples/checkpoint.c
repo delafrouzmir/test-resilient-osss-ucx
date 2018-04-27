@@ -252,9 +252,13 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             break;
 
         case SPARE_PE:
-
-            while ( cpr_resrv_queue_head >= cpr_resrv_queue_tail ){
-                nanosleep(1000, NULL);
+            // waiting to receive the first reservation request in the queue:
+            while ( cpr_resrv_queue_head >= cpr_resrv_queue_tail )
+            {
+                struct timespec ts;
+                ts.tv_sec = 0;
+                ts.tv_nsec = 10000;
+                nanosleep(&ts, NULL);
             }
             printf("RESERVING from a SPARE:\treading %d carriers\n", cpr_resrv_queue_tail - cpr_resrv_queue_head);
             while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
@@ -340,9 +344,13 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             {
                 shmem_cpr_reserve(id, mem, count, pe_num);
             }
+            // waiting to receive the first checkpointing request in the queue:
             while ( cpr_check_queue_head >= cpr_check_queue_tail )
             {
-                nanosleep(1000, NULL);
+                struct timespec ts;
+                ts.tv_sec = 0;
+                ts.tv_nsec = 10000;
+                nanosleep(&ts, NULL);
             }
             printf("CHPING from a SPARE:\treading %d carriers\n", cpr_check_queue_tail - cpr_check_queue_head);
             while (cpr_check_queue_head < cpr_check_queue_tail)
