@@ -56,6 +56,7 @@ int cpr_resrv_queue_head, cpr_resrv_queue_tail;
 
 // delarrations for the application
 int me, npes;
+int called_check, called_resrv, posted_check, posted_resrv, read_check, read_resrv;
 
 void shmem_cpr_set_pe_type (int me, int npes, int spes)
 {
@@ -216,6 +217,9 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
     8- hashtable: id should be unique. look up id. if it already exists, error for user
     */
 
+    // TEST:
+    called_resrv++;
+
     cpr_resrv_carrier *carr = (cpr_resrv_carrier *) malloc ( sizeof (cpr_resrv_carrier*) ); 
     int i, q_tail;
     int npes = cpr_num_active_pes + cpr_num_spare_pes;
@@ -242,6 +246,8 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             // and update the cpr_table_size of all spare PEs
             for ( i= cpr_first_spare; i < npes; ++i)
             {
+                // TEST:
+                posted_resrv++;
                 // shmem_int_atomic_fetch_inc returns the amount before increment
                 q_tail = ( shmem_int_atomic_fetch_inc ( &cpr_resrv_queue_tail, i)) % MAX_CARRIER_QSIZE;
                 shmem_putmem (&cpr_resrv_queue[q_tail], (void *) carr, 1 * sizeof(cpr_resrv_carrier), i);
@@ -263,6 +269,8 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             // printf("RESERVING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_resrv_queue_tail - cpr_resrv_queue_head);
             while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
             {
+                // TEST:
+                read_resrv++;
                 // head and tail might overflow the int size... add code to check
                 carr = &cpr_resrv_queue[(cpr_resrv_queue_head % MAX_CARRIER_QSIZE)];
                 cpr_resrv_queue_head ++;
@@ -303,6 +311,8 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
         original or ressurected: shadow mem
         Spare: cpr_checkpoint_table[pe_num][index]
     */
+    // TEST:
+    called_check++;
 
     cpr_check_carrier *carr = (cpr_check_carrier *) malloc ( sizeof (cpr_check_carrier) ); 
     int i, q_tail;
@@ -331,6 +341,8 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             // and update the cpr_table_size of all spare PEs
             for ( i= cpr_first_spare; i < npes; ++i)
             {
+                // TEST:
+                posted_check++;
                 // shmem_int_atomic_fetch_inc returns the amount before increment
                 q_tail = ( shmem_int_atomic_fetch_inc (&cpr_check_queue_tail, i)) % MAX_CARRIER_QSIZE;
                 shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), i);
@@ -356,6 +368,8 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             printf("CHPING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_check_queue_tail - cpr_check_queue_head);
             while (cpr_check_queue_head < cpr_check_queue_tail)
             {
+                // TEST:
+                read_check++;
                 // head and tail might overflow the int size... add code to check
                 carr = &cpr_check_queue[(cpr_check_queue_head % MAX_CARRIER_QSIZE)];
                 cpr_check_queue_head ++;
