@@ -508,9 +508,9 @@ int main ()
         printf("active PEs=%d\n***\n", cpr_num_active_pes);
         for ( i=0; i < cpr_num_active_pes; ++i )
         {
-            printf("for PE=%d, we have %d carriers\n", i, cpr_table_size[i]);
-            /*
-            for ( j=0; j < cpr_table_size[i]; ++j )
+            //printf("for PE=%d, we have %d carriers\n", i, cpr_table_size[i]);
+            
+            for ( j=0; j < cpr_table_size[i] - 1; ++j )
             {
                 *carr = cpr_checkpoint_table[i][j];
                 printf("for PE=%d carrier=%d: id=%d, count=%d, pe=%d\n", i, j, carr->id, carr->count, carr->pe_num);
@@ -518,7 +518,7 @@ int main ()
                 for ( k=0; k < carr->count; ++k)
                     printf("%d  ", carr->data[k]);
                 printf("\n------------------\n");
-            }*/
+            }
         }
     }
 
