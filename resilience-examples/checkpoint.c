@@ -378,6 +378,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             //printf("CHPING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_check_queue_tail - cpr_check_queue_head);
             while (cpr_check_queue_head < cpr_check_queue_tail)
             {
+                // TEST:
                 read_check++;
                 // head and tail might overflow the int size... add code to check
                 carr = &cpr_check_queue[(cpr_check_queue_head % MAX_CARRIER_QSIZE)];
@@ -515,9 +516,11 @@ int main ()
                 *carr = cpr_checkpoint_table[i][j];
                 printf("for PE=%d carrier=%d: id=%d, count=%d, pe=%d\n", i, j, carr->id, carr->count, carr->pe_num);
                 int k;
+                /*
                 for ( k=0; k < carr->count; ++k)
                     printf("%d  ", carr->data[k]);
                 printf("\n------------------\n");
+                */
             }
         }
     }
