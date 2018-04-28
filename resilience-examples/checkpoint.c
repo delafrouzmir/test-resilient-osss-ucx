@@ -365,7 +365,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             if ( cpr_resrv_queue_head < cpr_resrv_queue_tail )
             {
                 printf("*** entered reservation from checkpointing from pe=%d with %d carriers***\n", pe_num, cpr_resrv_queue_tail-cpr_resrv_queue_head);
-                //shmem_cpr_reserve(id, mem, count, pe_num);
+                shmem_cpr_reserve(id, mem, count, pe_num);
             }
             // waiting to receive the first checkpointing request in the queue:
             while ( cpr_check_queue_head >= cpr_check_queue_tail )
