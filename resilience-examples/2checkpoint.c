@@ -364,8 +364,8 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             // First, we need to check reservation queue is empty. if not, call reservation
             if ( cpr_resrv_queue_head < cpr_resrv_queue_tail )
             {
-                //printf("*** entered reservation from checkpointing from pe=%d with %d carriers***\n", pe_num, cpr_resrv_queue_tail-cpr_resrv_queue_head);
-                shmem_cpr_reserve(id, mem, count, pe_num);
+                printf("*** entered reservation from checkpointing from pe=%d with %d carriers***\n", pe_num, cpr_resrv_queue_tail-cpr_resrv_queue_head);
+                //shmem_cpr_reserve(id, mem, count, pe_num);
             }
             // waiting to receive the first checkpointing request in the queue:
             while ( cpr_check_queue_head >= cpr_check_queue_tail )
@@ -430,7 +430,10 @@ int shmem_cpr_restore ( int dead_pe, int me )
 
             case SPARE_PE:
                 // if this PE is not the failed one
-                
+                if ( me == cpr_first_spare )
+                {
+
+                }
                 break;
 
             default:
@@ -501,25 +504,6 @@ int main ()
     }
 
     shmem_barrier_all ();
-
-    if ( me == 8 )
-    {
-        cpr_check_carrier *carr;
-        printf("active PEs=%d\n***\n", cpr_num_active_pes);
-        for ( i=0; i < cpr_num_active_pes; ++i )
-        {
-            for ( j=0; j < cpr_table_size[i]; ++j )
-            {
-                *carr = cpr_checkpoint_table[i][j];
-                printf("for PE=%d carrier=%d: id=%d, count=%d, pe=%d\n", i, j, carr->id, carr->count, carr->pe_num);
-                int k;
-                for ( k=0; k < carr->count; ++k)
-                    printf("%d  ", carr->data[k]);
-                printf("\n------------------\n");
-            }
-        }
-    }
-
     //for ( j=0; j<npes; ++j )
     //    if ( me == j )
     //    {
