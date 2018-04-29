@@ -384,9 +384,16 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                 carr = &cpr_check_queue[(cpr_check_queue_head % MAX_CARRIER_QSIZE)];
                 cpr_check_queue_head ++;
                 
+                // TEST:
+                if ( pe_num == 8 )
+                    printf("for PE=%d carrier: id=%d, count=%d, pe=%d\n", pe_num, carr->id, carr->count, carr->pe_num);
+
                 for ( i=0; i< carr-> count; ++i)
                 {
                     cpr_checkpoint_table[carr-> pe_num][carr-> id].data[i] = carr-> data[i];
+                    // TEST:
+                    if ( pe_num == 8 )
+                        printf("***cpr_checkpoint_table[%d][%d].data[%d]\n\n", carr-> pe_num, carr-> id, i, cpr_checkpoint_table[carr-> pe_num][carr-> id].data[i]);
                 }
                 // I'm assuming id = index here
             }
@@ -430,8 +437,30 @@ int shmem_cpr_restore ( int dead_pe, int me )
                 break;
 
             case SPARE_PE:
-                // if this PE is not the failed one
-                
+                // First, if there is any checkpoint remaining in the queue, should be checkpointed
+                if ( cpr_check_queue_head < cpr_check_queue_tail )
+                {
+                    //printf("*** entered checkpointing from restore from pe=%d with %d carriers***\n", pe_num, cpr_check_queue_tail-cpr_check_queue_head);
+                    shmem_cpr_checkpoint(0, NULL, 0, me);
+                }
+                // The first spare replaces the dead PE
+                if ( me == cpr_first_spare )
+                {
+                    cpr_pe_type = RESURRECTED_PE;
+                    cpr_shadow_mem = (cpr_check_carrier *) malloc ( cpr_table_size[dead_pe] * sizeof(cpr_check_carrier));
+                    for ( i=0; i < cpr_table_size[dead_pe]; ++i )
+                    {
+                        cpr_shadow_mem[i] = cpr_checkpoint_table[dead_pe][i];
+                        // check if the variable is in memory region of symmetrics
+                        // if ( symmetric )
+                        // translate the address, new adr
+                        for ( j=0; j < cpr_shadow_mem[i].count; ++j )
+                        {
+                            *(adr+j) = cpr_shadow_mem[i].data[j];
+                        }
+                        // else, what?
+                    }
+                }
                 break;
 
             default:
@@ -514,7 +543,7 @@ int main ()
             for ( j=0; j < cpr_table_size[i] - 1; ++j )
             {
                 *carr = cpr_checkpoint_table[i][j];
-                printf("for PE=%d carrier=%d: id=%d, count=%d, pe=%d\n", i, j, carr->id, carr->count, carr->pe_num);
+                //printf("for PE=%d carrier=%d: id=%d, count=%d, pe=%d\n", i, j, carr->id, carr->count, carr->pe_num);
                 int k;
                 /*
                 for ( k=0; k < carr->count; ++k)
