@@ -456,7 +456,7 @@ int shmem_cpr_restore ( int dead_pe, int me )
                         // translate the address, new adr
                         for ( j=0; j < cpr_shadow_mem[i].count; ++j )
                         {
-                            *(adr+j) = cpr_shadow_mem[i].data[j];
+                            //*(adr+j) = cpr_shadow_mem[i].data[j];
                         }
                         // else, what?
                     }
