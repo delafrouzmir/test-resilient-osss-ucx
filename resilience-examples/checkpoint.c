@@ -393,7 +393,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                     cpr_checkpoint_table[carr-> pe_num][carr-> id].data[i] = carr-> data[i];
                     // TEST:
                     if ( pe_num == 8 )
-                        printf("***cpr_checkpoint_table[%d][%d].data[%d]\n\n", carr-> pe_num, carr-> id, i, cpr_checkpoint_table[carr-> pe_num][carr-> id].data[i]);
+                        printf("***cpr_checkpoint_table[%d][%d].data[%d]=%d\n\n", carr-> pe_num, carr-> id, i, cpr_checkpoint_table[carr-> pe_num][carr-> id].data[i]);
                 }
                 // I'm assuming id = index here
             }
