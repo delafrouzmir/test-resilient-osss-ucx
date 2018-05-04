@@ -530,6 +530,8 @@ int main ()
         }*/
     }
 
+    printf("PE %d is finished checkpointing before barrier\n", me);
+
     shmem_barrier_all ();
 
     printf("PE %d is finished checkpointing\n", me);
