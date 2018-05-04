@@ -532,6 +532,8 @@ int main ()
 
     shmem_barrier_all ();
 
+    printf("PE %d is finished checkpointing\n", me);
+
     if ( me == 8 )
     {
         cpr_check_carrier *carr;
