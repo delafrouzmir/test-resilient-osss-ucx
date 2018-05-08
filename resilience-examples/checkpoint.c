@@ -385,15 +385,15 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                 cpr_check_queue_head ++;
                 
                 // TEST:
-                if ( pe_num == 8 )
-                    printf("for PE=%d carrier: id=%d, count=%d, pe=%d\n", pe_num, carr->id, carr->count, carr->pe_num);
+                //if ( pe_num == 8 )
+                //    printf("for PE=%d carrier: id=%d, count=%d, pe=%d\n", pe_num, carr->id, carr->count, carr->pe_num);
 
                 for ( i=0; i< carr-> count; ++i)
                 {
                     cpr_checkpoint_table[carr-> pe_num][carr-> id].data[i] = carr-> data[i];
                     // TEST:
-                    if ( pe_num == 8 )
-                        printf("***cpr_checkpoint_table[%d][%d].data[%d]=%d\n\n", carr-> pe_num, carr-> id, i, cpr_checkpoint_table[carr-> pe_num][carr-> id].data[i]);
+                    //if ( pe_num == 8 )
+                    //    printf("***cpr_checkpoint_table[%d][%d].data[%d]=%d\n\n", carr-> pe_num, carr-> id, i, cpr_checkpoint_table[carr-> pe_num][carr-> id].data[i]);
                 }
                 // I'm assuming id = index here
             }
@@ -517,9 +517,11 @@ int main ()
         if ( i%10 == 0)
         {
             shmem_cpr_checkpoint(0, &i, 1, me);
-            printf("PE %d is finished the 1st checkpointing at iter=%d\n", me, i);
+            if ( cpr_pe_type == SPARE_PE)
+                printf("PE %d is finished the 1st checkpointing at iter=%d\n", me, i);
             shmem_cpr_checkpoint(1, a, array_size, me);
-            printf("PE %d is finished the 2nd checkpointing at iter=%d\n", me, i);
+            if ( cpr_pe_type == SPARE_PE)
+                printf("PE %d is finished the 2nd checkpointing at iter=%d\n", me, i);
         }
 
         for ( j=0; j<array_size; ++j)
