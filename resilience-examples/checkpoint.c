@@ -517,8 +517,11 @@ int main ()
         if ( i%10 == 0)
         {
             shmem_cpr_checkpoint(0, &i, 1, me);
+            printf("PE %d is finished the 1st checkpointing at iter=%d\n", me, i);
             shmem_cpr_checkpoint(1, a, array_size, me);
+            printf("PE %d is finished the 2nd checkpointing at iter=%d\n", me, i);
         }
+
         for ( j=0; j<array_size; ++j)
             a[j] ++;
         /*
