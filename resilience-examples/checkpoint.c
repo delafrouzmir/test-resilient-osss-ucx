@@ -370,6 +370,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             // waiting to receive the first checkpointing request in the queue:
             while ( cpr_check_queue_head >= cpr_check_queue_tail )
             {
+                printf("%d is stuck in 1st while\n", me);
                 struct timespec ts;
                 ts.tv_sec = 0;
                 ts.tv_nsec = 10000;
@@ -378,6 +379,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             //printf("CHPING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_check_queue_tail - cpr_check_queue_head);
             while (cpr_check_queue_head < cpr_check_queue_tail)
             {
+                printf("%d is stuck in 2nd while\n", me);
                 // TEST:
                 read_check++;
                 // head and tail might overflow the int size... add code to check
@@ -517,11 +519,11 @@ int main ()
         if ( i%10 == 0)
         {
             shmem_cpr_checkpoint(0, &i, 1, me);
-            if ( cpr_pe_type == SPARE_PE)
-                printf("PE %d is finished the 1st checkpointing at iter=%d\n", me, i);
+            //if ( cpr_pe_type == SPARE_PE)
+            //    printf("PE %d is finished the 1st checkpointing at iter=%d\n", me, i);
             shmem_cpr_checkpoint(1, a, array_size, me);
-            if ( cpr_pe_type == SPARE_PE)
-                printf("PE %d is finished the 2nd checkpointing at iter=%d\n", me, i);
+            //if ( cpr_pe_type == SPARE_PE)
+            //    printf("PE %d is finished the 2nd checkpointing at iter=%d\n", me, i);
         }
 
         for ( j=0; j<array_size; ++j)
