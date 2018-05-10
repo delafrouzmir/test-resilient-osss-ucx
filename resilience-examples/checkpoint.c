@@ -354,6 +354,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                 posted_check++;
                 // shmem_int_atomic_fetch_inc returns the amount before increment
                 q_tail = ( shmem_int_atomic_fetch_inc (&cpr_check_queue_tail, i)) % MAX_CARRIER_QSIZE;
+                printf("%d is putting to %d with qtail=%d\n", me, i, q_tail);
                 shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), i);
                 //printf("CHP carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
             }
@@ -380,7 +381,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             //printf("CHPING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_check_queue_tail - cpr_check_queue_head);
             while (cpr_check_queue_head < cpr_check_queue_tail)
             {
-                printf("%d is stuck in 2nd while\n", me);
+                //printf("%d is stuck in 2nd while\n", me);
                 // TEST:
                 read_check++;
                 // head and tail might overflow the int size... add code to check
