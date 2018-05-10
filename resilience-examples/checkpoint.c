@@ -270,6 +270,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             // waiting to receive the first reservation request in the queue:
             while ( cpr_resrv_queue_head >= cpr_resrv_queue_tail )
             {
+                printf("%d stuck in 1st reserve loop\n", me);
                 struct timespec ts;
                 ts.tv_sec = 0;
                 ts.tv_nsec = 10000;
@@ -278,6 +279,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             // printf("RESERVING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_resrv_queue_tail - cpr_resrv_queue_head);
             while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
             {
+                printf("%d stuck in 2nd reserve loop\n", me);
                 // TEST Purpose:
                 read_resrv++;
                 // head and tail might overflow the int size... add code to check
