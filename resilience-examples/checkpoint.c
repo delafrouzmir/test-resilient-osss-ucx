@@ -370,7 +370,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             // waiting to receive the first checkpointing request in the queue:
             while ( cpr_check_queue_head >= cpr_check_queue_tail )
             {
-                printf("%d is stuck in 1st while\n", me);
+                printf("%d is stuck in 1st while\n with head=%d tail=%d", me, cpr_check_queue_head, cpr_check_queue_tail);
                 struct timespec ts;
                 ts.tv_sec = 0;
                 ts.tv_nsec = 10000;
