@@ -546,10 +546,9 @@ int main ()
         }*/
     }
 
-    shmem_barrier_all ();
-
     if ( cpr_pe_type == SPARE_PE)
        printf("PE %d is finished checkpointing\n", me);
+    shmem_barrier_all ();
     if (me == 0) printf("-----------------------------\n\n");
 
     // if ( me == 8 )
