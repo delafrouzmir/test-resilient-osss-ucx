@@ -528,11 +528,11 @@ int main ()
             //if ( cpr_pe_type == SPARE_PE)
             //    printf("* PE %d 1st check at iter=%d with head=%d, tail=%d\n", me, i, cpr_check_queue_head, cpr_check_queue_tail);
             shmem_cpr_checkpoint(0, &i, 1, me);
-            shmem_barrier_all();
+            //shmem_barrier_all();
             //if ( cpr_pe_type == SPARE_PE)
             //    printf("** PE %d 2nd check at iter=%dwith head=%d, tail=%d\n", me, i, cpr_check_queue_head, cpr_check_queue_tail);
             shmem_cpr_checkpoint(1, a, array_size, me);
-            shmem_barrier_all();
+            //shmem_barrier_all();
         }
 
         for ( j=0; j<array_size; ++j)
@@ -550,14 +550,6 @@ int main ()
     //    printf("PE %d is finished checkpointing before barrier\n", me);
 
     shmem_barrier_all ();
-
-    if ( cpr_pe_type == SPARE_PE)
-        printf("PE %d is finished checkpointing with check head=%d, tail=%d\n", me, cpr_check_queue_head, cpr_check_queue_tail);
-
-    // TEST:
-    shmem_barrier_all ();
-
-    if ( me == 0) printf("--------------------------------------\n\n");
 
     // if ( me == 8 )
     // {
