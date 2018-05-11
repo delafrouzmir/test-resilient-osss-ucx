@@ -356,7 +356,10 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                 posted_check++;
                 // shmem_int_atomic_fetch_inc returns the amount before increment
                 q_tail = ( shmem_int_atomic_fetch_inc (&cpr_check_queue_tail, i)) % MAX_CARRIER_QSIZE;
-                printf("%d original is putting to %d with qtail=%d\n", me, i, q_tail);
+                // TEST:
+                q_head = ( shmem_int_atomic_fetch (&cpr_check_queue_head, i)) % MAX_CARRIER_QSIZE; 
+                printf("%d original putting to %d with qhead=%d, qtail=%d, with id=%d, count=%d\n", me, i, q_head, q_tail, id, count);
+
                 shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), i);
                 //printf("CHP carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
             }
@@ -374,7 +377,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             // waiting to receive the first checkpointing request in the queue:
             while ( cpr_check_queue_head >= cpr_check_queue_tail )
             {
-                printf("%d is stuck in 1st while with head=%d tail=%d\n", me, cpr_check_queue_head, cpr_check_queue_tail);
+                //printf("%d is stuck in 1st while with head=%d tail=%d\n", me, cpr_check_queue_head, cpr_check_queue_tail);
                 struct timespec ts;
                 ts.tv_sec = 0;
                 ts.tv_nsec = 10000;
