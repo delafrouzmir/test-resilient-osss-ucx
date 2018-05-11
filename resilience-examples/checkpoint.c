@@ -327,6 +327,8 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
 
     cpr_check_carrier *carr = (cpr_check_carrier *) malloc ( sizeof (cpr_check_carrier) ); 
     int i, q_tail;
+    //TEST
+    int q_head;
     int npes = cpr_num_active_pes + cpr_num_spare_pes;
 
     // for now, I assume id = index
