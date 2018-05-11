@@ -549,7 +549,7 @@ int main ()
     shmem_barrier_all ();
     // I need this part only for testing the whole checkpointing, to make sure nothing's left in queues
     if ( cpr_pe_type == SPARE_PE )
-        shmem_cpr_checkpoint(100, me, me, me);
+        shmem_cpr_checkpoint(100, &me, me, me);
 
     shmem_barrier_all ();
 
