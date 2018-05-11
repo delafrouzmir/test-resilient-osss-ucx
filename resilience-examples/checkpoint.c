@@ -358,7 +358,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                 q_tail = ( shmem_int_atomic_fetch_inc (&cpr_check_queue_tail, i)) % MAX_CARRIER_QSIZE;
                 // TEST:
                 q_head = ( shmem_int_atomic_fetch (&cpr_check_queue_head, i)) % MAX_CARRIER_QSIZE; 
-                printf("%d original putting to %d with qhead=%d, qtail=%d, with id=%d, count=%d\n", me, i, q_head, q_tail, id, count);
+                //printf("%d original putting to %d with qhead=%d, qtail=%d, with id=%d, count=%d\n", me, i, q_head, q_tail, id, count);
 
                 shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), i);
                 //printf("CHP carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
@@ -367,7 +367,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
             break;
 
         case SPARE_PE:
-            printf("%d spare is entering chp with head=%d tail=%d\n", me, cpr_check_queue_head, cpr_check_queue_tail);
+            //printf("%d spare is entering chp with head=%d tail=%d\n", me, cpr_check_queue_head, cpr_check_queue_tail);
             // First, we need to check reservation queue is empty. if not, call reservation
             if ( cpr_resrv_queue_head < cpr_resrv_queue_tail )
             {
@@ -525,12 +525,12 @@ int main ()
     {
         if ( i%10 == 0)
         {
+            if ( cpr_pe_type == SPARE_PE)
+                printf("* PE %d 1st check at iter=%d with head=%d, tail=%d\n", me, i, cpr_check_queue_head, cpr_check_queue_tail);
             shmem_cpr_checkpoint(0, &i, 1, me);
-            //if ( cpr_pe_type == SPARE_PE)
-            //    printf("PE %d is finished the 1st checkpointing at iter=%d\n", me, i);
+            if ( cpr_pe_type == SPARE_PE)
+                printf("** PE %d 2nd check at iter=%dwith head=%d, tail=%d\n", me, i, cpr_check_queue_head, cpr_check_queue_tail);
             shmem_cpr_checkpoint(1, a, array_size, me);
-            //if ( cpr_pe_type == SPARE_PE)
-            //    printf("PE %d is finished the 2nd checkpointing at iter=%d\n", me, i);
         }
 
         for ( j=0; j<array_size; ++j)
