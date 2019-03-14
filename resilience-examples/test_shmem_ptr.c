@@ -33,7 +33,7 @@ main(void)
 
     shmem_barrier_all();
 
-    printf("The address of dest in the next PE=%d is %d and I am=%d\n", nextpe, dest_on_next_pe, me);    
+    printf("The address of dest in the next PE=%d is %d and it contains=%d\n", nextpe, dest_on_next_pe, *dest_on_next_pe);    
 
     shmem_barrier_all();
     shmem_free(dest);
