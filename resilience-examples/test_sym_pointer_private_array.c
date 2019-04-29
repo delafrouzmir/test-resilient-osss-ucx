@@ -22,15 +22,15 @@ main(void)
     npes = shmem_n_pes();
 
     example = (ex *) shmem_malloc(sizeof(ex *));
+    example -> arr = (int *) malloc (10*sizeof(int));
     
     if ( me == 0 )
     {
         example -> count = 10;
-        example -> arr = (int *) malloc (10*sizeof (int));
         for ( i=0; i<10; ++i )
             example -> arr[i] = i*2;
         printf("address to example in pe 0 is %d\n", example);
-        shmem_putmem (&example, (void *) example, 1 * sizeof(ex), 1);
+        shmem_putmem (example, (void *) example, 1 * sizeof(ex), 1);
     }
 
     shmem_barrier_all();
