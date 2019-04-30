@@ -747,7 +747,7 @@ int main ()
     // not sure if this is necessary here
     shmem_barrier_all ();
 
-    printf("PE=%d, adr to reserve_q=%d, adr to check_q=%d\n", me, cpr_resrv_queue, cpr_check_queue);
+    // SUCCESSFUL: printf("PE=%d, adr to reserve_q=%d, adr to check_q=%d\n", me, cpr_resrv_queue, cpr_check_queue);
 
     shmem_barrier_all ();
     if ( me == 0 )
@@ -755,10 +755,10 @@ int main ()
         printf("size of reserve q is %d\n", sizeof (cpr_resrv_queue));
         for ( i = 1; i<npes; ++i )
         {
-            if ( shmem_addr_accessible(cpr_resrv_queue, i) )
-                printf("reserve q on pe=%d is accessible\n", i);
-            if ( shmem_addr_accessible(cpr_check_queue, i) )
-                printf("check q on pe=%d is accessible\n", i);
+            if ( shmem_addr_accessible(cpr_resrv_queue[0], i) )
+                printf("reserve q[0] on pe=%d is accessible\n", i);
+            if ( shmem_addr_accessible(cpr_check_queue[0], i) )
+                printf("check q[0] on pe=%d is accessible\n", i);
         }
     }
     // shmem_cpr_reserve(0, &i, 1, me);
