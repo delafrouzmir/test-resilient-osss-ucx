@@ -330,7 +330,7 @@ int shmem_cpr_is_new_reservation (int id)
 void shmem_cpr_copy_carrier ( cpr_rsvr_carrier *frst, cpr_check_carrier *scnd )
 {
     scnd -> id = frst -> id;
-    scnd -> mem = frst -> mem;
+    scnd -> adr = frst -> adr;
     scnd -> count = frst -> count;
     scnd -> pe_num = frst -> pe_num;
     scnd -> is_symmetric = frst -> is_symmetric;
@@ -732,7 +732,7 @@ int main ()
     else
         spes = 0;
 
-    success_init = shmem_cpr_init(me,npes, spes, COLLECTIVE_CHECKPOINT);
+    success_init = shmem_cpr_init(me,npes, spes, CPR_MANY_COPY_CHECKPOINT);
     //if ( me == 0 )
     //    printf ("init is %d\n", success_init);
     printf("I am %d with cpr_pe_type= %d\n", me, cpr_pe_type);
