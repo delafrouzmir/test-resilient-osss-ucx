@@ -442,7 +442,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 
                             // TEST purpose:
                             posted_resrv++;
-                            // printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
+                            printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
                         }
                     }
                     // update hashtable
