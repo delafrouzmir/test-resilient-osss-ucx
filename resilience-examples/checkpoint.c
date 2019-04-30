@@ -735,7 +735,7 @@ int main ()
     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
     //if ( me == 0 )
     //    printf ("init is %d\n", success_init);
-    printf("I am %d with cpr_pe_type= %d\n", me, cpr_pe_type);
+    // SUCCESSFUL: printf("I am %d with cpr_pe_type= %d\n", me, cpr_pe_type);
 
     array_size = 10 + me;
     a = (int *) malloc((array_size)*sizeof(int));
@@ -749,6 +749,18 @@ int main ()
 
     printf("PE=%d, adr to reserve_q=%d, adr to check_q=%d\n", me, cpr_resrv_queue, cpr_check_queue);
 
+    shmem_barrier_all ();
+    if ( me == 0 )
+    {
+        printf("size of reserve q is %d\n", sizeof (cpr_resrv_queue));
+        for ( i = 1; i<npes; ++i )
+        {
+            if ( shmem_addr_accessible(cpr_resrv_queue, i) )
+                printf("reserve q on pe=%d is accessible\n", i);
+            if ( shmem_addr_accessible(cpr_check_queue, i) )
+                printf("check q on pe=%d is accessible\n", i);
+        }
+    }
     // shmem_cpr_reserve(0, &i, 1, me);
     // shmem_cpr_reserve(1, a, array_size, me);
 
