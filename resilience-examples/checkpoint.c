@@ -402,6 +402,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 
             if ( shmem_cpr_is_new_reservation (id) )
             {
+                printf("PE=%d entered reservation with id=%d, count=%d\n", pe_num, id, count);
                 carr->id = id;
                 carr->adr = mem;
                 carr->count = count;
@@ -412,6 +413,10 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 // updating the shadow mem with the reservation request:
                 cpr_shadow_mem[cpr_shadow_mem_size-1] = (cpr_check_carrier *) malloc (1* sizeof(cpr_check_carrier));
                 shmem_cpr_copy_carrier (carr, cpr_shadow_mem[cpr_shadow_mem_size-1]);
+
+                printf("PE=%d cpr_shadow_mem[%d]={id=%d, count=%d, adr=%d}\n", pe_num, cpr_shadow_mem_size-1,
+                        cpr_shadow_mem[cpr_shadow_mem_size-1] -> id, cpr_shadow_mem[cpr_shadow_mem_size-1] -> count
+                        , cpr_shadow_mem[cpr_shadow_mem_size-1] -> adr);
 
                 cpr_shadow_mem_size ++;
                 // TO DO: Is it a bad idea to realloc every time?
@@ -749,20 +754,19 @@ int main ()
 
     // SUCCESSFUL: printf("PE=%d, adr to reserve_q=%d, adr to check_q=%d\n", me, cpr_resrv_queue, cpr_check_queue);
 
-    shmem_barrier_all ();
-    if ( me == 0 )
-    {
-        printf("size of reserve q is %d\n", sizeof (cpr_resrv_queue));
-        for ( i = 1; i<npes; ++i )
-        {
-            if ( shmem_addr_accessible(&cpr_resrv_queue[0], i) )
-                printf("reserve q[0] on pe=%d is accessible\n", i);
-            if ( shmem_addr_accessible(&cpr_check_queue[0], i) )
-                printf("check q[0] on pe=%d is accessible\n", i);
-        }
-    }
-    // shmem_cpr_reserve(0, &i, 1, me);
-    // shmem_cpr_reserve(1, a, array_size, me);
+    // SUCCESSFUL: if ( me == 0 )
+    // {
+    //     printf("size of reserve q is %d\n", sizeof (cpr_resrv_queue));
+    //     for ( i = 1; i<npes; ++i )
+    //     {
+    //         if ( shmem_addr_accessible(&cpr_resrv_queue[0], i) )
+    //             printf("reserve q[0] on pe=%d is accessible\n", i);
+    //         if ( shmem_addr_accessible(&cpr_check_queue[0], i) )
+    //             printf("check q[0] on pe=%d is accessible\n", i);
+    //     }
+    // }
+    shmem_cpr_reserve(0, &i, 1, me);
+    shmem_cpr_reserve(1, a, array_size, me);
 
     shmem_barrier_all();
     
