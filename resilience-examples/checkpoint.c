@@ -735,7 +735,7 @@ int main ()
     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
     //if ( me == 0 )
     //    printf ("init is %d\n", success_init);
-    // SUCCESSFUL: printf("I am %d with cpr_pe_type= %d\n", me, cpr_pe_type);
+    printf("I am %d with cpr_pe_type= %d\n", me, cpr_pe_type);
 
     array_size = 10 + me;
     a = (int *) malloc((array_size)*sizeof(int));
