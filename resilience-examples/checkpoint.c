@@ -755,9 +755,9 @@ int main ()
         printf("size of reserve q is %d\n", sizeof (cpr_resrv_queue));
         for ( i = 1; i<npes; ++i )
         {
-            if ( shmem_addr_accessible(cpr_resrv_queue[0], i) )
+            if ( shmem_addr_accessible(&cpr_resrv_queue[0], i) )
                 printf("reserve q[0] on pe=%d is accessible\n", i);
-            if ( shmem_addr_accessible(cpr_check_queue[0], i) )
+            if ( shmem_addr_accessible(&cpr_check_queue[0], i) )
                 printf("check q[0] on pe=%d is accessible\n", i);
         }
     }
