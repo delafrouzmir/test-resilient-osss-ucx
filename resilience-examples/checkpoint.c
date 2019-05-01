@@ -402,7 +402,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 
             if ( shmem_cpr_is_new_reservation (id) )
             {
-                printf("PE=%d entered reservation with id=%d, count=%d\n", pe_num, id, count);
+                // SUCCESSFUL: printf("PE=%d entered reservation with id=%d, count=%d\n", pe_num, id, count);
                 carr->id = id;
                 carr->adr = mem;
                 carr->count = count;
@@ -414,9 +414,9 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 cpr_shadow_mem[cpr_shadow_mem_size-1] = (cpr_check_carrier *) malloc (1* sizeof(cpr_check_carrier));
                 shmem_cpr_copy_carrier (carr, cpr_shadow_mem[cpr_shadow_mem_size-1]);
 
-                printf("PE=%d cpr_shadow_mem[%d]={id=%d, count=%d, adr=%d}\n", pe_num, cpr_shadow_mem_size-1,
-                        cpr_shadow_mem[cpr_shadow_mem_size-1] -> id, cpr_shadow_mem[cpr_shadow_mem_size-1] -> count
-                        , cpr_shadow_mem[cpr_shadow_mem_size-1] -> adr);
+                // SUCCESSFUL: printf("PE=%d cpr_shadow_mem[%d]={id=%d, count=%d, adr=%d}\n", pe_num, cpr_shadow_mem_size-1,
+                //        cpr_shadow_mem[cpr_shadow_mem_size-1] -> id, cpr_shadow_mem[cpr_shadow_mem_size-1] -> count
+                //        , cpr_shadow_mem[cpr_shadow_mem_size-1] -> adr);
 
                 cpr_shadow_mem_size ++;
                 // TO DO: Is it a bad idea to realloc every time?
@@ -576,7 +576,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                     q_tail = ( shmem_int_atomic_fetch_inc (&cpr_check_queue_tail, i)) % CPR_STARTING_QUEUE_LEN;
                     // TEST:
                     q_head = ( shmem_int_atomic_fetch (&cpr_check_queue_head, i)) % CPR_STARTING_QUEUE_LEN; 
-                    //printf("%d original putting to %d with qhead=%d, qtail=%d, with id=%d, count=%d\n", me, i, q_head, q_tail, id, count);
+                    printf("%d original putting to %d with qhead=%d, qtail=%d, with id=%d, count=%d\n", me, i, q_head, q_tail, id, count);
 
                     shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), i);
                     //printf("CHP carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
