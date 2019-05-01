@@ -442,7 +442,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 
                             // TEST purpose:
                             posted_resrv++;
-                            printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
+                            //SUCCESSFUL: printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
                         }
                     }
                     // update hashtable
@@ -544,9 +544,11 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
     int q_head;
     int npes = cpr_num_active_pes + cpr_num_spare_pes;
 
+    printf("before if! PE=%d ENTERED CHECKPOINT.\n", pe_num);
     // first we have to check if this data has reserved a place before
     if ( shmem_cpr_is_reserved (id, mem, pe_num) )
     {
+        printf("TEST! PE=%d ENTERED CHECKPOINT.\n", pe_num);
         // TO DO: change to hash table. for now, I assume id = index
         switch (cpr_pe_type)
         {
