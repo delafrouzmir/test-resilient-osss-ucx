@@ -617,8 +617,8 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                     cpr_check_queue_head ++;
                     
                     // TEST:
-                    //if ( pe_num == 8 )
-                    //    printf("for PE=%d carrier: id=%d, count=%d, pe=%d\n", pe_num, carr->id, carr->count, carr->pe_num);
+                    if ( pe_num == 8 )
+                       printf("for PE=%d carrier: id=%d, count=%d, pe=%d\n", pe_num, carr->id, carr->count, carr->pe_num);
 
                     for ( i=0; i< carr-> count; ++i)
                     {
