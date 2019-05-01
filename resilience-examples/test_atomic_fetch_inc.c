@@ -14,7 +14,7 @@ main(void)
 
     int *counter = (int *) shmem_malloc(1 * sizeof(int));
     *counter = 5*me;
-    printf("PE=%d, initial counter=%d\n", me, counter);
+    printf("PE=%d, initial counter=%d\n", me, *counter);
 
     shmem_barrier_all();
 
@@ -23,7 +23,7 @@ main(void)
 
     shmem_barrier_all();
 
-    printf("PE=%d, final counter=%d\n", me, counter);    
+    printf("PE=%d, final counter=%d\n", me, *counter);    
 
     shmem_barrier_all();
     shmem_free(counter);
