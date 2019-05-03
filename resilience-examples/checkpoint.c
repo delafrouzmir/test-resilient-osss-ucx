@@ -428,7 +428,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 carr->count = count;
                 carr->pe_num = pe_num;
                 // check if mem is symmetric or not
-                carr->is_symmetric = shmem_addr_accessible(mem, cpr_first_spare);
+                carr->is_symmetric = shmem_addr_accessible(mem, cpr_sotrage_pes[0]);
 
                 // updating the shadow mem with the reservation request:
                 cpr_shadow_mem[cpr_shadow_mem_size-1] = (cpr_check_carrier *) malloc (1* sizeof(cpr_check_carrier));
@@ -628,7 +628,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
 
 void shmem_cpr_copy_check_table ( int candid, int storage )
 {
-    
+
 }
 
 int shmem_cpr_rollback ( int dead_pe, int me )
@@ -699,10 +699,15 @@ int shmem_cpr_rollback ( int dead_pe, int me )
 
                 // If we are in 2-copy-mode, we should prepare another storage PE to hold the checkpointing-table
                 // Precisely: the last storage PE should copy the table to a spare PE
+
+                // TO DO:
+                // 1- check for number of spares left
+                // 2- reduce the number of storage/spare PEs if necessary
+                // 3- add the new storage PE to the array of storage PEs
                 if ( cpr_checkpointing_mode == CPR_TWO_COPY_CHECKPOINT )
                 {
                     int candid_storage;
-                    for ( i = npes - spes; i < npes; ++i )
+                    for ( i = cpr_num_active_pes; i < npes; ++i )
                         if ( cpr_all_pe_type[i] == CPR_SPARE_PE && cpr_all_pe_role[i] == CPR_DORMANT_ROLE )
                         {
                             candid_storage = i;
