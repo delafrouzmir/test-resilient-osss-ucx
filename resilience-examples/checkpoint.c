@@ -105,7 +105,7 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
 
     // instead of pe number i, we should use cpr_pe[i]
     // e.g: shmem_int_put(dest, &source, nelems, cpr_pe[j]);
-    printf("Me=%d calling set_type with npes=%d, spes=%d, mode=%d\n", me, npes, spes, cpr_mode);
+    // printf("Me=%d calling set_type with npes=%d, spes=%d, mode=%d\n", me, npes, spes, cpr_mode);
 
     int i=0;
     for (; i<cpr_num_active_pes; ++i)
@@ -131,25 +131,26 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
             * the rest are storages
             */
 
-    //         cpr_num_storage_pes = spes;
+            cpr_num_storage_pes = spes;
             printf("MANY COPY!\n");
-    //         if ( me >= npes - spes )
-    //         {
-    //             cpr_pe_type = CPR_SPARE_PE;
-    //             cpr_pe_role = CPR_STORAGE_ROLE;
-    //         }
+            if ( me >= npes - spes )
+            {
+                cpr_pe_type = CPR_SPARE_PE;
+                cpr_pe_role = CPR_STORAGE_ROLE;
+            }
 
-    //         //cpr_sotrage_pes = (int *) shmem_malloc (cpr_num_storage_pes * sizeof (int));
+            printf("me=%d, type=%d, role=%d\n", me, cpr_pe_type, cpr_pe_role);
+            //cpr_sotrage_pes = (int *) shmem_malloc (cpr_num_storage_pes * sizeof (int));
             
-    //         for ( i = npes - spes ; i < npes; ++i )
-    //         {
-    //             cpr_all_pe_type[i] = CPR_SPARE_PE;
-    //             //cpr_sotrage_pes[i-(npes-spes)] = i;
-    //         }
+            for ( i = npes - spes ; i < npes; ++i )
+            {
+                cpr_all_pe_type[i] = CPR_SPARE_PE;
+                //cpr_sotrage_pes[i-(npes-spes)] = i;
+            }
 
-    //         // cpr_first_spare = cpr_num_active_pes;
-    //         // cpr_first_mspe = -1;
-    //         // cpr_second_mspe = -1;
+            // cpr_first_spare = cpr_num_active_pes;
+            // cpr_first_mspe = -1;
+            // cpr_second_mspe = -1;
             break;
 
         case CPR_TWO_COPY_CHECKPOINT:
