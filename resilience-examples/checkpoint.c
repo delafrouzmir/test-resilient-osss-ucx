@@ -123,110 +123,110 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
         cpr_pe_role = CPR_ACTIVE_ROLE;
     }
 
-    switch (cpr_mode)
-    {
-        case CPR_MANY_COPY_CHECKPOINT:
-            /*
-            * PEs 0 to npes-spes-1 are originals
-            * the rest are storages
-            */
+    // switch (cpr_mode)
+    // {
+    //     case CPR_MANY_COPY_CHECKPOINT:
+    //         /*
+    //         * PEs 0 to npes-spes-1 are originals
+    //         * the rest are storages
+    //         */
 
-            cpr_num_storage_pes = spes;
+    //         cpr_num_storage_pes = spes;
 
-            if ( me >= npes - spes )
-            {
-                cpr_pe_type = CPR_SPARE_PE;
-                cpr_pe_role = CPR_STORAGE_ROLE;
-            }
+    //         if ( me >= npes - spes )
+    //         {
+    //             cpr_pe_type = CPR_SPARE_PE;
+    //             cpr_pe_role = CPR_STORAGE_ROLE;
+    //         }
 
-            //cpr_sotrage_pes = (int *) shmem_malloc (cpr_num_storage_pes * sizeof (int));
+    //         //cpr_sotrage_pes = (int *) shmem_malloc (cpr_num_storage_pes * sizeof (int));
             
-            for ( i = npes - spes ; i < npes; ++i )
-            {
-                cpr_all_pe_type[i] = CPR_SPARE_PE;
-                //cpr_sotrage_pes[i-(npes-spes)] = i;
-            }
+    //         for ( i = npes - spes ; i < npes; ++i )
+    //         {
+    //             cpr_all_pe_type[i] = CPR_SPARE_PE;
+    //             //cpr_sotrage_pes[i-(npes-spes)] = i;
+    //         }
 
-            // cpr_first_spare = cpr_num_active_pes;
-            // cpr_first_mspe = -1;
-            // cpr_second_mspe = -1;
-            break;
+    //         // cpr_first_spare = cpr_num_active_pes;
+    //         // cpr_first_mspe = -1;
+    //         // cpr_second_mspe = -1;
+    //         break;
 
-        case CPR_TWO_COPY_CHECKPOINT:
-            /*
-            * PEs 0 to npes-spes-1 are originals
-            * PEs npes-1 and npes-spes are CPR_MSPEs and sotrages (to probably avoid being on the same node)
-            * the rest are spares, and dormant
-            */
-            if ( spes > 2)
-            {
-                cpr_num_storage_pes = 2;
-                //cpr_sotrage_pes = (int*) shmem_malloc (cpr_num_storage_pes * sizeof (int));
-                // cpr_sotrage_pes[0] = npes - spes;
-                // cpr_sotrage_pes[1] = npes - 1;
+    //     case CPR_TWO_COPY_CHECKPOINT:
+    //         /*
+    //         * PEs 0 to npes-spes-1 are originals
+    //         * PEs npes-1 and npes-spes are CPR_MSPEs and sotrages (to probably avoid being on the same node)
+    //         * the rest are spares, and dormant
+    //         */
+    //         if ( spes > 2)
+    //         {
+    //             cpr_num_storage_pes = 2;
+    //             //cpr_sotrage_pes = (int*) shmem_malloc (cpr_num_storage_pes * sizeof (int));
+    //             // cpr_sotrage_pes[0] = npes - spes;
+    //             // cpr_sotrage_pes[1] = npes - 1;
 
-                if ( me == npes-1 || me == npes - spes )
-                {
-                    cpr_pe_type = CPR_MSPE;
-                    cpr_pe_role = CPR_SPARE_PE;
-                }
-                else if ( me > npes - spes )
-                {
-                   cpr_pe_type = CPR_SPARE_PE;
-                   cpr_pe_role = CPR_DORMANT_ROLE;
-                }
+    //             if ( me == npes-1 || me == npes - spes )
+    //             {
+    //                 cpr_pe_type = CPR_MSPE;
+    //                 cpr_pe_role = CPR_SPARE_PE;
+    //             }
+    //             else if ( me > npes - spes )
+    //             {
+    //                cpr_pe_type = CPR_SPARE_PE;
+    //                cpr_pe_role = CPR_DORMANT_ROLE;
+    //             }
                 
-                cpr_all_pe_type[npes-1] = CPR_MSPE;
-                cpr_all_pe_type[npes - spes] = CPR_MSPE;
-                cpr_all_pe_role[npes-1] = CPR_STORAGE_ROLE;
-                cpr_all_pe_role[npes - spes] = CPR_STORAGE_ROLE;
+    //             cpr_all_pe_type[npes-1] = CPR_MSPE;
+    //             cpr_all_pe_type[npes - spes] = CPR_MSPE;
+    //             cpr_all_pe_role[npes-1] = CPR_STORAGE_ROLE;
+    //             cpr_all_pe_role[npes - spes] = CPR_STORAGE_ROLE;
                 
-                for ( i = npes-spes +1 ; i < npes-1; ++i )
-                {
-                    cpr_all_pe_type[i] = CPR_SPARE_PE;
-                    cpr_all_pe_role[i] = CPR_DORMANT_ROLE;
-                }
+    //             for ( i = npes-spes +1 ; i < npes-1; ++i )
+    //             {
+    //                 cpr_all_pe_type[i] = CPR_SPARE_PE;
+    //                 cpr_all_pe_role[i] = CPR_DORMANT_ROLE;
+    //             }
 
-                // cpr_first_spare = cpr_num_active_pes+1;
-                // cpr_first_mspe = npes - spes;
-                // cpr_second_mspe = npes-1;
-            }
+    //             // cpr_first_spare = cpr_num_active_pes+1;
+    //             // cpr_first_mspe = npes - spes;
+    //             // cpr_second_mspe = npes-1;
+    //         }
 
-            else // spes == 1 || spes == 2
-            {
-                // there will be no spare PEs, only 1 or 2 CPR_MSPEs
-                if ( me >= npes - spes )
-                {
-                    cpr_pe_type = CPR_MSPE;
-                    cpr_pe_role = CPR_STORAGE_ROLE;
-                }
+    //         else // spes == 1 || spes == 2
+    //         {
+    //             // there will be no spare PEs, only 1 or 2 CPR_MSPEs
+    //             if ( me >= npes - spes )
+    //             {
+    //                 cpr_pe_type = CPR_MSPE;
+    //                 cpr_pe_role = CPR_STORAGE_ROLE;
+    //             }
                 
-                // cpr_first_spare = -1;
-                // cpr_first_mspe = npes - spes;
+    //             // cpr_first_spare = -1;
+    //             // cpr_first_mspe = npes - spes;
                 
-                cpr_all_pe_type[npes-1] = CPR_MSPE;
-                cpr_all_pe_role[npes-1] = CPR_STORAGE_ROLE;
+    //             cpr_all_pe_type[npes-1] = CPR_MSPE;
+    //             cpr_all_pe_role[npes-1] = CPR_STORAGE_ROLE;
 
-                if ( spes == 1 )
-                {
-                    //cpr_second_mspe = -1;
-                    cpr_num_storage_pes = 1;
-                }
-                else
-                {
-                    cpr_num_storage_pes = 2;
-                    //cpr_second_mspe = npes-1;
-                    cpr_all_pe_type[npes-2] = CPR_MSPE;
-                    cpr_all_pe_role[npes-2] = CPR_STORAGE_ROLE;
-                }
-            }
+    //             if ( spes == 1 )
+    //             {
+    //                 //cpr_second_mspe = -1;
+    //                 cpr_num_storage_pes = 1;
+    //             }
+    //             else
+    //             {
+    //                 cpr_num_storage_pes = 2;
+    //                 //cpr_second_mspe = npes-1;
+    //                 cpr_all_pe_type[npes-2] = CPR_MSPE;
+    //                 cpr_all_pe_role[npes-2] = CPR_STORAGE_ROLE;
+    //             }
+    //         }
 
-            break;
+    //         break;
 
-        case CPR_NO_CHECKPOINT:
-        default:
-            return;
-    }
+    //     case CPR_NO_CHECKPOINT:
+    //     default:
+    //         return;
+    // }
     
 }
 
