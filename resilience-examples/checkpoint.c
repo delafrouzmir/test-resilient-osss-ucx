@@ -105,6 +105,8 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
 
     // instead of pe number i, we should use cpr_pe[i]
     // e.g: shmem_int_put(dest, &source, nelems, cpr_pe[j]);
+    printf("Me=%d calling set_type with npes=%d, spes=%d, mode=%d\n", me, npes, spes, cpr_mode);
+
     int i=0;
     for (; i<cpr_num_active_pes; ++i)
     {
@@ -281,7 +283,7 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
             break;
     }
         
-    // shmem_cpr_set_pe_type (me, npes, spes, cpr_checkpointing_mode);
+    shmem_cpr_set_pe_type (me, npes, spes, cpr_checkpointing_mode);
 
     
     // * ORIGINAL or RESURRECTED PEs have a shadow_mem for chckpointing their own data
@@ -748,7 +750,7 @@ int main ()
     else
         spes = 0;
 
-    //success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
+    success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
     //if ( me == 0 )
     //    printf ("init is %d\n", success_init);
     //printf("I am %d with cpr_pe_type= %d cpr_role=%d\n", me, cpr_pe_type, cpr_pe_role);
@@ -762,7 +764,6 @@ int main ()
 
     // not sure if this is necessary here
     shmem_barrier_all ();
-    printf("I am %d and spes=%d/%d\n", me, spes, npes);
 
     // SUCCESSFUL: printf("PE=%d, adr to reserve_q=%d, adr to check_q=%d\n", me, cpr_resrv_queue, cpr_check_queue);
 
