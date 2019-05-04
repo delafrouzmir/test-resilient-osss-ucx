@@ -247,20 +247,20 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
 
     // Initializing queues
     // Checkpointing queue:
-    cpr_check_queue = (cpr_check_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_check_carrier));
-    cpr_check_queue_head = 0;
-    cpr_check_queue_tail = 0;
+    // cpr_check_queue = (cpr_check_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_check_carrier));
+    // cpr_check_queue_head = 0;
+    // cpr_check_queue_tail = 0;
 
-    // Reservation queue:
-    cpr_resrv_queue = (cpr_rsvr_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_rsvr_carrier));
-    cpr_resrv_queue_head = 0;
-    cpr_resrv_queue_tail = 0;
+    // // Reservation queue:
+    // cpr_resrv_queue = (cpr_rsvr_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_rsvr_carrier));
+    // cpr_resrv_queue_head = 0;
+    // cpr_resrv_queue_tail = 0;
 
-    // Setting up numbers of active and spare PEs
-    cpr_num_spare_pes = spes;
-    cpr_num_active_pes = npes - spes;
-    cpr_pe = (int *) shmem_malloc (cpr_num_active_pes * sizeof(int));
-    cpr_all_pe_type = (int *) malloc (npes * sizeof(int));
+    // // Setting up numbers of active and spare PEs
+    // cpr_num_spare_pes = spes;
+    // cpr_num_active_pes = npes - spes;
+    // cpr_pe = (int *) shmem_malloc (cpr_num_active_pes * sizeof(int));
+    // cpr_all_pe_type = (int *) malloc (npes * sizeof(int));
 
     // add an if for different checkpointing mode here
     switch (mode)
@@ -283,46 +283,46 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
         
     shmem_cpr_set_pe_type (me, npes, spes, cpr_checkpointing_mode);
 
-    /*
-    * ORIGINAL or RESURRECTED PEs have a shadow_mem for chckpointing their own data
-    * SPARE PEs:
-        ** if in MANY_COPY mode: have a checkpoint_table which is a copy of all
-            *** the ORIGINAL or RESURRECTED PEs' shadow_mem's
-        ** if in TWO-COPY mode: have a shadow_mem and checkpoint_table to be prepared later
-    * CPR_MSPEs:
-        ** if in MANY_COPY mode: wrong type, error
-        ** if in TWO-COPY mode: have a checkpoint_table which is a copy of all
-            *** the ORIGINAL or RESURRECTED PEs' shadow_mem's
-    */
-    cpr_shadow_mem_size = 1;
-    cpr_shadow_mem = (cpr_check_carrier **) malloc(cpr_shadow_mem_size * sizeof(cpr_check_carrier *) );
+    
+    // * ORIGINAL or RESURRECTED PEs have a shadow_mem for chckpointing their own data
+    // * SPARE PEs:
+    //     ** if in MANY_COPY mode: have a checkpoint_table which is a copy of all
+    //         *** the ORIGINAL or RESURRECTED PEs' shadow_mem's
+    //     ** if in TWO-COPY mode: have a shadow_mem and checkpoint_table to be prepared later
+    // * CPR_MSPEs:
+    //     ** if in MANY_COPY mode: wrong type, error
+    //     ** if in TWO-COPY mode: have a checkpoint_table which is a copy of all
+    //         *** the ORIGINAL or RESURRECTED PEs' shadow_mem's
+    
+    // cpr_shadow_mem_size = 1;
+    // cpr_shadow_mem = (cpr_check_carrier **) malloc(cpr_shadow_mem_size * sizeof(cpr_check_carrier *) );
 
-    switch (cpr_pe_role)
-    {
-        case CPR_STORAGE_ROLE:
-            cpr_checkpoint_table = (cpr_check_carrier ***) malloc (cpr_num_active_pes * sizeof(cpr_check_carrier **));
-            cpr_table_size = (int *) malloc(cpr_num_active_pes * sizeof(int *));
+    // switch (cpr_pe_role)
+    // {
+    //     case CPR_STORAGE_ROLE:
+    //         cpr_checkpoint_table = (cpr_check_carrier ***) malloc (cpr_num_active_pes * sizeof(cpr_check_carrier **));
+    //         cpr_table_size = (int *) malloc(cpr_num_active_pes * sizeof(int *));
             
-            int i;
-            for (i=0; i<cpr_num_active_pes; ++i)
-            {
-                cpr_table_size[i] = 1;
-                cpr_checkpoint_table[i] = (cpr_check_carrier **) malloc (cpr_table_size[i] * sizeof(cpr_check_carrier *));
-            }
-            break;
+    //         int i;
+    //         for (i=0; i<cpr_num_active_pes; ++i)
+    //         {
+    //             cpr_table_size[i] = 1;
+    //             cpr_checkpoint_table[i] = (cpr_check_carrier **) malloc (cpr_table_size[i] * sizeof(cpr_check_carrier *));
+    //         }
+    //         break;
         
-        case CPR_ACTIVE_ROLE:
-        case CPR_DORMANT_ROLE:   
-        default:
-            // Nothing here for now, but it may change "if" init is called for subtitute PEs
-            break;
-    }
+    //     case CPR_ACTIVE_ROLE:
+    //     case CPR_DORMANT_ROLE:   
+    //     default:
+    //         // Nothing here for now, but it may change "if" init is called for subtitute PEs
+    //         break;
+    // }
 
-    shmem_barrier_all();
-    cpr_start = 1;
-    //  THIS IF IS FOR WHEN SPARES DO NOT PARTICIPATE IN RUNNING THE CODE
-    //if ( cpr_pe_type == CPR_SPARE_PE )
-    //    shmem_cpr_spare_wait(me, npes, spes);
+    // shmem_barrier_all();
+    // cpr_start = 1;
+    // //  THIS IF IS FOR WHEN SPARES DO NOT PARTICIPATE IN RUNNING THE CODE
+    // //if ( cpr_pe_type == CPR_SPARE_PE )
+    // //    shmem_cpr_spare_wait(me, npes, spes);
     return SUCCESS;
 }
 
@@ -753,10 +753,10 @@ int main ()
     //    printf ("init is %d\n", success_init);
     printf("I am %d with cpr_pe_type= %d cpr_role=%d\n", me, cpr_pe_type, cpr_pe_role);
 
-    array_size = 10 + me;
-    a = (int *) malloc((array_size)*sizeof(int));
-    for ( i=0; i<array_size; ++i)
-        a[i] = me;
+    // array_size = 10 + me;
+    // a = (int *) malloc((array_size)*sizeof(int));
+    // for ( i=0; i<array_size; ++i)
+    //     a[i] = me;
 
     //printf("PE %d: array of size:%d\n", me, array_size);
 
