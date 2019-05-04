@@ -452,7 +452,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 
                 for ( i=0; i < cpr_num_storage_pes; ++i )
                 {
-                    q_tail = ( shmem_atomic_fetch_inc ( &cpr_resrv_queue_tail, cpr_sotrage_pes[i])) % CPR_STARTING_QUEUE_LEN;
+                    q_tail = ( shmem_int_atomic_fetch_inc ( &cpr_resrv_queue_tail, cpr_sotrage_pes[i])) % CPR_STARTING_QUEUE_LEN;
                     shmem_putmem (&cpr_resrv_queue[q_tail], (void *) carr, 1 * sizeof(cpr_rsvr_carrier), cpr_sotrage_pes[i]);
 
                     // TEST purpose:
@@ -559,10 +559,10 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                 {
                     // TEST Purpose:
                     posted_check++;
-                    // shmem_atomic_fetch_inc returns the amount before increment
-                    q_tail = ( shmem_atomic_fetch_inc (&cpr_check_queue_tail, cpr_sotrage_pes[i])) % CPR_STARTING_QUEUE_LEN;
+                    // shmem_int_atomic_fetch_inc returns the amount before increment
+                    q_tail = ( shmem_int_atomic_fetch_inc (&cpr_check_queue_tail, cpr_sotrage_pes[i])) % CPR_STARTING_QUEUE_LEN;
                     // TEST:
-                    q_head = ( shmem_atomic_fetch (&cpr_check_queue_head, cpr_sotrage_pes[i])) % CPR_STARTING_QUEUE_LEN; 
+                    q_head = ( shmem_int_atomic_fetch (&cpr_check_queue_head, cpr_sotrage_pes[i])) % CPR_STARTING_QUEUE_LEN; 
                     printf("%d original putting to %d with qhead=%d, qtail=%d, with id=%d, count=%d\n", me, i, q_head, q_tail, id, count);
 
                     shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), cpr_sotrage_pes[i]);
