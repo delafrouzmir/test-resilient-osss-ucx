@@ -751,7 +751,7 @@ int main ()
     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
     //if ( me == 0 )
     //    printf ("init is %d\n", success_init);
-    // SUCCESSFUL: printf("I am %d with cpr_pe_type= %d\n", me, cpr_pe_type);
+    printf("I am %d with cpr_pe_type= %d cpr_role=%d\n", me, cpr_pe_type, cpr_pe_role);
 
     array_size = 10 + me;
     a = (int *) malloc((array_size)*sizeof(int));
@@ -776,77 +776,77 @@ int main ()
     //             printf("check q[0] on pe=%d is accessible\n", i);
     //     }
     // }
-    shmem_cpr_reserve(0, &i, 1, me);
-    shmem_cpr_reserve(1, a, array_size, me);
-
-    shmem_barrier_all();
-    
-    for ( i=0; i<40; ++i )
-    {
-        if ( i%10 == 0)
-        {
-            // if ( cpr_pe_type == CPR_SPARE_PE)
-            //     printf("* PE %d 1st check at iter=%d with head=%d, tail=%d\n", me, i, cpr_check_queue_head, cpr_check_queue_tail);
-            shmem_cpr_checkpoint(0, &i, 1, me);
-            //shmem_barrier_all();
-            // if ( cpr_pe_type == CPR_SPARE_PE)
-            //     printf("** PE %d 2nd check at iter=%dwith head=%d, tail=%d\n", me, i, cpr_check_queue_head, cpr_check_queue_tail);
-            shmem_cpr_checkpoint(1, a, array_size, me);
-            //shmem_barrier_all();
-        }
-
-    //     for ( j=0; j<array_size; ++j)
-    //         a[j] ++;
-    //     /*
-    //     if ( i == 25 ){
-    //         shmem_cpr_rollback();
-    //         if ( me == 0)
-    //             printf("AFTER ROLLBACK:\n");
-    //         printf("PE %d: \t i=%d \t a[0]=%d\n", me, i, a[0]);
-    //     }*/
-    }
-
-    // shmem_barrier_all ();
-    // // I need this part only for testing the whole checkpointing, to make sure nothing's left in queues
-    // if ( cpr_pe_type == CPR_SPARE_PE )
-    //     shmem_cpr_checkpoint(100, &me, me, me);
-
-    // shmem_barrier_all ();
-
-    // if ( me == 8 )
-    // {
-    //     cpr_check_carrier *carr;
-        
-    //     for ( i=0; i < cpr_num_active_pes; ++i )
-    //     {
-    //         printf("for PE=%d, we have %d carriers\n", i, cpr_table_size[i]);
-            
-    //         for ( j=0; j < cpr_table_size[i] - 1; ++j )
-    //         {
-    //             carr = cpr_checkpoint_table[i][j];
-    //             //printf("for PE=%d carrier=%d: id=%d, count=%d, pe=%d\n", i, j, carr->id, carr->count, carr->pe_num);
-    //             int k;
-                
-    //             for ( k=0; k < carr->count; ++k)
-    //                 printf("%d  ", carr->data[k]);
-    //             printf("\n------------------\n");
-                
-    //         }
-    //     }
-    // }
+    // shmem_cpr_reserve(0, &i, 1, me);
+    // shmem_cpr_reserve(1, a, array_size, me);
 
     // shmem_barrier_all();
+    
+    // for ( i=0; i<40; ++i )
+    // {
+    //     if ( i%10 == 0)
+    //     {
+    //         // if ( cpr_pe_type == CPR_SPARE_PE)
+    //         //     printf("* PE %d 1st check at iter=%d with head=%d, tail=%d\n", me, i, cpr_check_queue_head, cpr_check_queue_tail);
+    //         shmem_cpr_checkpoint(0, &i, 1, me);
+    //         //shmem_barrier_all();
+    //         // if ( cpr_pe_type == CPR_SPARE_PE)
+    //         //     printf("** PE %d 2nd check at iter=%dwith head=%d, tail=%d\n", me, i, cpr_check_queue_head, cpr_check_queue_tail);
+    //         shmem_cpr_checkpoint(1, a, array_size, me);
+    //         //shmem_barrier_all();
+    //     }
 
-    // for ( j=0; j<npes; ++j )
-    //    if ( me == j )
-    //    {
-    //        printf("I am =%d, called %d reservs and %d checks,\t posted %d reservs and %d checks,\t and read %d reservs and %d checks\n", me, called_resrv, called_check, posted_resrv, posted_check, read_resrv, read_check);
-    //    }
-    /*
-    if ( me == 0)
-        printf("\nFINALLY\n");
-    printf("PE %d: \t a[0]=%d\n", me, a[0]);
-    */
+    // //     for ( j=0; j<array_size; ++j)
+    // //         a[j] ++;
+    // //     /*
+    // //     if ( i == 25 ){
+    // //         shmem_cpr_rollback();
+    // //         if ( me == 0)
+    // //             printf("AFTER ROLLBACK:\n");
+    // //         printf("PE %d: \t i=%d \t a[0]=%d\n", me, i, a[0]);
+    // //     }*/
+    // }
+
+    // // shmem_barrier_all ();
+    // // // I need this part only for testing the whole checkpointing, to make sure nothing's left in queues
+    // // if ( cpr_pe_type == CPR_SPARE_PE )
+    // //     shmem_cpr_checkpoint(100, &me, me, me);
+
+    // // shmem_barrier_all ();
+
+    // // if ( me == 8 )
+    // // {
+    // //     cpr_check_carrier *carr;
+        
+    // //     for ( i=0; i < cpr_num_active_pes; ++i )
+    // //     {
+    // //         printf("for PE=%d, we have %d carriers\n", i, cpr_table_size[i]);
+            
+    // //         for ( j=0; j < cpr_table_size[i] - 1; ++j )
+    // //         {
+    // //             carr = cpr_checkpoint_table[i][j];
+    // //             //printf("for PE=%d carrier=%d: id=%d, count=%d, pe=%d\n", i, j, carr->id, carr->count, carr->pe_num);
+    // //             int k;
+                
+    // //             for ( k=0; k < carr->count; ++k)
+    // //                 printf("%d  ", carr->data[k]);
+    // //             printf("\n------------------\n");
+                
+    // //         }
+    // //     }
+    // // }
+
+    // // shmem_barrier_all();
+
+    // // for ( j=0; j<npes; ++j )
+    // //    if ( me == j )
+    // //    {
+    // //        printf("I am =%d, called %d reservs and %d checks,\t posted %d reservs and %d checks,\t and read %d reservs and %d checks\n", me, called_resrv, called_check, posted_resrv, posted_check, read_resrv, read_check);
+    // //    }
+    // /*
+    // if ( me == 0)
+    //     printf("\nFINALLY\n");
+    // printf("PE %d: \t a[0]=%d\n", me, a[0]);
+    // */
     shmem_finalize();
 
     return 0;
