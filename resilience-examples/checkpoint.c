@@ -123,16 +123,16 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
         cpr_pe_role = CPR_ACTIVE_ROLE;
     }
 
-    // switch (cpr_mode)
-    // {
-    //     case CPR_MANY_COPY_CHECKPOINT:
-    //         /*
-    //         * PEs 0 to npes-spes-1 are originals
-    //         * the rest are storages
-    //         */
+    switch (cpr_mode)
+    {
+        case CPR_MANY_COPY_CHECKPOINT:
+            /*
+            * PEs 0 to npes-spes-1 are originals
+            * the rest are storages
+            */
 
     //         cpr_num_storage_pes = spes;
-
+            printf("MANY COPY!\n");
     //         if ( me >= npes - spes )
     //         {
     //             cpr_pe_type = CPR_SPARE_PE;
@@ -150,14 +150,15 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
     //         // cpr_first_spare = cpr_num_active_pes;
     //         // cpr_first_mspe = -1;
     //         // cpr_second_mspe = -1;
-    //         break;
+            break;
 
-    //     case CPR_TWO_COPY_CHECKPOINT:
+        case CPR_TWO_COPY_CHECKPOINT:
     //         /*
     //         * PEs 0 to npes-spes-1 are originals
     //         * PEs npes-1 and npes-spes are CPR_MSPEs and sotrages (to probably avoid being on the same node)
     //         * the rest are spares, and dormant
     //         */
+            printf("TWO COPY!\n");
     //         if ( spes > 2)
     //         {
     //             cpr_num_storage_pes = 2;
@@ -221,12 +222,12 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
     //             }
     //         }
 
-    //         break;
+            break;
 
-    //     case CPR_NO_CHECKPOINT:
-    //     default:
-    //         return;
-    // }
+        case CPR_NO_CHECKPOINT:
+        default:
+            return;
+    }
     
 }
 
