@@ -67,15 +67,15 @@ cpr_check_carrier ***cpr_checkpoint_table; // a spare PE or MSPE's copy of all a
 int *cpr_table_size;
 
 // Part 3: queues necessary for exchange of data when reserving or checkpointing
-//cpr_check_carrier *cpr_check_queue;
+cpr_check_carrier cpr_check_queue[CPR_STARTING_QUEUE_LEN];
 int cpr_check_queue_head, cpr_check_queue_tail;
-//cpr_rsvr_carrier *cpr_resrv_queue;
+cpr_rsvr_carrier cpr_resrv_queue[CPR_STARTING_QUEUE_LEN];
 int cpr_resrv_queue_head, cpr_resrv_queue_tail;
 
 // Part 4: keeping the number of different pe types
 //int cpr_first_mspe, cpr_second_mspe, cpr_first_spare;
 int cpr_num_spare_pes, cpr_num_active_pes, cpr_num_storage_pes;
-// int *cpr_sotrage_pes;
+int *cpr_sotrage_pes;
 
 // Part 5: keeping checkpointing info in every PE
 int cpr_pe_role, cpr_pe_type;
@@ -143,7 +143,7 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
             
             for ( i = npes - spes ; i < npes; ++i )
             {
-                cpr_all_pe_type[i] = CPR_SPARE_PE;
+                //cpr_all_pe_type[i] = CPR_SPARE_PE;
                 //cpr_sotrage_pes[i-(npes-spes)] = i;
             }
 
@@ -248,24 +248,13 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
         return FAILURE;
     }
 
-    cpr_sotrage_pes = (int *) shmem_malloc (spes * sizeof (int));
-
-    // Initializing queues
-    // Checkpointing queue:
-    cpr_check_queue = (cpr_check_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_check_carrier));
-    cpr_check_queue_head = 0;
-    cpr_check_queue_tail = 0;
-
-    // Reservation queue:
-    cpr_resrv_queue = (cpr_rsvr_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_rsvr_carrier));
-    cpr_resrv_queue_head = 0;
-    cpr_resrv_queue_tail = 0;
-
     // Setting up numbers of active and spare PEs
+    // and arrays containing info on types and roles of PEs
     cpr_num_spare_pes = spes;
     cpr_num_active_pes = npes - spes;
     cpr_pe = (int *) shmem_malloc (cpr_num_active_pes * sizeof(int));
-    cpr_all_pe_type = (int *) malloc (npes * sizeof(int));
+    cpr_all_pe_type = (int *) shmem_malloc (npes * sizeof(int));
+    cpr_sotrage_pes = (int *) shmem_malloc (spes * sizeof (int));
 
     // add an if for different checkpointing mode here
     switch (mode)
