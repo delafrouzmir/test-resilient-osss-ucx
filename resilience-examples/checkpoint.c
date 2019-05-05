@@ -67,9 +67,9 @@ cpr_check_carrier ***cpr_checkpoint_table; // a spare PE or MSPE's copy of all a
 int *cpr_table_size;
 
 // Part 3: queues necessary for exchange of data when reserving or checkpointing
-cpr_check_carrier *cpr_check_queue;
+//cpr_check_carrier *cpr_check_queue;
 int cpr_check_queue_head, cpr_check_queue_tail;
-cpr_rsvr_carrier *cpr_resrv_queue;
+//cpr_rsvr_carrier *cpr_resrv_queue;
 int cpr_resrv_queue_head, cpr_resrv_queue_tail;
 
 // Part 4: keeping the number of different pe types
@@ -252,12 +252,12 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
 
     // Initializing queues
     // Checkpointing queue:
-    cpr_check_queue = (cpr_check_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_check_carrier));
+    cpr_check_carrier *cpr_check_queue = (cpr_check_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_check_carrier));
     cpr_check_queue_head = 0;
     cpr_check_queue_tail = 0;
 
     // Reservation queue:
-    cpr_resrv_queue = (cpr_rsvr_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_rsvr_carrier));
+    cpr_rsvr_carrier *cpr_resrv_queue = (cpr_rsvr_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_rsvr_carrier));
     cpr_resrv_queue_head = 0;
     cpr_resrv_queue_tail = 0;
 
