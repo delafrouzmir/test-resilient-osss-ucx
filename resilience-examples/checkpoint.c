@@ -222,6 +222,7 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
                 }
             }
 
+            printf("me=%d, type=%d, role=%d\n", me, cpr_pe_type, cpr_pe_role);
             break;
 
         case CPR_NO_CHECKPOINT:
