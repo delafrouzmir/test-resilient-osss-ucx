@@ -141,11 +141,11 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
 
             printf("me=%d, type=%d, role=%d\n", me, cpr_pe_type, cpr_pe_role);
             
-            for ( i = npes - spes ; i < npes; ++i )
-            {
-                //cpr_all_pe_type[i] = CPR_SPARE_PE;
-                //cpr_sotrage_pes[i-(npes-spes)] = i;
-            }
+            // for ( i = npes - spes ; i < npes; ++i )
+            // {
+            //     //cpr_all_pe_type[i] = CPR_SPARE_PE;
+            //     //cpr_sotrage_pes[i-(npes-spes)] = i;
+            // }
 
             // cpr_first_spare = cpr_num_active_pes;
             // cpr_first_mspe = -1;
