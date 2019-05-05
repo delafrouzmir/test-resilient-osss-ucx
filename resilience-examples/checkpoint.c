@@ -75,7 +75,7 @@ int cpr_resrv_queue_head, cpr_resrv_queue_tail;
 // Part 4: keeping the number of different pe types
 //int cpr_first_mspe, cpr_second_mspe, cpr_first_spare;
 int cpr_num_spare_pes, cpr_num_active_pes2, cpr_num_storage_pes;
-int *cpr_sotrage_pes;
+int *cpr_storage_pes;
 
 // Part 5: keeping checkpointing info in every PE
 int cpr_pe_role, cpr_pe_type;
@@ -141,11 +141,11 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
 
             printf("me=%d, type=%d, role=%d\n", me, cpr_pe_type, cpr_pe_role);
             
-            // for ( i = npes - spes ; i < npes; ++i )
-            // {
-            //     //cpr_all_pe_type[i] = CPR_SPARE_PE;
-            //     //cpr_sotrage_pes[i-(npes-spes)] = i;
-            // }
+            for ( i = npes - spes ; i < npes; ++i )
+            {
+                cpr_all_pe_type[i] = CPR_SPARE_PE;
+                cpr_storage_pes[i-(npes-spes)] = i;
+            }
 
             // cpr_first_spare = cpr_num_active_pes2;
             // cpr_first_mspe = -1;
@@ -162,9 +162,9 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
     //         if ( spes > 2)
     //         {
     //             cpr_num_storage_pes = 2;
-    //             //cpr_sotrage_pes = (int*) shmem_malloc (cpr_num_storage_pes * sizeof (int));
-    //             // cpr_sotrage_pes[0] = npes - spes;
-    //             // cpr_sotrage_pes[1] = npes - 1;
+    //             //cpr_storage_pes = (int*) shmem_malloc (cpr_num_storage_pes * sizeof (int));
+    //             // cpr_storage_pes[0] = npes - spes;
+    //             // cpr_storage_pes[1] = npes - 1;
 
     //             if ( me == npes-1 || me == npes - spes )
     //             {
@@ -256,7 +256,7 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
     cpr_pe = (int *) shmem_malloc (cpr_num_active_pes2 * sizeof(int));
     cpr_all_pe_type = (int *) shmem_malloc (npes * sizeof(int));
     cpr_all_pe_role = (int *) shmem_malloc (npes * sizeof(int));
-    cpr_sotrage_pes = (int *) shmem_malloc (spes * sizeof (int));
+    cpr_storage_pes = (int *) shmem_malloc (spes * sizeof (int));
 
     // add an if for different checkpointing mode here
     switch (mode)
@@ -424,7 +424,7 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
 //                 carr->count = count;
 //                 carr->pe_num = pe_num;
 //                 // check if mem is symmetric or not
-//                 carr->is_symmetric = shmem_addr_accessible(mem, cpr_sotrage_pes[0]);
+//                 carr->is_symmetric = shmem_addr_accessible(mem, cpr_storage_pes[0]);
 
 //                 // updating the shadow mem with the reservation request:
 //                 cpr_shadow_mem[cpr_shadow_mem_size-1] = (cpr_check_carrier *) malloc (1* sizeof(cpr_check_carrier));
@@ -448,8 +448,8 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
 
 //                 for ( i=0; i < cpr_num_storage_pes; ++i )
 //                 {
-//                     q_tail = ( shmem_int_atomic_fetch_inc ( &cpr_resrv_queue_tail, cpr_sotrage_pes[i])) % CPR_STARTING_QUEUE_LEN;
-//                     shmem_putmem (&cpr_resrv_queue[q_tail], (void *) carr, 1 * sizeof(cpr_rsvr_carrier), cpr_sotrage_pes[i]);
+//                     q_tail = ( shmem_int_atomic_fetch_inc ( &cpr_resrv_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
+//                     shmem_putmem (&cpr_resrv_queue[q_tail], (void *) carr, 1 * sizeof(cpr_rsvr_carrier), cpr_storage_pes[i]);
 
 //                     // TEST purpose:
 //                     posted_resrv++;
@@ -556,12 +556,12 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
 //                     // TEST Purpose:
 //                     posted_check++;
 //                     // shmem_int_atomic_fetch_inc returns the amount before increment
-//                     q_tail = ( shmem_int_atomic_fetch_inc (&cpr_check_queue_tail, cpr_sotrage_pes[i])) % CPR_STARTING_QUEUE_LEN;
+//                     q_tail = ( shmem_int_atomic_fetch_inc (&cpr_check_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
 //                     // TEST:
-//                     q_head = ( shmem_int_atomic_fetch (&cpr_check_queue_head, cpr_sotrage_pes[i])) % CPR_STARTING_QUEUE_LEN; 
+//                     q_head = ( shmem_int_atomic_fetch (&cpr_check_queue_head, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN; 
 //                     printf("%d original putting to %d with qhead=%d, qtail=%d, with id=%d, count=%d\n", me, i, q_head, q_tail, id, count);
 
-//                     shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), cpr_sotrage_pes[i]);
+//                     shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), cpr_storage_pes[i]);
 //                     //printf("CHP carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
 //                 }
 //                 // update hashtable
@@ -671,7 +671,7 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
 //                     shmem_cpr_checkpoint(0, NULL, 0, me);
 //                 }
 //                 // The first spare replaces the dead PE
-//                 if ( me == cpr_sotrage_pes[0] )
+//                 if ( me == cpr_storage_pes[0] )
 //                 {
 //                     cpr_pe_type = CPR_RESURRECTED_PE;
 //                     cpr_shadow_mem = (cpr_check_carrier **) malloc ( cpr_table_size[dead_pe] * sizeof(cpr_check_carrier *));
@@ -710,8 +710,8 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
 //                             break;
 //                         }
 
-//                     if ( me == candid_storage || me == cpr_sotrage_pes[cpr_num_storage_pes-1] )
-//                         shmem_cpr_copy_check_table ( candid_storage, cpr_sotrage_pes[cpr_num_storage_pes-1] );
+//                     if ( me == candid_storage || me == cpr_storage_pes[cpr_num_storage_pes-1] )
+//                         shmem_cpr_copy_check_table ( candid_storage, cpr_storage_pes[cpr_num_storage_pes-1] );
 //                 }
 //                 break;
 
