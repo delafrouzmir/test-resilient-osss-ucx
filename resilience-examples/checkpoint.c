@@ -140,7 +140,6 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
             }
 
             printf("me=%d, type=%d, role=%d\n", me, cpr_pe_type, cpr_pe_role);
-            //cpr_sotrage_pes = (int *) shmem_malloc (cpr_num_storage_pes * sizeof (int));
             
             for ( i = npes - spes ; i < npes; ++i )
             {
@@ -248,6 +247,8 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
         cpr_checkpointing_mode = CPR_NO_CHECKPOINT;
         return FAILURE;
     }
+
+    cpr_sotrage_pes = (int *) shmem_malloc (spes * sizeof (int));
 
     // Initializing queues
     // Checkpointing queue:
