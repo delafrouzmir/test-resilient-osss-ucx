@@ -147,6 +147,13 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
                 cpr_storage_pes[i-(npes-spes)] = i;
             }
 
+            if ( me == 0 )
+            {
+                printf("cpr_num_storage_pes=%d\n", cpr_num_storage_pes);
+                for ( i=0; i<cpr_num_storage_pes; ++i )
+                    printf("sorage_pe[%d]=%d\n", i, cpr_storage_pes[i]);
+            }
+
             // cpr_first_spare = cpr_num_active_pes2;
             // cpr_first_mspe = -1;
             // cpr_second_mspe = -1;
@@ -158,7 +165,7 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
             * PEs npes-1 and npes-spes are CPR_MSPEs and sotrages (to probably avoid being on the same node)
             * the rest are spares, and dormant
             */
-            printf("TWO COPY!\n");
+            
             if ( spes > 2)
             {
                 cpr_num_storage_pes = 2;
@@ -222,7 +229,13 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
                 }
             }
 
-            printf("me=%d, type=%d, role=%d\n", me, cpr_pe_type, cpr_pe_role);
+            if ( me == 0 )
+            {
+                printf("cpr_num_storage_pes=%d\n", cpr_num_storage_pes);
+                for ( i=0; i<cpr_num_storage_pes; ++i )
+                    printf("sorage_pe[%d]=%d\n", i, cpr_storage_pes[i]);
+            }
+            
             break;
 
         case CPR_NO_CHECKPOINT:
