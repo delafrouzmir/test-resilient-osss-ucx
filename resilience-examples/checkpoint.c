@@ -74,7 +74,7 @@ int cpr_resrv_queue_head, cpr_resrv_queue_tail;
 
 // Part 4: keeping the number of different pe types
 //int cpr_first_mspe, cpr_second_mspe, cpr_first_spare;
-int cpr_num_spare_pes, cpr_num_active_pes, cpr_num_storage_pes;
+int cpr_num_spare_pes, cpr_num_active_pes2, cpr_num_storage_pes;
 int *cpr_sotrage_pes;
 
 // Part 5: keeping checkpointing info in every PE
@@ -108,7 +108,7 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
     // printf("Me=%d calling set_type with npes=%d, spes=%d, mode=%d\n", me, npes, spes, cpr_mode);
 
     int i=0;
-    for (; i<cpr_num_active_pes; ++i)
+    for (; i<cpr_num_active_pes2; ++i)
     {
         cpr_pe[i] = i;
         // PEs 0 to npes-spes-1 are originals in any case
@@ -147,7 +147,7 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
             //     //cpr_sotrage_pes[i-(npes-spes)] = i;
             // }
 
-            // cpr_first_spare = cpr_num_active_pes;
+            // cpr_first_spare = cpr_num_active_pes2;
             // cpr_first_mspe = -1;
             // cpr_second_mspe = -1;
             break;
@@ -188,7 +188,7 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
     //                 cpr_all_pe_role[i] = CPR_DORMANT_ROLE;
     //             }
 
-    //             // cpr_first_spare = cpr_num_active_pes+1;
+    //             // cpr_first_spare = cpr_num_active_pes2+1;
     //             // cpr_first_mspe = npes - spes;
     //             // cpr_second_mspe = npes-1;
     //         }
@@ -250,10 +250,10 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
 
     // Setting up numbers of active and spare PEs
     // and arrays containing info on types and roles of PEs
-    
+
     // cpr_num_spare_pes = spes;
-    // cpr_num_active_pes = npes - spes;
-    cpr_pe = (int *) shmem_malloc (cpr_num_active_pes * sizeof(int));
+    cpr_num_active_pes2 = npes - spes;
+    cpr_pe = (int *) shmem_malloc (cpr_num_active_pes2 * sizeof(int));
     cpr_all_pe_type = (int *) shmem_malloc (npes * sizeof(int));
     cpr_sotrage_pes = (int *) shmem_malloc (spes * sizeof (int));
 
@@ -295,11 +295,11 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
     // switch (cpr_pe_role)
     // {
     //     case CPR_STORAGE_ROLE:
-    //         cpr_checkpoint_table = (cpr_check_carrier ***) malloc (cpr_num_active_pes * sizeof(cpr_check_carrier **));
-    //         cpr_table_size = (int *) malloc(cpr_num_active_pes * sizeof(int *));
+    //         cpr_checkpoint_table = (cpr_check_carrier ***) malloc (cpr_num_active_pes2 * sizeof(cpr_check_carrier **));
+    //         cpr_table_size = (int *) malloc(cpr_num_active_pes2 * sizeof(int *));
             
     //         int i;
-    //         for (i=0; i<cpr_num_active_pes; ++i)
+    //         for (i=0; i<cpr_num_active_pes2; ++i)
     //         {
     //             cpr_table_size[i] = 1;
     //             cpr_checkpoint_table[i] = (cpr_check_carrier **) malloc (cpr_table_size[i] * sizeof(cpr_check_carrier *));
@@ -323,7 +323,7 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
 
 int shmem_cpr_pe_num ( int pe_num)
 {
-    if ( pe_num >= 0 && pe_num < cpr_num_active_pes )
+    if ( pe_num >= 0 && pe_num < cpr_num_active_pes2 )
         return cpr_pe[pe_num];
     return -1;
 }
@@ -406,7 +406,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
     cpr_rsvr_carrier *carr = (cpr_rsvr_carrier *) malloc ( sizeof (cpr_rsvr_carrier) ); 
     int i, q_tail;
     // TO DO: could/should this npes change through the program?
-    int npes = cpr_num_active_pes + cpr_num_spare_pes;
+    int npes = cpr_num_active_pes2 + cpr_num_spare_pes;
 
     // TEST purpose:
     called_resrv++;
@@ -525,7 +525,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
     int i, q_tail;
     //TEST
     int q_head;
-    int npes = cpr_num_active_pes + cpr_num_spare_pes;
+    int npes = cpr_num_active_pes2 + cpr_num_spare_pes;
 
     printf("before if! PE=%d ENTERED CHECKPOINT.\n", pe_num);
     // first we have to check if this data has reserved a place before
@@ -702,7 +702,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                 if ( cpr_checkpointing_mode == CPR_TWO_COPY_CHECKPOINT )
                 {
                     int candid_storage;
-                    for ( i = cpr_num_active_pes; i < npes; ++i )
+                    for ( i = cpr_num_active_pes2; i < npes; ++i )
                         if ( cpr_all_pe_type[i] == CPR_SPARE_PE && cpr_all_pe_role[i] == CPR_DORMANT_ROLE )
                         {
                             candid_storage = i;
@@ -812,7 +812,7 @@ int main ()
     // // {
     // //     cpr_check_carrier *carr;
         
-    // //     for ( i=0; i < cpr_num_active_pes; ++i )
+    // //     for ( i=0; i < cpr_num_active_pes2; ++i )
     // //     {
     // //         printf("for PE=%d, we have %d carriers\n", i, cpr_table_size[i]);
             
@@ -858,7 +858,7 @@ int shmem_cpr_spare_wait (int me, int npes, int spes)
     while ( cpr_start == 1 )
     {
         // get the signal of every PE and check it needs reservation or checkpointing
-        for ( i=0; i<cpr_num_active_pes; ++i )
+        for ( i=0; i<cpr_num_active_pes2; ++i )
         {
             pe = cpr_pe[i];
             shmem_get(&cpr_sig, &cpr_sig, 1, pe);
