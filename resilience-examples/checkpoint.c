@@ -75,7 +75,7 @@ int cpr_resrv_queue_head, cpr_resrv_queue_tail;
 // Part 4: keeping the number of different pe types
 //int cpr_first_mspe, cpr_second_mspe, cpr_first_spare;
 int cpr_num_spare_pes, cpr_num_active_pes, cpr_num_storage_pes;
-int *cpr_sotrage_pes;
+// int *cpr_sotrage_pes;
 
 // Part 5: keeping checkpointing info in every PE
 int cpr_pe_role, cpr_pe_type;
@@ -248,7 +248,7 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
         return FAILURE;
     }
 
-    cpr_sotrage_pes = (int *) shmem_malloc (spes * sizeof (int));
+    int *cpr_sotrage_pes = (int *) shmem_malloc (spes * sizeof (int));
 
     // Initializing queues
     // Checkpointing queue:
