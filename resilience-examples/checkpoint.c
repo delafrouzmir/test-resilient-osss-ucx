@@ -248,24 +248,24 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
         return FAILURE;
     }
 
-    // cpr_sotrage_pes = (int *) shmem_malloc (spes * sizeof (int));
+    cpr_sotrage_pes = (int *) shmem_malloc (spes * sizeof (int));
 
     // Initializing queues
     // Checkpointing queue:
-    // cpr_check_queue = (cpr_check_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_check_carrier));
-    // cpr_check_queue_head = 0;
-    // cpr_check_queue_tail = 0;
+    cpr_check_queue = (cpr_check_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_check_carrier));
+    cpr_check_queue_head = 0;
+    cpr_check_queue_tail = 0;
 
-    // // Reservation queue:
-    // cpr_resrv_queue = (cpr_rsvr_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_rsvr_carrier));
-    // cpr_resrv_queue_head = 0;
-    // cpr_resrv_queue_tail = 0;
+    // Reservation queue:
+    cpr_resrv_queue = (cpr_rsvr_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_rsvr_carrier));
+    cpr_resrv_queue_head = 0;
+    cpr_resrv_queue_tail = 0;
 
-    // // Setting up numbers of active and spare PEs
-    // cpr_num_spare_pes = spes;
-    // cpr_num_active_pes = npes - spes;
-    // cpr_pe = (int *) shmem_malloc (cpr_num_active_pes * sizeof(int));
-    // cpr_all_pe_type = (int *) malloc (npes * sizeof(int));
+    // Setting up numbers of active and spare PEs
+    cpr_num_spare_pes = spes;
+    cpr_num_active_pes = npes - spes;
+    cpr_pe = (int *) shmem_malloc (cpr_num_active_pes * sizeof(int));
+    cpr_all_pe_type = (int *) malloc (npes * sizeof(int));
 
     // add an if for different checkpointing mode here
     switch (mode)
