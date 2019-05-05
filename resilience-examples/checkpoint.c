@@ -252,9 +252,9 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
     // and arrays containing info on types and roles of PEs
     cpr_num_spare_pes = spes;
     cpr_num_active_pes = npes - spes;
-    cpr_pe = (int *) shmem_malloc (cpr_num_active_pes * sizeof(int));
-    cpr_all_pe_type = (int *) shmem_malloc (npes * sizeof(int));
-    cpr_sotrage_pes = (int *) shmem_malloc (spes * sizeof (int));
+    // cpr_pe = (int *) shmem_malloc (cpr_num_active_pes * sizeof(int));
+    // cpr_all_pe_type = (int *) shmem_malloc (npes * sizeof(int));
+    // cpr_sotrage_pes = (int *) shmem_malloc (spes * sizeof (int));
 
     // add an if for different checkpointing mode here
     switch (mode)
