@@ -248,16 +248,16 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
         return FAILURE;
     }
 
-    int *cpr_sotrage_pes = (int *) shmem_malloc (spes * sizeof (int));
+    cpr_sotrage_pes = (int *) shmem_malloc (spes * sizeof (int));
 
     // Initializing queues
     // Checkpointing queue:
-    cpr_check_carrier *cpr_check_queue = (cpr_check_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_check_carrier));
+    cpr_check_queue = (cpr_check_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_check_carrier));
     cpr_check_queue_head = 0;
     cpr_check_queue_tail = 0;
 
     // Reservation queue:
-    cpr_rsvr_carrier *cpr_resrv_queue = (cpr_rsvr_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_rsvr_carrier));
+    cpr_resrv_queue = (cpr_rsvr_carrier *) shmem_malloc (CPR_STARTING_QUEUE_LEN * sizeof(cpr_rsvr_carrier));
     cpr_resrv_queue_head = 0;
     cpr_resrv_queue_tail = 0;
 
