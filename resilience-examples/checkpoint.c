@@ -105,7 +105,6 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
 
     // instead of pe number i, we should use cpr_pe[i]
     // e.g: shmem_int_put(dest, &source, nelems, cpr_pe[j]);
-    // printf("Me=%d calling set_type with npes=%d, spes=%d, mode=%d\n", me, npes, spes, cpr_mode);
 
     int i=0;
     for (; i<cpr_num_active_pes2; ++i)
@@ -153,10 +152,6 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
                 for ( i=0; i<cpr_num_storage_pes; ++i )
                     printf("sorage_pe[%d]=%d\n", i, cpr_storage_pes[i]);
             }
-
-            // cpr_first_spare = cpr_num_active_pes2;
-            // cpr_first_mspe = -1;
-            // cpr_second_mspe = -1;
             break;
 
         case CPR_TWO_COPY_CHECKPOINT:
@@ -193,10 +188,6 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
                     cpr_all_pe_type[i] = CPR_SPARE_PE;
                     cpr_all_pe_role[i] = CPR_DORMANT_ROLE;
                 }
-
-                // cpr_first_spare = cpr_num_active_pes2+1;
-                // cpr_first_mspe = npes - spes;
-                // cpr_second_mspe = npes-1;
             }
 
             else // spes == 1 || spes == 2
@@ -208,22 +199,17 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
                     cpr_pe_role = CPR_STORAGE_ROLE;
                 }
 
-                // cpr_first_spare = -1;
-                // cpr_first_mspe = npes - spes;
-                
                 cpr_all_pe_type[npes-1] = CPR_MSPE;
                 cpr_all_pe_role[npes-1] = CPR_STORAGE_ROLE;
 
                 if ( spes == 1 )
                 {
-                    //cpr_second_mspe = -1;
                     cpr_storage_pes[0] = npes-1;
                     cpr_num_storage_pes = 1;
                 }
                 else    // spes == 2
                 {
                     cpr_num_storage_pes = 2;
-                    //cpr_second_mspe = npes-1;
                     cpr_all_pe_type[npes-2] = CPR_MSPE;
                     cpr_all_pe_role[npes-2] = CPR_STORAGE_ROLE;
                     cpr_storage_pes[0] = npes-2;
@@ -306,35 +292,35 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
     //     ** if in TWO-COPY mode: have a checkpoint_table which is a copy of all
     //         *** the ORIGINAL or RESURRECTED PEs' shadow_mem's
     
-    // cpr_shadow_mem_size = 1;
-    // cpr_shadow_mem = (cpr_check_carrier **) malloc(cpr_shadow_mem_size * sizeof(cpr_check_carrier *) );
+    cpr_shadow_mem_size = 1;
+    cpr_shadow_mem = (cpr_check_carrier **) malloc(cpr_shadow_mem_size * sizeof(cpr_check_carrier *) );
 
-    // switch (cpr_pe_role)
-    // {
-    //     case CPR_STORAGE_ROLE:
-    //         cpr_checkpoint_table = (cpr_check_carrier ***) malloc (cpr_num_active_pes2 * sizeof(cpr_check_carrier **));
-    //         cpr_table_size = (int *) malloc(cpr_num_active_pes2 * sizeof(int *));
+    switch (cpr_pe_role)
+    {
+        case CPR_STORAGE_ROLE:
+            cpr_checkpoint_table = (cpr_check_carrier ***) malloc (cpr_num_active_pes2 * sizeof(cpr_check_carrier **));
+            cpr_table_size = (int *) malloc(cpr_num_active_pes2 * sizeof(int *));
             
-    //         int i;
-    //         for (i=0; i<cpr_num_active_pes2; ++i)
-    //         {
-    //             cpr_table_size[i] = 1;
-    //             cpr_checkpoint_table[i] = (cpr_check_carrier **) malloc (cpr_table_size[i] * sizeof(cpr_check_carrier *));
-    //         }
-    //         break;
+            int i;
+            for (i=0; i<cpr_num_active_pes2; ++i)
+            {
+                cpr_table_size[i] = 1;
+                cpr_checkpoint_table[i] = (cpr_check_carrier **) malloc (cpr_table_size[i] * sizeof(cpr_check_carrier *));
+            }
+            break;
         
-    //     case CPR_ACTIVE_ROLE:
-    //     case CPR_DORMANT_ROLE:   
-    //     default:
-    //         // Nothing here for now, but it may change "if" init is called for subtitute PEs
-    //         break;
-    // }
+        case CPR_ACTIVE_ROLE:
+        case CPR_DORMANT_ROLE:   
+        default:
+            // Nothing here for now, but it may change "if" init is called for subtitute PEs
+            break;
+    }
 
-    // shmem_barrier_all();
-    // cpr_start = 1;
-    // //  THIS IF IS FOR WHEN SPARES DO NOT PARTICIPATE IN RUNNING THE CODE
-    // //if ( cpr_pe_type == CPR_SPARE_PE )
-    // //    shmem_cpr_spare_wait(me, npes, spes);
+    shmem_barrier_all();
+    cpr_start = 1;
+    //  THIS IF IS FOR WHEN SPARES DO NOT PARTICIPATE IN RUNNING THE CODE
+    //if ( cpr_pe_type == CPR_SPARE_PE )
+    //    shmem_cpr_spare_wait(me, npes, spes);
     return SUCCESS;
 }
 
