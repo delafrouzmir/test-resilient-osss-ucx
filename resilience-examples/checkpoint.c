@@ -751,16 +751,16 @@ int main ()
     me = shmem_my_pe ();
     npes = shmem_n_pes ();
 
-    if ( npes >= 6 )
-        spes = 4;
-    else if ( npes == 5 )
-        spes = 2;
-    else if ( npes == 4 )
-        spes = 1;
-    else
-        spes = 0;
+    // if ( npes >= 6 )
+    //     spes = 4;
+    // else if ( npes == 5 )
+    //     spes = 2;
+    // else if ( npes == 4 )
+    //     spes = 1;
+    // else
+    //     spes = 0;
 
-    success_init = shmem_cpr_init(me, npes, spes, CPR_TWO_COPY_CHECKPOINT);
+    success_init = shmem_cpr_init(me, npes, 1, CPR_TWO_COPY_CHECKPOINT);
     //if ( me == 0 )
     //    printf ("init is %d\n", success_init);
     //printf("I am %d with cpr_pe_type= %d cpr_role=%d\n", me, cpr_pe_type, cpr_pe_role);
