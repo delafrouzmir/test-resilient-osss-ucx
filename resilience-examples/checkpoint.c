@@ -169,9 +169,8 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
             if ( spes > 2)
             {
                 cpr_num_storage_pes = 2;
-                //cpr_storage_pes = (int*) shmem_malloc (cpr_num_storage_pes * sizeof (int));
-                // cpr_storage_pes[0] = npes - spes;
-                // cpr_storage_pes[1] = npes - 1;
+                cpr_storage_pes[0] = npes - spes;
+                cpr_storage_pes[1] = npes - 1;
 
                 if ( me == npes-1 || me == npes - spes )
                 {
@@ -208,7 +207,7 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
                     cpr_pe_type = CPR_MSPE;
                     cpr_pe_role = CPR_STORAGE_ROLE;
                 }
-                
+
                 // cpr_first_spare = -1;
                 // cpr_first_mspe = npes - spes;
                 
@@ -218,14 +217,17 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
                 if ( spes == 1 )
                 {
                     //cpr_second_mspe = -1;
+                    cpr_storage_pes[0] = npes-1;
                     cpr_num_storage_pes = 1;
                 }
-                else
+                else    // spes == 2
                 {
                     cpr_num_storage_pes = 2;
                     //cpr_second_mspe = npes-1;
                     cpr_all_pe_type[npes-2] = CPR_MSPE;
                     cpr_all_pe_role[npes-2] = CPR_STORAGE_ROLE;
+                    cpr_storage_pes[0] = npes-2;
+                    cpr_storage_pes[1] = npes-1;
                 }
             }
 
