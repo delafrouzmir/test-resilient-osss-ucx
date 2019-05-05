@@ -108,13 +108,13 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
     // printf("Me=%d calling set_type with npes=%d, spes=%d, mode=%d\n", me, npes, spes, cpr_mode);
 
     int i=0;
-    // for (; i<cpr_num_active_pes2; ++i)
-    // {
-    //     cpr_pe[i] = i;
-    //     // PEs 0 to npes-spes-1 are originals in any case
-    //     cpr_all_pe_type[i] = CPR_ORIGINAL_PE;
-    //     cpr_all_pe_role[i] = CPR_ACTIVE_ROLE;
-    // }
+    for (; i<cpr_num_active_pes2; ++i)
+    {
+        cpr_pe[i] = i;
+        // PEs 0 to npes-spes-1 are originals in any case
+        cpr_all_pe_type[i] = CPR_ORIGINAL_PE;
+        cpr_all_pe_role[i] = CPR_ACTIVE_ROLE;
+    }
     
     // PEs 0 to npes-spes-1 are originals in any case
     if ( me >= 0 && me < npes - spes )
@@ -251,10 +251,11 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
     // Setting up numbers of active and spare PEs
     // and arrays containing info on types and roles of PEs
 
-    // cpr_num_spare_pes = spes;
+    cpr_num_spare_pes = spes;
     cpr_num_active_pes2 = npes - spes;
     cpr_pe = (int *) shmem_malloc (cpr_num_active_pes2 * sizeof(int));
     cpr_all_pe_type = (int *) shmem_malloc (npes * sizeof(int));
+    cpr_all_pe_role = (int *) shmem_malloc (npes * sizeof(int));
     cpr_sotrage_pes = (int *) shmem_malloc (spes * sizeof (int));
 
     // add an if for different checkpointing mode here
