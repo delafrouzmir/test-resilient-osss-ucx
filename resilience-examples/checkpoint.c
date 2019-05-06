@@ -440,7 +440,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 
                     // TEST purpose:
                     posted_resrv++;
-                    printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", cpr_storage_pes[i], q_tail, pe_num);
+                    /**///printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", cpr_storage_pes[i], q_tail, pe_num);
                 }
             }
             break;
@@ -764,6 +764,17 @@ int main ()
     shmem_cpr_reserve(1, a, array_size, me);
 
     shmem_barrier_all();
+
+    resrv_carrier *carr;
+    if ( cpr_pe_role == CPR_STORAGE_ROLE)
+    {
+        for ( i=0; i<cpr_resrv_queue_tail; ++i)
+        {
+            carr = &cpr_resrv_queue[i];
+            printf("IN MAIN: PE=%d, carr(%d/%d)\n, pe_num=%d, id=%d, count=%d, cpr_table_size[%d]=%d",
+                me, i, cpr_resrv_queue_tail, carr->pe_num, carr->id, carr->count, carr->pe_num, cpr_table_size[carr->pe_num]);
+        }
+    }
     
     // for ( i=0; i<40; ++i )
     // {
