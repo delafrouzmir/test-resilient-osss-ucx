@@ -470,18 +470,24 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 read_resrv++;
                 // TO DO: head and tail might overflow the int size... add code to check
                 carr = &cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)];
+
+                printf("***at spare=%d, qtail=%d, qhead=%d, carr->pe_num=%d, table_size[%d]=%d\n", pe_num, cpr_resrv_queue_head,
+                    cpr_resrv_queue_head, carr->pe_num, carr->pe_num, cpr_table_size[ carr-> pe_num]);
+
                 cpr_resrv_queue_head ++;
                 cpr_table_size[ carr-> pe_num] ++;
                 
+
+
                 // TO DO: I should reserve count/1000+1 carriers
-                cpr_checkpoint_table[carr-> pe_num] =
-                            (cpr_check_carrier **) realloc (cpr_checkpoint_table[carr-> pe_num], 
-                                        cpr_table_size[carr-> pe_num] * sizeof(cpr_check_carrier *));
+                /**///cpr_checkpoint_table[carr-> pe_num] =
+                //            (cpr_check_carrier **) realloc (cpr_checkpoint_table[carr-> pe_num], 
+                //                        cpr_table_size[carr-> pe_num] * sizeof(cpr_check_carrier *));
 
                 // Preparing the meta data of this piece of checkpoint for later
                 // e.g: later if they want to checkpoint with id=5, I lookup for id=5 which
                             // I have assigned here:
-                shmem_cpr_copy_carrier (carr, cpr_checkpoint_table[carr-> pe_num][cpr_table_size[carr-> pe_num]-1]);
+                /**///shmem_cpr_copy_carrier (carr, cpr_checkpoint_table[carr-> pe_num][cpr_table_size[carr-> pe_num]-1]);
                 
                 // TODO: update the hash table. I'm assuming id = index here
             }
