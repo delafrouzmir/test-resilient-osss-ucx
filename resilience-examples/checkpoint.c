@@ -766,15 +766,43 @@ int main ()
     shmem_barrier_all();
 
     cpr_rsvr_carrier *carr;
-    if ( cpr_pe_role == CPR_STORAGE_ROLE)
-    {
-        for ( i=0; i<cpr_resrv_queue_tail; ++i)
-        {
-            carr = &cpr_resrv_queue[i];
-            printf("IN MAIN: PE=%d, carr(%d/%d), pe_num=%d, id=%d, count=%d, cpr_table_size[%d]=%d\n",
-                me, i, cpr_resrv_queue_tail, carr->pe_num, carr->id, carr->count, carr->pe_num, cpr_table_size[carr->pe_num]);
-        }
+    if ( me == 8 ){
+        printf("PE 8: ");
+        for ( i=0; i<cpr_num_active_pes; ++i )
+            printf("cpr_table_size[%d]=%d ", i, cpr_table_size[i]);
+        printf("\n");
     }
+    shmem_barrier_all();    
+    if ( me == 9 ){
+        printf("PE 9: ");
+        for ( i=0; i<cpr_num_active_pes; ++i )
+            printf("cpr_table_size[%d]=%d ", i, cpr_table_size[i]);
+        printf("\n");
+    }
+    shmem_barrier_all();    
+    if ( me == 10 ){
+        printf("PE 10: ");
+        for ( i=0; i<cpr_num_active_pes; ++i )
+            printf("cpr_table_size[%d]=%d ", i, cpr_table_size[i]);
+        printf("\n");
+    }
+    shmem_barrier_all();    
+    if ( me == 11 ){
+        printf("PE 11: ");
+        for ( i=0; i<cpr_num_active_pes; ++i )
+            printf("cpr_table_size[%d]=%d ", i, cpr_table_size[i]);
+        printf("\n");
+    }
+
+    // if ( cpr_pe_role == CPR_STORAGE_ROLE)
+    // {
+    //     for ( i=0; i<cpr_resrv_queue_tail; ++i)
+    //     {
+    //         carr = &cpr_resrv_queue[i];
+    //         printf("IN MAIN: PE=%d, carr(%d/%d), pe_num=%d, id=%d, count=%d, cpr_table_size[%d]=%d\n",
+    //             me, i, cpr_resrv_queue_tail, carr->pe_num, carr->id, carr->count, carr->pe_num, cpr_table_size[carr->pe_num]);
+    //     }
+    // }
     
     // for ( i=0; i<40; ++i )
     // {
