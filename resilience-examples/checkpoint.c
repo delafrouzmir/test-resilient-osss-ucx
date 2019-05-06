@@ -472,7 +472,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 carr = &cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)];
 
                 printf("***at spare=%d, qtail=%d, qhead=%d, carr->pe_num=%d, carr->id=%d, table_size[%d]=%d\n", pe_num, cpr_resrv_queue_head,
-                    cpr_resrv_queue_head, carr->pe_num, carr->id carr->pe_num, cpr_table_size[ carr-> pe_num]);
+                    cpr_resrv_queue_head, carr->pe_num, carr->id, carr->pe_num, cpr_table_size[ carr-> pe_num]);
 
                 cpr_resrv_queue_head ++;
                 cpr_table_size[ carr-> pe_num] ++;
