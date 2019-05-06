@@ -765,7 +765,7 @@ int main ()
 
     shmem_barrier_all();
 
-    resrv_carrier *carr;
+    cpr_rsvr_carrier *carr;
     if ( cpr_pe_role == CPR_STORAGE_ROLE)
     {
         for ( i=0; i<cpr_resrv_queue_tail; ++i)
