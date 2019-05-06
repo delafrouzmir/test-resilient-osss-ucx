@@ -771,7 +771,7 @@ int main ()
         for ( i=0; i<cpr_resrv_queue_tail; ++i)
         {
             carr = &cpr_resrv_queue[i];
-            printf("IN MAIN: PE=%d, carr(%d/%d)\n, pe_num=%d, id=%d, count=%d, cpr_table_size[%d]=%d",
+            printf("IN MAIN: PE=%d, carr(%d/%d), pe_num=%d, id=%d, count=%d, cpr_table_size[%d]=%d\n",
                 me, i, cpr_resrv_queue_tail, carr->pe_num, carr->id, carr->count, carr->pe_num, cpr_table_size[carr->pe_num]);
         }
     }
