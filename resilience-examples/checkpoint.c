@@ -440,7 +440,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 
                     // TEST purpose:
                     posted_resrv++;
-                    printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
+                    printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", cpr_storage_pes[i], q_tail, pe_num);
                 }
             }
             break;
@@ -461,7 +461,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 ts.tv_nsec = 100000;
                 nanosleep(&ts, NULL);
             }
-            // printf("RESERVING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_resrv_queue_tail - cpr_resrv_queue_head);
+            printf("RESERVING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_resrv_queue_tail - cpr_resrv_queue_head);
             
             /***** TO DO: check if this works in circular queues *****/
             while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
@@ -485,7 +485,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 
                 // TODO: update the hash table. I'm assuming id = index here
             }
-            // printf("***at the end SPARE=%d:\thas %d carriers left\n", pe_num, cpr_resrv_queue_tail - cpr_resrv_queue_head);
+            printf("***at the end SPARE=%d:\thas %d carriers left\n", pe_num, cpr_resrv_queue_tail - cpr_resrv_queue_head);
             //return FAILURE;     // if SPAREs are not participated in code, they won't call reserve
             break;
 
@@ -743,17 +743,17 @@ int main ()
 
     // SUCCESSFUL: printf("PE=%d, adr to reserve_q=%d, adr to check_q=%d\n", me, cpr_resrv_queue, cpr_check_queue);
 
-    if ( me == 0 )
-    {
-        printf("size of reserve q is %d\n", sizeof (cpr_resrv_queue));
-        for ( i = 1; i<npes; ++i )
-        {
-            if ( shmem_addr_accessible(&cpr_resrv_queue[0], i) )
-                printf("reserve q[0] on pe=%d is accessible\n", i);
-            if ( shmem_addr_accessible(&cpr_check_queue[0], i) )
-                printf("check q[0] on pe=%d is accessible\n", i);
-        }
-    }
+    // SUCCESSFUL: if ( me == 0 )
+    // {
+    //     printf("size of reserve q is %d\n", sizeof (cpr_resrv_queue));
+    //     for ( i = 1; i<npes; ++i )
+    //     {
+    //         if ( shmem_addr_accessible(&cpr_resrv_queue[0], i) )
+    //             printf("reserve q[0] on pe=%d is accessible\n", i);
+    //         if ( shmem_addr_accessible(&cpr_check_queue[0], i) )
+    //             printf("check q[0] on pe=%d is accessible\n", i);
+    //     }
+    // }
     shmem_cpr_reserve(0, &i, 1, me);
     shmem_cpr_reserve(1, a, array_size, me);
 
