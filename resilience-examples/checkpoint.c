@@ -457,14 +457,18 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             // during the same function call and read them in the next function call
             
             /***** TO DO: check if this works in circular queues *****/
-            if ( cpr_resrv_queue_head >= cpr_resrv_queue_tail )
+            int wait_num;
+            for ( wait_num=0; wait_num < 10; ++wait_num )
             {
-                // test:
-                printf("waiting now in PE=%d\n", pe_num);
-                struct timespec ts;
-                ts.tv_sec = 0;
-                ts.tv_nsec = 1000000;
-                nanosleep(&ts, NULL);
+                if ( cpr_resrv_queue_head >= cpr_resrv_queue_tail )
+                {
+                    // test:
+                    printf("waiting now in PE=%d for %dth time\n", pe_num, wait_num);
+                    struct timespec ts;
+                    ts.tv_sec = 0;
+                    ts.tv_nsec = 1000000;
+                    nanosleep(&ts, NULL);
+                }
             }
             printf("RESERVING from a SPARE=%d:\t qhead=%d, qtail=%d, reading %d carriers\n", pe_num, cpr_resrv_queue_head, cpr_resrv_queue_tail, cpr_resrv_queue_tail - cpr_resrv_queue_head);
             
@@ -577,13 +581,17 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                 }
                 // waiting to receive the first checkpointing request in the queue:
                 /***** check if this works in circular queues *****/
-                if ( cpr_check_queue_head >= cpr_check_queue_tail )
+                int wait_num;
+                for ( wait_num=0; wait_num < 10; ++wait_num )
                 {
-                    //printf("%d is stuck in 1st while with head=%d tail=%d\n", me, cpr_check_queue_head, cpr_check_queue_tail);
-                    struct timespec ts;
-                    ts.tv_sec = 0;
-                    ts.tv_nsec = 100000;
-                    nanosleep(&ts, NULL);
+                    if ( cpr_check_queue_head >= cpr_check_queue_tail )
+                    {
+                        //printf("%d is stuck in 1st while with head=%d tail=%d\n", me, cpr_check_queue_head, cpr_check_queue_tail);
+                        struct timespec ts;
+                        ts.tv_sec = 0;
+                        ts.tv_nsec = 1000000;
+                        nanosleep(&ts, NULL);
+                    }
                 }
                 //printf("CHPING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_check_queue_tail - cpr_check_queue_head);
                 /***** check if this works in circular queues *****/
@@ -814,29 +822,29 @@ int main ()
         shmem_barrier_all();
     }
     
-    shmem_cpr_reserve(0, &i, 1, me);
+    // shmem_cpr_reserve(0, &i, 1, me);
 
-    shmem_barrier_all();
+    // shmem_barrier_all();
 
-    if ( me == 0 )
-            printf("After 2nd reservation:\n");
+    // if ( me == 0 )
+    //         printf("After 2nd reservation:\n");
 
-    for ( i=0; i<8; ++i )
-    {
-        if ( me == i )
-            printf("Me=%d, cpr_shadow_mem_tail=%d, cpr_shadow_mem_size=%d\n", me, cpr_shadow_mem_tail, cpr_shadow_mem_size);
-        shmem_barrier_all();
-    }
-    for ( i=8; i<12; ++i )
-    {
-        if ( me == i ){
-            printf("PE %d: qhead=%d, qtail=%d", i, cpr_resrv_queue_head, cpr_resrv_queue_tail);
-            for ( j=0; j<cpr_num_active_pes; ++j )
-                printf("cpr_table_tail[%d]=%d, cpr_table_size[%d]=%d\n", j, cpr_table_tail[j], j, cpr_table_size[j]);
-            printf("\n");
-        }
-        shmem_barrier_all();
-    }
+    // for ( i=0; i<8; ++i )
+    // {
+    //     if ( me == i )
+    //         printf("Me=%d, cpr_shadow_mem_tail=%d, cpr_shadow_mem_size=%d\n", me, cpr_shadow_mem_tail, cpr_shadow_mem_size);
+    //     shmem_barrier_all();
+    // }
+    // for ( i=8; i<12; ++i )
+    // {
+    //     if ( me == i ){
+    //         printf("PE %d: qhead=%d, qtail=%d", i, cpr_resrv_queue_head, cpr_resrv_queue_tail);
+    //         for ( j=0; j<cpr_num_active_pes; ++j )
+    //             printf("cpr_table_tail[%d]=%d, cpr_table_size[%d]=%d\n", j, cpr_table_tail[j], j, cpr_table_size[j]);
+    //         printf("\n");
+    //     }
+    //     shmem_barrier_all();
+    // }
 
     // if ( cpr_pe_role == CPR_STORAGE_ROLE)
     // {
