@@ -459,12 +459,14 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             /***** TO DO: check if this works in circular queues *****/
             if ( cpr_resrv_queue_head >= cpr_resrv_queue_tail )
             {
+                // test:
+                printf("waiting now in PE=%d\n", pe_num);
                 struct timespec ts;
                 ts.tv_sec = 0;
                 ts.tv_nsec = 100000;
                 nanosleep(&ts, NULL);
             }
-            printf("RESERVING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_resrv_queue_tail - cpr_resrv_queue_head);
+            printf("RESERVING from a SPARE=%d:\t qhead=%d, qtail=%d, reading %d carriers\n", pe_num, cpr_resrv_queue_head, cpr_resrv_queue_tail, cpr_resrv_queue_tail - cpr_resrv_queue_head);
             
             /***** TO DO: check if this works in circular queues *****/
             while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
