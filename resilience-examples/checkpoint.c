@@ -468,7 +468,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 ts.tv_nsec = 100000;
                 nanosleep(&ts, NULL);
             }
-            //printf("RESERVING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_resrv_queue_tail - cpr_resrv_queue_head);
+            printf("RESERVING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_resrv_queue_tail - cpr_resrv_queue_head);
             
             /***** TO DO: check if this works in circular queues *****/
             while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
@@ -770,24 +770,24 @@ int main ()
     //     }
     // }
 
-    if ( me == 0 )
-        printf("Before reservation:\n");
-    for ( i=0; i<8; ++i )
-    {
-        if ( me == i )
-            printf("Me=%d, cpr_shadow_mem_tail=%d, cpr_shadow_mem_size=%d\n", me, cpr_shadow_mem_tail, cpr_shadow_mem_size);
-        shmem_barrier_all();
-    }
-    for ( i=8; i<12; ++i )
-    {
-        if ( me == i ){
-            printf("PE %d: ", i);
-            for ( j=0; j<cpr_num_active_pes; ++j )
-                printf("cpr_table_tail[%d]=%d, cpr_table_size[%d]=%d\t", j, cpr_table_tail[j], j, cpr_table_size[j]);
-            printf("\n");
-        }
-        shmem_barrier_all();
-    }
+    // if ( me == 0 )
+    //     printf("Before reservation:\n");
+    // for ( i=0; i<8; ++i )
+    // {
+    //     if ( me == i )
+    //         printf("Me=%d, cpr_shadow_mem_tail=%d, cpr_shadow_mem_size=%d\n", me, cpr_shadow_mem_tail, cpr_shadow_mem_size);
+    //     shmem_barrier_all();
+    // }
+    // for ( i=8; i<12; ++i )
+    // {
+    //     if ( me == i ){
+    //         printf("PE %d: ", i);
+    //         for ( j=0; j<cpr_num_active_pes; ++j )
+    //             printf("cpr_table_tail[%d]=%d, cpr_table_size[%d]=%d\t", j, cpr_table_tail[j], j, cpr_table_size[j]);
+    //         printf("\n");
+    //     }
+    //     shmem_barrier_all();
+    // }
 
     i=0;
     shmem_cpr_reserve(0, &i, 1, me);
