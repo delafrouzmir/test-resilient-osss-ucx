@@ -821,7 +821,6 @@ int main ()
     if ( me == 0 )
             printf("After 2nd reservation:\n");
 
-    cpr_rsvr_carrier *carr;
     for ( i=0; i<8; ++i )
     {
         if ( me == i )
