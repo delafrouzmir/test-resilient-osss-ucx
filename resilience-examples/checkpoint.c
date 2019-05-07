@@ -782,13 +782,14 @@ int main ()
     {
         if ( me == i ){
             printf("PE %d: ", i);
-            for ( i=0; i<cpr_num_active_pes; ++i )
-                printf("cpr_table_tail[%d]=%d, cpr_table_size[%d]=%d\t", i, cpr_table_tail[i], i, cpr_table_size[i]);
+            for ( j=0; j<cpr_num_active_pes; ++j )
+                printf("cpr_table_tail[%d]=%d, cpr_table_size[%d]=%d\t", j, cpr_table_tail[j], j, cpr_table_size[j]);
             printf("\n");
         }
         shmem_barrier_all();
     }
 
+    i=0;
     shmem_cpr_reserve(0, &i, 1, me);
     shmem_cpr_reserve(1, a, array_size, me);
 
