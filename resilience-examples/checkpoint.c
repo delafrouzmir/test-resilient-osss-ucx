@@ -806,7 +806,7 @@ int main ()
     for ( i=8; i<12; ++i )
     {
         if ( me == i ){
-            printf("PE %d: ", i);
+            printf("PE %d: qhead=%d, qtail=%d", i, cpr_resrv_queue_head, cpr_resrv_queue_tail);
             for ( j=0; j<cpr_num_active_pes; ++j )
                 printf("cpr_table_tail[%d]=%d, cpr_table_size[%d]=%d\n", j, cpr_table_tail[j], j, cpr_table_size[j]);
             printf("\n");
