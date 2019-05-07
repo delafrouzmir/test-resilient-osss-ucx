@@ -434,9 +434,6 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 //         cpr_shadow_mem[cpr_shadow_mem_tail-1] -> id, cpr_shadow_mem[cpr_shadow_mem_tail-1] -> count
                 //         , cpr_shadow_mem[cpr_shadow_mem_tail-1] -> adr);
 
-                
-                printf("RESERVING from an ORIGINAL:\tid = %d,\tcount = %d, from pe = %d\n", id, count, pe_num);
-
                 // should reserve a place on all storage PEs
                 // and update the cpr_table_tail of all spare PEs
 
@@ -444,10 +441,9 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 {
                     q_tail = ( shmem_int_atomic_fetch_inc ( &cpr_resrv_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
                     shmem_putmem (&cpr_resrv_queue[q_tail], (void *) carr, 1 * sizeof(cpr_rsvr_carrier), cpr_storage_pes[i]);
-
                     // TEST purpose:
                     posted_resrv++;
-                    // printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", cpr_storage_pes[i], q_tail, pe_num);
+                    printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", cpr_storage_pes[i], q_tail, pe_num);
                 }
             }
             break;
