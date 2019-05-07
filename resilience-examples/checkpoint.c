@@ -457,8 +457,8 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             // during the same function call and read them in the next function call
             
             /***** TO DO: check if this works in circular queues *****/
-            int wait_num;
-            for ( wait_num=0; wait_num < 10; ++wait_num )
+            int wait_num = 0;
+            for ( ; wait_num < 10; ++wait_num )
             {
                 if ( cpr_resrv_queue_head >= cpr_resrv_queue_tail )
                 {
@@ -581,8 +581,8 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                 }
                 // waiting to receive the first checkpointing request in the queue:
                 /***** check if this works in circular queues *****/
-                int wait_num;
-                for ( wait_num=0; wait_num < 10; ++wait_num )
+                int wait_num = 0;
+                for ( ; wait_num < 10; ++wait_num )
                 {
                     if ( cpr_check_queue_head >= cpr_check_queue_tail )
                     {
