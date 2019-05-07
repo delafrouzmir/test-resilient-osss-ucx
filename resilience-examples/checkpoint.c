@@ -814,6 +814,31 @@ int main ()
         shmem_barrier_all();
     }
     
+    shmem_cpr_reserve(0, &i, 1, me);
+
+    shmem_barrier_all();
+
+    if ( me == 0 )
+            printf("After 2nd reservation:\n");
+
+    cpr_rsvr_carrier *carr;
+    for ( i=0; i<8; ++i )
+    {
+        if ( me == i )
+            printf("Me=%d, cpr_shadow_mem_tail=%d, cpr_shadow_mem_size=%d\n", me, cpr_shadow_mem_tail, cpr_shadow_mem_size);
+        shmem_barrier_all();
+    }
+    for ( i=8; i<12; ++i )
+    {
+        if ( me == i ){
+            printf("PE %d: qhead=%d, qtail=%d", i, cpr_resrv_queue_head, cpr_resrv_queue_tail);
+            for ( j=0; j<cpr_num_active_pes; ++j )
+                printf("cpr_table_tail[%d]=%d, cpr_table_size[%d]=%d\n", j, cpr_table_tail[j], j, cpr_table_size[j]);
+            printf("\n");
+        }
+        shmem_barrier_all();
+    }
+
     // if ( cpr_pe_role == CPR_STORAGE_ROLE)
     // {
     //     for ( i=0; i<cpr_resrv_queue_tail; ++i)
