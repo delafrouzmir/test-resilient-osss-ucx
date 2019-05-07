@@ -410,7 +410,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
         case CPR_ACTIVE_ROLE:
             if ( shmem_cpr_is_new_reservation (id) )
             {
-                // SUCCESSFUL: printf("PE=%d entered reservation with id=%d, count=%d\n", pe_num, id, count);
+                printf("PE=%d entered reservation with id=%d, count=%d\n", pe_num, id, count);
                 carr->id = id;
                 carr->adr = mem;
                 carr->count = count;
@@ -430,12 +430,12 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 cpr_shadow_mem[cpr_shadow_mem_tail-1] = (cpr_check_carrier *) malloc (1* sizeof(cpr_check_carrier));
                 shmem_cpr_copy_carrier (carr, cpr_shadow_mem[cpr_shadow_mem_tail-1]);
 
-                // SUCCESSFUL: printf("PE=%d cpr_shadow_mem[%d]={id=%d, count=%d, adr=%d}\n", pe_num, cpr_shadow_mem_tail-1,
-                //        cpr_shadow_mem[cpr_shadow_mem_tail-1] -> id, cpr_shadow_mem[cpr_shadow_mem_tail-1] -> count
-                //        , cpr_shadow_mem[cpr_shadow_mem_tail-1] -> adr);
+                // printf("PE=%d cpr_shadow_mem[%d]={id=%d, count=%d, adr=%d}\n", pe_num, cpr_shadow_mem_tail-1,
+                //         cpr_shadow_mem[cpr_shadow_mem_tail-1] -> id, cpr_shadow_mem[cpr_shadow_mem_tail-1] -> count
+                //         , cpr_shadow_mem[cpr_shadow_mem_tail-1] -> adr);
 
                 
-                // printf("RESERVING from an ORIGINAL:\tid = %d,\tcount = %d, from pe = %d\n", id, count, pe_num);
+                printf("RESERVING from an ORIGINAL:\tid = %d,\tcount = %d, from pe = %d\n", id, count, pe_num);
 
                 // should reserve a place on all storage PEs
                 // and update the cpr_table_tail of all spare PEs
@@ -447,7 +447,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 
                     // TEST purpose:
                     posted_resrv++;
-                    /**///printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", cpr_storage_pes[i], q_tail, pe_num);
+                    // printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", cpr_storage_pes[i], q_tail, pe_num);
                 }
             }
             break;
