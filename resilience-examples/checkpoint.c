@@ -796,7 +796,7 @@ int main ()
 
     if ( me == 0 )
             printf("After reservation:\n");
-        
+
     cpr_rsvr_carrier *carr;
     for ( i=0; i<8; ++i )
     {
@@ -808,8 +808,8 @@ int main ()
     {
         if ( me == i ){
             printf("PE %d: ", i);
-            for ( i=0; i<cpr_num_active_pes; ++i )
-                printf("cpr_table_tail[%d]=%d, cpr_table_size[%d]=%d\t", i, cpr_table_tail[i], i, cpr_table_size[i]);
+            for ( j=0; j<cpr_num_active_pes; ++j )
+                printf("cpr_table_tail[%d]=%d, cpr_table_size[%d]=%d\n", j, cpr_table_tail[j], j, cpr_table_size[j]);
             printf("\n");
         }
         shmem_barrier_all();
