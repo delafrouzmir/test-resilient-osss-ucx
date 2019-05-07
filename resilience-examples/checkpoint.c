@@ -483,7 +483,6 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 
                 cpr_resrv_queue_head ++;
                 // TO DO: I should reserve count/1000+1 carriers
-                
                 if ( cpr_table_tail[ carr-> pe_num] >= cpr_table_size[ carr-> pe_num] )
                 {
                     cpr_table_size[ carr-> pe_num] *= 2;
@@ -492,6 +491,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                     //                        cpr_table_size[carr-> pe_num] * sizeof(cpr_check_carrier *));
                 }
                 cpr_table_tail[ carr-> pe_num] ++;
+                printf("From me=%d in reservation, cpr_table_tail[%d]=%d;\n", me, carr->pe_num, cpr_table_tail[carr->pe_num]);
 
                 // Preparing the meta data of this piece of checkpoint for later
                 // e.g: later if they want to checkpoint with id=5, I lookup for id=5 which
