@@ -293,8 +293,8 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
     cpr_shadow_mem_tail = 0;
     cpr_shadow_mem_size = CPR_STARTING_TABLE_SIZE;
     cpr_shadow_mem = (cpr_check_carrier **) malloc(cpr_shadow_mem_size * sizeof(cpr_check_carrier *) );
-    for ( i=0; i<cpr_shadow_mem_size; ++i )
-        cpr_shadow_mem[i] = (cpr_check_carrier *) malloc (1 * sizeof(cpr_check_carrier));
+    // for ( i=0; i<cpr_shadow_mem_size; ++i )
+    //     cpr_shadow_mem[i] = (cpr_check_carrier *) malloc (1 * sizeof(cpr_check_carrier));
     switch (cpr_pe_role)
     {
         case CPR_STORAGE_ROLE:
@@ -309,8 +309,8 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
                 cpr_table_size[i] = CPR_STARTING_TABLE_SIZE;
                 cpr_table_tail[i] = 0;
                 cpr_checkpoint_table[i] = (cpr_check_carrier **) malloc (cpr_table_size[i] * sizeof(cpr_check_carrier *));
-                for (j=0; j<cpr_table_size[i]; ++i)
-                    cpr_checkpoint_table[i][j] = (cpr_check_carrier *) malloc (1 * sizeof(cpr_check_carrier));
+                // for (j=0; j<cpr_table_size[i]; ++i)
+                //     cpr_checkpoint_table[i][j] = (cpr_check_carrier *) malloc (1 * sizeof(cpr_check_carrier));
             }
             break;
         
@@ -523,6 +523,8 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                                 cpr_table_size[carr-> pe_num] * sizeof(cpr_check_carrier *));
                 }
                 cpr_table_tail[ carr-> pe_num] ++;
+
+                cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] = (cpr_check_carrier *) malloc ( 1* sizeof(cpr_check_carrier));
                 printf("From me=%d in reservation, cpr_table_tail[%d]=%d;\n", me, carr->pe_num, cpr_table_tail[carr->pe_num]);
 
                 // Preparing the meta data of this piece of checkpoint for later
