@@ -99,6 +99,18 @@ int called_check, called_resrv, posted_check, posted_resrv, read_check, read_res
 /****                 ****/
 ///////////////////////////
 
+void delay(double dly){
+    /* save start time */
+    const time_t start = time(NULL);
+
+    time_t current;
+    do{
+        /* get current time */
+        time(&current);
+        /* break loop when the requested number of seconds have elapsed */
+    }while(difftime(current, start) < dly);
+}
+
 void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
 {
     // spes is checked before, we know it is a positive int
@@ -467,12 +479,13 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 {
                     // test:
                     printf("waiting now in PE=%d for %dth time\n", pe_num, wait_num);
-                    struct timespec ts;
-                    ts.tv_sec = 1;
-                    ts.tv_nsec = 1000000000;
+                    // struct timespec ts;
+                    // ts.tv_sec = 1;
+                    // ts.tv_nsec = 1000000000;
                     start = clock();
                     //clock_nanosleep(&ts, NULL);
-                    pselect(0, NULL, NULL, NULL, &ts, NULL);
+                    // pselect(0, NULL, NULL, NULL, &ts, NULL);
+                    delay(0.01);
                     end = clock();
                     printf("waited for %f in PE=%d\n", ((double) (end - start)) / CLOCKS_PER_SEC, pe_num);
                 }
