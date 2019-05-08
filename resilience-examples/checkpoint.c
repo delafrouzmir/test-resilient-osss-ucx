@@ -531,6 +531,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 
                 // TODO: update the hash table. I'm assuming id = index here
             }
+            cpr_sig_rsvr = 0;
             //printf("***at the end SPARE=%d:\thas %d carriers left\n", pe_num, cpr_resrv_queue_tail - cpr_resrv_queue_head);
             //return FAILURE;     // if SPAREs are not participated in code, they won't call reserve
             break;
