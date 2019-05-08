@@ -850,13 +850,16 @@ int main ()
     //         printf("Me=%d, cpr_shadow_mem_tail=%d, cpr_shadow_mem_size=%d\n", me, cpr_shadow_mem_tail, cpr_shadow_mem_size);
     //     shmem_barrier_all();
     // }
+
+    shmem_cpr_reserve(0, &i, 1, me);
+    shmem_barrier_all();
     for ( i=8; i<12; ++i )
     {
         if ( me == i )
         {
             printf("PE=%d\n", i);
             for ( j=0; j<cpr_resrv_queue_tail; ++j )
-                printf("%d ", cpr_resrv_queue[j].pe_num);
+                printf("pe=%d id=%d count=%d\n", cpr_resrv_queue[j].pe_num, cpr_resrv_queue[j].id, cpr_resrv_queue[j].count);
             printf("\n");
         }
         
