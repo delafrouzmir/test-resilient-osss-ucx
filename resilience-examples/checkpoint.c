@@ -468,8 +468,8 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                     // test:
                     printf("waiting now in PE=%d for %dth time\n", pe_num, wait_num);
                     struct timespec ts;
-                    ts.tv_sec = 0;
-                    ts.tv_nsec = 10000000;
+                    ts.tv_sec = 1;
+                    ts.tv_nsec = 1000000000;
                     start = clock();
                     nanosleep(&ts, NULL);
                     end = clock();
