@@ -818,7 +818,8 @@ int main ()
     //     }
     //     shmem_barrier_all();
     // }
-
+    time_t start = time(NULL);
+    time_t end;
     i=0;
     shmem_cpr_reserve(0, &i, 1, me);
     shmem_cpr_reserve(1, a, array_size, me);
@@ -845,7 +846,9 @@ int main ()
         }
         shmem_barrier_all();
     }
-    
+        
+    end = time(NULL);
+    printf("*** start=%f end=%f, difftime=%d\n", start, end, difftime(end, start));
     // shmem_cpr_reserve(0, &i, 1, me);
 
     // shmem_barrier_all();
