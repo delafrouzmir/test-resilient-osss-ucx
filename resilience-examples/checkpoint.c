@@ -288,11 +288,13 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
     //     ** if in MANY_COPY mode: wrong type, error
     //     ** if in TWO-COPY mode: have a checkpoint_table which is a copy of all
     //         *** the ORIGINAL or RESURRECTED PEs' shadow_mem's
-    
+    int i, j;
+
     cpr_shadow_mem_tail = 0;
     cpr_shadow_mem_size = CPR_STARTING_TABLE_SIZE;
     cpr_shadow_mem = (cpr_check_carrier **) malloc(cpr_shadow_mem_size * sizeof(cpr_check_carrier *) );
-
+    for ( i=0; i<cpr_shadow_mem_size; ++i )
+        cpr_shadow_mem[i] = (cpr_check_carrier *) malloc (1 * sizeof(cpr_check_carrier));
     switch (cpr_pe_role)
     {
         case CPR_STORAGE_ROLE:
@@ -302,12 +304,13 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
             cpr_table_size = (int *) malloc(cpr_num_active_pes * sizeof(int *));
             cpr_table_tail = (int *) malloc(cpr_num_active_pes * sizeof(int *));
             
-            int i;
             for (i=0; i<cpr_num_active_pes; ++i)
             {
                 cpr_table_size[i] = CPR_STARTING_TABLE_SIZE;
                 cpr_table_tail[i] = 0;
                 cpr_checkpoint_table[i] = (cpr_check_carrier **) malloc (cpr_table_size[i] * sizeof(cpr_check_carrier *));
+                for (j=0; j<cpr_table_size[i]; ++i)
+                    cpr_checkpoint_table[i][j] = (cpr_check_carrier *) malloc (1 * sizeof(cpr_check_carrier));
             }
             break;
         
