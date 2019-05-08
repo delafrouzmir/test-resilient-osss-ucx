@@ -471,7 +471,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                     ts.tv_sec = 1;
                     ts.tv_nsec = 1000000000;
                     start = clock();
-                    nanosleep(&ts, NULL);
+                    clock_nanosleep(&ts, NULL);
                     end = clock();
                     printf("waited for %f in PE=%d\n", ((double) (end - start)) / CLOCKS_PER_SEC, pe_num);
                 }
