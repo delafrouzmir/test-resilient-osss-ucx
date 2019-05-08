@@ -396,6 +396,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
     if ours, then maybe hashtable for pe numbers can help
     */
 
+    int wait_num;
     cpr_rsvr_carrier *carr = (cpr_rsvr_carrier *) malloc ( sizeof (cpr_rsvr_carrier) ); 
     int i, q_tail;
     // TO DO: could/should this npes change through the program?
@@ -457,8 +458,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             // during the same function call and read them in the next function call
             
             /***** TO DO: check if this works in circular queues *****/
-            int wait_num = 0;
-            for ( ; wait_num < 10; ++wait_num )
+            for ( wait_num=0; wait_num < 10; ++wait_num )
             {
                 if ( cpr_resrv_queue_head >= cpr_resrv_queue_tail )
                 {
@@ -469,6 +469,8 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                     ts.tv_nsec = 1000000;
                     nanosleep(&ts, NULL);
                 }
+                else
+                    break;
             }
             printf("RESERVING from a SPARE=%d:\t qhead=%d, qtail=%d, reading %d carriers\n", pe_num, cpr_resrv_queue_head, cpr_resrv_queue_tail, cpr_resrv_queue_tail - cpr_resrv_queue_head);
             
@@ -526,6 +528,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
     // TEST Purpose:
     called_check++;
 
+    int wait_num;
     cpr_check_carrier *carr = (cpr_check_carrier *) malloc ( sizeof (cpr_check_carrier) ); 
     int i, q_tail;
     //TEST
@@ -581,8 +584,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                 }
                 // waiting to receive the first checkpointing request in the queue:
                 /***** check if this works in circular queues *****/
-                int wait_num = 0;
-                for ( ; wait_num < 10; ++wait_num )
+                for ( wait_num=0 ; wait_num < 10; ++wait_num )
                 {
                     if ( cpr_check_queue_head >= cpr_check_queue_tail )
                     {
@@ -592,6 +594,8 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                         ts.tv_nsec = 1000000;
                         nanosleep(&ts, NULL);
                     }
+                    else
+                        break;
                 }
                 //printf("CHPING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_check_queue_tail - cpr_check_queue_head);
                 /***** check if this works in circular queues *****/
