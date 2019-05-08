@@ -510,7 +510,8 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 // TO DO: head and tail might overflow the int size... add code to check
                 *carr = cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)];
 
-                printf("in reserve: PE=%d, qcarrier[%d].pe_num=%d\n", pe_num, cpr_resrv_queue_head, carr->pe_num);
+                printf("in reserve, through carr: PE=%d, qcarrier[%d].pe_num=%d\n", pe_num, cpr_resrv_queue_head, carr->pe_num);
+                printf("in reserve, through queu: PE=%d, qcarrier[%d].pe_num=%d\n", pe_num, cpr_resrv_queue_head, cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)].pe_num);
                 cpr_resrv_queue_head ++;
                 // TO DO: I should reserve count/1000+1 carriers
                 if ( cpr_table_tail[ carr-> pe_num] >= cpr_table_size[ carr-> pe_num] )
