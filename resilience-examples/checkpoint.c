@@ -869,7 +869,7 @@ int main ()
         {
             printf("PE=%d\n", i);
             for ( j=0; j<cpr_resrv_queue_tail; ++j )
-                printf("cpr_resrv_queue[%d].id=%d\n", j, cpr_resrv_queue[j].id);
+                printf("cpr_resrv_queue[%d].pe_num=%d\n", j, cpr_resrv_queue[j].pe_num);
         }
         
         // if ( me == i ){
