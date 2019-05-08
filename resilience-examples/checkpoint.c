@@ -510,17 +510,14 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 // TO DO: head and tail might overflow the int size... add code to check
                 carr = &cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)];
 
-                // printf("***at spare=%d, qtail=%d, qhead=%d, carr->pe_num=%d, carr->id=%d, table_tail[%d]=%d\n", pe_num, cpr_resrv_queue_head,
-                    // cpr_resrv_queue_head, carr->pe_num, carr->id, carr->pe_num, cpr_table_tail[ carr-> pe_num]);
-
                 cpr_resrv_queue_head ++;
                 // TO DO: I should reserve count/1000+1 carriers
                 if ( cpr_table_tail[ carr-> pe_num] >= cpr_table_size[ carr-> pe_num] )
                 {
                     cpr_table_size[ carr-> pe_num] *= 2;
-                    /**///cpr_checkpoint_table[carr-> pe_num] =
-                    //            (cpr_check_carrier **) realloc (cpr_checkpoint_table[carr-> pe_num], 
-                    //                        cpr_table_size[carr-> pe_num] * sizeof(cpr_check_carrier *));
+                    cpr_checkpoint_table[carr-> pe_num] =
+                            (cpr_check_carrier **) realloc (cpr_checkpoint_table[carr-> pe_num], 
+                                cpr_table_size[carr-> pe_num] * sizeof(cpr_check_carrier *));
                 }
                 cpr_table_tail[ carr-> pe_num] ++;
                 printf("From me=%d in reservation, cpr_table_tail[%d]=%d;\n", me, carr->pe_num, cpr_table_tail[carr->pe_num]);
@@ -528,6 +525,9 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 // Preparing the meta data of this piece of checkpoint for later
                 // e.g: later if they want to checkpoint with id=5, I lookup for id=5 which
                             // I have assigned here:
+                if ( cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] != NULL )
+                    printf("***at spare=%d, qtail=%d, qhead=%d, carr->pe_num=%d, carr->id=%d, table_tail[%d]=%d\n", pe_num, cpr_resrv_queue_head,
+                        cpr_resrv_queue_head, carr->pe_num, carr->id, carr->pe_num, cpr_table_tail[ carr-> pe_num]);
                 /**///shmem_cpr_copy_carrier (carr, cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1]);
                 
                 // TODO: update the hash table. I'm assuming id = index here
