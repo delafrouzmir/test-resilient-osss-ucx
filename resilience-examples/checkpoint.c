@@ -395,8 +395,11 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
     should it be the user's responsibility or ours?!
     if ours, then maybe hashtable for pe numbers can help
     */
-
+    // TEST purpose:
     int wait_num;
+    clock_t start, end;
+    double cpu_time_used;
+
     cpr_rsvr_carrier *carr = (cpr_rsvr_carrier *) malloc ( sizeof (cpr_rsvr_carrier) ); 
     int i, q_tail;
     // TO DO: could/should this npes change through the program?
@@ -467,7 +470,10 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                     struct timespec ts;
                     ts.tv_sec = 0;
                     ts.tv_nsec = 10000000;
+                    start = clock();
                     nanosleep(&ts, NULL);
+                    end = clock();
+                    printf("waited for %f in PE=%d\n", ((double) (end - start)) / CLOCKS_PER_SEC, pe_num);
                 }
                 else
                     break;
