@@ -99,17 +99,17 @@ int called_check, called_resrv, posted_check, posted_resrv, read_check, read_res
 /****                 ****/
 ///////////////////////////
 
-void delay(double dly){
-    /* save start time */
-    const time_t start = time(NULL);
+// void delay(double dly){
+//     /* save start time */
+//     const time_t start = time(NULL);
 
-    time_t current;
-    do{
-        /* get current time */
-        time(&current);
-        /* break loop when the requested number of seconds have elapsed */
-    }while(difftime(current, start) < dly);
-}
+//     time_t current;
+//     do{
+//         /* get current time */
+//         time(&current);
+//         /* break loop when the requested number of seconds have elapsed */
+//     }while(difftime(current, start) < dly);
+// }
 
 void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
 {
@@ -351,6 +351,11 @@ int shmem_cpr_is_new_reservation (int id)
 
 void shmem_cpr_copy_carrier ( cpr_rsvr_carrier *frst, cpr_check_carrier *scnd )
 {
+    if ( frst == NULL || scnd == NULL )
+    {
+        printf("error. one is null\n");
+        return;
+    }
     scnd -> id = frst -> id;
     scnd -> adr = frst -> adr;
     scnd -> count = frst -> count;
@@ -407,10 +412,6 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
     should it be the user's responsibility or ours?!
     if ours, then maybe hashtable for pe numbers can help
     */
-    // TEST purpose:
-    int wait_num;
-    clock_t start, end;
-    double cpu_time_used;
 
     cpr_rsvr_carrier *carr = (cpr_rsvr_carrier *) malloc ( sizeof (cpr_rsvr_carrier) ); 
     int i, q_tail;
@@ -438,7 +439,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 {
                     cpr_shadow_mem_size *= 2;
                     cpr_shadow_mem = (cpr_check_carrier **) realloc (cpr_shadow_mem,
-                                    cpr_shadow_mem_size * sizeof(cpr_check_carrier *) );
+                            cpr_shadow_mem_size * sizeof(cpr_check_carrier *) );
                 }
                 cpr_shadow_mem_tail ++;
 
@@ -456,15 +457,15 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 for ( i=0; i < cpr_num_storage_pes; ++i )
                 {
                     q_tail = ( shmem_atomic_fetch_inc ( &cpr_resrv_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
-                    time_t start = time(NULL);
+                    // time_t start = time(NULL);
                     shmem_putmem (&cpr_resrv_queue[q_tail], (void *) carr, 1 * sizeof(cpr_rsvr_carrier), cpr_storage_pes[i]);
                     
                     if ( shmem_atomic_fetch ( &cpr_sig_rsvr, cpr_storage_pes[i]) == 0 )
                         shmem_atomic_set( &cpr_sig_rsvr, 1, cpr_storage_pes[i]);
                     // TEST purpose:
-                    time_t end = time(NULL);
+                    // time_t end = time(NULL);
                     posted_resrv++;
-                    printf("shmem_put took %f in PE=%d\n", difftime(end, start), pe_num);
+                    // printf("shmem_put took %f in PE=%d\n", difftime(end, start), pe_num);
                     //printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", cpr_storage_pes[i], q_tail, pe_num);
                 }
             }
@@ -509,8 +510,8 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 // TO DO: head and tail might overflow the int size... add code to check
                 carr = &cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)];
 
-                printf("***at spare=%d, qtail=%d, qhead=%d, carr->pe_num=%d, carr->id=%d, table_tail[%d]=%d\n", pe_num, cpr_resrv_queue_head,
-                    cpr_resrv_queue_head, carr->pe_num, carr->id, carr->pe_num, cpr_table_tail[ carr-> pe_num]);
+                // printf("***at spare=%d, qtail=%d, qhead=%d, carr->pe_num=%d, carr->id=%d, table_tail[%d]=%d\n", pe_num, cpr_resrv_queue_head,
+                    // cpr_resrv_queue_head, carr->pe_num, carr->id, carr->pe_num, cpr_table_tail[ carr-> pe_num]);
 
                 cpr_resrv_queue_head ++;
                 // TO DO: I should reserve count/1000+1 carriers
@@ -826,8 +827,7 @@ int main ()
     //     }
     //     shmem_barrier_all();
     // }
-    time_t start = time(NULL);
-    time_t end;
+    
     i=0;
     shmem_cpr_reserve(0, &i, 1, me);
     shmem_cpr_reserve(1, a, array_size, me);
@@ -835,7 +835,7 @@ int main ()
     shmem_barrier_all();
 
     if ( me == 0 )
-            printf("After reservation:\n");
+        printf("After reservation:\n");
 
     cpr_rsvr_carrier *carr;
     for ( i=0; i<8; ++i )
@@ -854,9 +854,7 @@ int main ()
         }
         shmem_barrier_all();
     }
-        
-    end = time(NULL);
-    printf("*** start=%f end=%f, difftime=%d\n", start, end, difftime(end, start));
+    
     // shmem_cpr_reserve(0, &i, 1, me);
 
     // shmem_barrier_all();
