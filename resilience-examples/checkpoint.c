@@ -293,8 +293,7 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
     cpr_shadow_mem_tail = 0;
     cpr_shadow_mem_size = CPR_STARTING_TABLE_SIZE;
     cpr_shadow_mem = (cpr_check_carrier **) malloc(cpr_shadow_mem_size * sizeof(cpr_check_carrier *) );
-    // for ( i=0; i<cpr_shadow_mem_size; ++i )
-    //     cpr_shadow_mem[i] = (cpr_check_carrier *) malloc (1 * sizeof(cpr_check_carrier));
+    
     switch (cpr_pe_role)
     {
         case CPR_STORAGE_ROLE:
@@ -309,8 +308,6 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
                 cpr_table_size[i] = CPR_STARTING_TABLE_SIZE;
                 cpr_table_tail[i] = 0;
                 cpr_checkpoint_table[i] = (cpr_check_carrier **) malloc (cpr_table_size[i] * sizeof(cpr_check_carrier *));
-                // for (j=0; j<cpr_table_size[i]; ++i)
-                //     cpr_checkpoint_table[i][j] = (cpr_check_carrier *) malloc (1 * sizeof(cpr_check_carrier));
             }
             break;
         
@@ -430,7 +427,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
         case CPR_ACTIVE_ROLE:
             if ( shmem_cpr_is_new_reservation (id) )
             {
-                printf("PE=%d entered reservation with id=%d, count=%d\n", pe_num, id, count);
+                // printf("PE=%d entered reservation with id=%d, count=%d\n", pe_num, id, count);
                 carr->id = id;
                 carr->adr = mem;
                 carr->count = count;
@@ -503,7 +500,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             //         break;
             // }
             shmem_wait_until ( &cpr_sig_rsvr, SHMEM_CMP_GT, 0);
-            printf("RESERVING from a SPARE=%d:\t qhead=%d, qtail=%d, reading %d carriers\n", pe_num, cpr_resrv_queue_head, cpr_resrv_queue_tail, cpr_resrv_queue_tail - cpr_resrv_queue_head);
+            // printf("RESERVING from a SPARE=%d:\t qhead=%d, qtail=%d, reading %d carriers\n", pe_num, cpr_resrv_queue_head, cpr_resrv_queue_tail, cpr_resrv_queue_tail - cpr_resrv_queue_head);
             
             /***** TO DO: check if this works in circular queues *****/
             while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
@@ -525,28 +522,31 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 cpr_table_tail[ carr-> pe_num] ++;
 
                 cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] = (cpr_check_carrier *) malloc ( 1* sizeof(cpr_check_carrier));
-                printf("From me=%d in reservation, cpr_table_tail[%d]=%d;\n", me, carr->pe_num, cpr_table_tail[carr->pe_num]);
+                printf("From me=%d in reservation, cpr_table_tail[%d]=%d;\n", pe_num, carr->pe_num, cpr_table_tail[carr->pe_num]);
+                for ( i=0; i<cpr_num_active_pes; ++i )
+                    printf("From me=%d, all table_tail[%d]=%d", pe_num, i, cpr_table_tail[i]);
+                printf("\n");
 
                 // Preparing the meta data of this piece of checkpoint for later
                 // e.g: later if they want to checkpoint with id=5, I lookup for id=5 which
                             // I have assigned here:
-                if ( cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] != NULL )
-                {
-                    cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> id = carr -> id;
-                    cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> adr = carr -> adr;
-                    cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> count = carr -> count;
-                    cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> pe_num = carr -> pe_num;
-                    cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> is_symmetric = carr -> is_symmetric;
+                // if ( cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] != NULL )
+                // {
+                //     cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> id = carr -> id;
+                //     cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> adr = carr -> adr;
+                //     cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> count = carr -> count;
+                //     cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> pe_num = carr -> pe_num;
+                //     cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> is_symmetric = carr -> is_symmetric;
                     
-                    printf("***at spare=%d, qtail=%d, qhead=%d, carr->pe_num=%d, carr->id=%d, carr->is_symmetric=%d, carr->count=%d, table_tail[%d]=%d\n",
-                        pe_num, cpr_resrv_queue_tail, cpr_resrv_queue_head,
-                        cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> pe_num,
-                        cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> id,
-                        cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> is_symmetric,
-                        cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> count,
-                        carr->pe_num,
-                        cpr_table_tail[ carr-> pe_num]);
-                }
+                //     printf("***at spare=%d, qtail=%d, qhead=%d, carr->pe_num=%d, carr->id=%d, carr->is_symmetric=%d, carr->count=%d, table_tail[%d]=%d\n",
+                //         pe_num, cpr_resrv_queue_tail, cpr_resrv_queue_head,
+                //         cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> pe_num,
+                //         cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> id,
+                //         cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> is_symmetric,
+                //         cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> count,
+                //         carr->pe_num,
+                //         cpr_table_tail[ carr-> pe_num]);
+                // }
                 /**///shmem_cpr_copy_carrier (carr, cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1]);
                 
                 // TODO: update the hash table. I'm assuming id = index here
