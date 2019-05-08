@@ -456,12 +456,12 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 for ( i=0; i < cpr_num_storage_pes; ++i )
                 {
                     q_tail = ( shmem_int_atomic_fetch_inc ( &cpr_resrv_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
-                    start = clock();
+                    time_t start = time(NULL);
                     shmem_putmem (&cpr_resrv_queue[q_tail], (void *) carr, 1 * sizeof(cpr_rsvr_carrier), cpr_storage_pes[i]);
                     // TEST purpose:
-                    end = clock();
+                    time_t end = time(NULL);
                     posted_resrv++;
-                    printf("shmem_put took %f in PE=%d\n", ((double) (end - start)) / CLOCKS_PER_SEC, pe_num);
+                    printf("shmem_put took %f in PE=%d\n", difftime(end, start), pe_num);
                     //printf("RESERVE carrier posted to pe %d with qtail=%d from pe %d\n", cpr_storage_pes[i], q_tail, pe_num);
                 }
             }
