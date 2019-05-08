@@ -510,8 +510,8 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 // TO DO: head and tail might overflow the int size... add code to check
                 *carr = cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)];
 
-                printf("in reserve, through carr: PE=%d, qcarrier[%d].pe_num=%d\n", pe_num, cpr_resrv_queue_head, carr->pe_num);
-                printf("in reserve, through queu: PE=%d, qcarrier[%d].pe_num=%d\n", pe_num, cpr_resrv_queue_head, cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)].pe_num);
+                printf("in reserve: PE=%d, qcarrier[%d].pe_num=%d\n", pe_num, cpr_resrv_queue_head, carr->pe_num);
+                // printf("in reserve, through queu: PE=%d, qcarrier[%d].pe_num=%d\n", pe_num, cpr_resrv_queue_head, cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)].pe_num);
                 cpr_resrv_queue_head ++;
                 // TO DO: I should reserve count/1000+1 carriers
                 if ( cpr_table_tail[ carr-> pe_num] >= cpr_table_size[ carr-> pe_num] )
@@ -524,7 +524,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 cpr_table_tail[ carr-> pe_num] ++;
 
                 cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] = (cpr_check_carrier *) malloc ( 1* sizeof(cpr_check_carrier));
-                printf("From me=%d in reservation, cpr_table_tail[%d]=%d;\n", pe_num, carr->pe_num, cpr_table_tail[carr->pe_num]);
+                // printf("From me=%d in reservation, cpr_table_tail[%d]=%d;\n", pe_num, carr->pe_num, cpr_table_tail[carr->pe_num]);
                 // for ( i=0; i<cpr_num_active_pes; ++i )
                 //     printf("From me=%d, all table_tail[%d]=%d", pe_num, i, cpr_table_tail[i]);
                 // printf("\n");
@@ -859,19 +859,20 @@ int main ()
         printf("After reservation:\n");
 
     cpr_rsvr_carrier *carr;
-    for ( i=0; i<8; ++i )
-    {
-        if ( me == i )
-            printf("Me=%d, cpr_shadow_mem_tail=%d, cpr_shadow_mem_size=%d\n", me, cpr_shadow_mem_tail, cpr_shadow_mem_size);
-        shmem_barrier_all();
-    }
+    // for ( i=0; i<8; ++i )
+    // {
+    //     if ( me == i )
+    //         printf("Me=%d, cpr_shadow_mem_tail=%d, cpr_shadow_mem_size=%d\n", me, cpr_shadow_mem_tail, cpr_shadow_mem_size);
+    //     shmem_barrier_all();
+    // }
     for ( i=8; i<12; ++i )
     {
         if ( me == i )
         {
             printf("PE=%d\n", i);
             for ( j=0; j<cpr_resrv_queue_tail; ++j )
-                printf("cpr_resrv_queue[%d].pe_num=%d\n", j, cpr_resrv_queue[j].pe_num);
+                printf("%d ", cpr_resrv_queue[j].pe_num);
+            printf("\n");
         }
         
         // if ( me == i ){
