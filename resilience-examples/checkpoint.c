@@ -533,24 +533,8 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 // Preparing the meta data of this piece of checkpoint for later
                 // e.g: later if they want to checkpoint with id=5, I lookup for id=5 which
                             // I have assigned here:
-                // if ( cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] != NULL )
-                // {
-                //     cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> id = carr -> id;
-                //     cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> adr = carr -> adr;
-                //     cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> count = carr -> count;
-                //     cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> pe_num = carr -> pe_num;
-                //     cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> is_symmetric = carr -> is_symmetric;
-                    
-                //     printf("***at spare=%d, qtail=%d, qhead=%d, carr->pe_num=%d, carr->id=%d, carr->is_symmetric=%d, carr->count=%d, table_tail[%d]=%d\n",
-                //         pe_num, cpr_resrv_queue_tail, cpr_resrv_queue_head,
-                //         cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> pe_num,
-                //         cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> id,
-                //         cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> is_symmetric,
-                //         cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] -> count,
-                //         carr->pe_num,
-                //         cpr_table_tail[ carr-> pe_num]);
-                // }
-                /**///shmem_cpr_copy_carrier (carr, cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1]);
+                
+                shmem_cpr_copy_carrier (carr, cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1]);
                 
                 // TODO: update the hash table. I'm assuming id = index here
             }
