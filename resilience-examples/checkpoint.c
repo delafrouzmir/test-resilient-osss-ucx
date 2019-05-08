@@ -506,6 +506,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
             {
                 // TEST Purpose:
+                shmem_wait_until(&cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)].count, SHMEM_CMP_NE, 0);
                 read_resrv++;
                 // TO DO: head and tail might overflow the int size... add code to check
                 *carr = cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)];
