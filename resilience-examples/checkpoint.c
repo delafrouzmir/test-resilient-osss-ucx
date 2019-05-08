@@ -69,9 +69,9 @@ int *cpr_table_size, *cpr_table_tail;
 
 // Part 3: queues necessary for exchange of data when reserving or checkpointing
 cpr_check_carrier cpr_check_queue[CPR_STARTING_QUEUE_LEN];
-int cpr_check_queue_head, cpr_check_queue_tail;
+int cpr_check_queue_head, cpr_check_queue_tail, cpr_sig_check;
 cpr_rsvr_carrier cpr_resrv_queue[CPR_STARTING_QUEUE_LEN];
-int cpr_resrv_queue_head, cpr_resrv_queue_tail;
+int cpr_resrv_queue_head, cpr_resrv_queue_tail, cpr_sig_rsvr;
 
 // Part 4: keeping the number of different pe types
 //int cpr_first_mspe, cpr_second_mspe, cpr_first_spare;
@@ -455,9 +455,12 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 
                 for ( i=0; i < cpr_num_storage_pes; ++i )
                 {
-                    q_tail = ( shmem_int_atomic_fetch_inc ( &cpr_resrv_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
+                    q_tail = ( shmem_atomic_fetch_inc ( &cpr_resrv_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
                     time_t start = time(NULL);
                     shmem_putmem (&cpr_resrv_queue[q_tail], (void *) carr, 1 * sizeof(cpr_rsvr_carrier), cpr_storage_pes[i]);
+                    
+                    if ( shmem_atomic_fetch ( &cpr_sig_rsvr, cpr_storage_pes[i]) == 0 )
+                        shmem_atomic_set( &cpr_sig_rsvr, 1, cpr_storage_pes[i]);
                     // TEST purpose:
                     time_t end = time(NULL);
                     posted_resrv++;
@@ -476,25 +479,26 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             // during the same function call and read them in the next function call
             
             /***** TO DO: check if this works in circular queues *****/
-            for ( wait_num=0; wait_num < 10; ++wait_num )
-            {
-                if ( cpr_resrv_queue_head >= cpr_resrv_queue_tail )
-                {
-                    // test:
-                    printf("waiting now in PE=%d for %dth time\n", pe_num, wait_num);
-                    // struct timespec ts;
-                    // ts.tv_sec = 1;
-                    // ts.tv_nsec = 1000000000;
-                    start = clock();
-                    //clock_nanosleep(&ts, NULL);
-                    // pselect(0, NULL, NULL, NULL, &ts, NULL);
-                    delay(0.01);
-                    end = clock();
-                    printf("waited for %f in PE=%d\n", ((double) (end - start)) / CLOCKS_PER_SEC, pe_num);
-                }
-                else
-                    break;
-            }
+            // for ( wait_num=0; wait_num < 10; ++wait_num )
+            // {
+            //     if ( cpr_resrv_queue_head >= cpr_resrv_queue_tail )
+            //     {
+            //         // test:
+            //         printf("waiting now in PE=%d for %dth time\n", pe_num, wait_num);
+            //         // struct timespec ts;
+            //         // ts.tv_sec = 1;
+            //         // ts.tv_nsec = 1000000000;
+            //         start = clock();
+            //         //clock_nanosleep(&ts, NULL);
+            //         // pselect(0, NULL, NULL, NULL, &ts, NULL);
+            //         delay(0.01);
+            //         end = clock();
+            //         printf("waited for %f in PE=%d\n", ((double) (end - start)) / CLOCKS_PER_SEC, pe_num);
+            //     }
+            //     else
+            //         break;
+            // }
+            shmem_wait_until ( &cpr_sig_rsvr, SHMEM_CMP_GT, 0);
             printf("RESERVING from a SPARE=%d:\t qhead=%d, qtail=%d, reading %d carriers\n", pe_num, cpr_resrv_queue_head, cpr_resrv_queue_tail, cpr_resrv_queue_tail - cpr_resrv_queue_head);
             
             /***** TO DO: check if this works in circular queues *****/
@@ -584,10 +588,10 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                 {
                     // TEST Purpose:
                     posted_check++;
-                    // shmem_int_atomic_fetch_inc returns the amount before increment
-                    q_tail = ( shmem_int_atomic_fetch_inc (&cpr_check_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
+                    // shmem_atomic_fetch_inc returns the amount before increment
+                    q_tail = ( shmem_atomic_fetch_inc (&cpr_check_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
                     // TEST:
-                    q_head = ( shmem_int_atomic_fetch (&cpr_check_queue_head, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN; 
+                    q_head = ( shmem_atomic_fetch (&cpr_check_queue_head, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN; 
                     printf("%d original putting to %d with qhead=%d, qtail=%d, with id=%d, count=%d\n", me, i, q_head, q_tail, id, count);
 
                     shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), cpr_storage_pes[i]);
