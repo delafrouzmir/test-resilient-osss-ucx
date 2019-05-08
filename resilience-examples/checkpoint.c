@@ -524,9 +524,9 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 
                 cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] = (cpr_check_carrier *) malloc ( 1* sizeof(cpr_check_carrier));
                 printf("From me=%d in reservation, cpr_table_tail[%d]=%d;\n", pe_num, carr->pe_num, cpr_table_tail[carr->pe_num]);
-                for ( i=0; i<cpr_num_active_pes; ++i )
-                    printf("From me=%d, all table_tail[%d]=%d", pe_num, i, cpr_table_tail[i]);
-                printf("\n");
+                // for ( i=0; i<cpr_num_active_pes; ++i )
+                //     printf("From me=%d, all table_tail[%d]=%d", pe_num, i, cpr_table_tail[i]);
+                // printf("\n");
 
                 // Preparing the meta data of this piece of checkpoint for later
                 // e.g: later if they want to checkpoint with id=5, I lookup for id=5 which
