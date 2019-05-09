@@ -594,7 +594,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                     // TEST:
                     read_check++;
                     // head and tail might overflow the int size... add code to check
-                    carr = &cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];
+                    *carr = cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];
                     cpr_check_queue_head ++;
                     
                     for ( i=0; i< carr-> count; ++i)
@@ -783,7 +783,7 @@ int main ()
         if ( me == i )
         {
             for ( j=0; j<cpr_resrv_queue_tail; ++j )
-                printf("Me=%d, carr[%d]->pe=%d, id=%d, count=%d\n", me, cpr_resrv_queue[j]->pe_num, cpr_resrv_queue[j]->id, cpr_resrv_queue[j]->count);
+                printf("Me=%d, carr[%d].pe=%d, id=%d, count=%d\n", me, cpr_resrv_queue[j].pe_num, cpr_resrv_queue[j].id, cpr_resrv_queue[j].count);
         }
         printf("&&&&&&\n");
         shmem_barrier_all();
