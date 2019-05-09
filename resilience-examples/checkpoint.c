@@ -529,11 +529,9 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
     int q_head;
     int npes = cpr_num_active_pes + cpr_num_spare_pes;
 
-    printf("before if! PE=%d ENTERED CHECKPOINT.\n", pe_num);
     // first we have to check if this data has reserved a place before
     if ( shmem_cpr_is_reserved (id, mem, pe_num) )
     {
-        printf("TEST! PE=%d ENTERED CHECKPOINT.\n", pe_num);
         // TO DO: change to hash table. for now, I assume id = index
         switch (cpr_pe_role)
         {
@@ -559,7 +557,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                     q_tail = ( shmem_atomic_fetch_inc (&cpr_check_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
                     // TEST:
                     q_head = ( shmem_atomic_fetch (&cpr_check_queue_head, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN; 
-                    printf("%d original putting to %d with qhead=%d, qtail=%d, with id=%d, count=%d\n", me, i, q_head, q_tail, id, count);
+                    // printf("%d original putting to %d with qhead=%d, qtail=%d, with id=%d, count=%d\n", me, cpr_storage_pes[i], q_head, q_tail, id, count);
 
                     shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), cpr_storage_pes[i]);
 
@@ -594,10 +592,6 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                     carr = &cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];
                     cpr_check_queue_head ++;
                     
-                    // TEST:
-                    if ( pe_num == 8 )
-                       printf("for PE=%d carrier: id=%d, count=%d, pe=%d\n", pe_num, carr->id, carr->count, carr->pe_num);
-
                     for ( i=0; i< carr-> count; ++i)
                     {
                         cpr_checkpoint_table[carr-> pe_num][carr-> id] -> data[i] = carr-> data[i];
@@ -819,10 +813,12 @@ int main ()
         if ( i%10 == 0)
         {
             shmem_cpr_checkpoint(0, &i, 1, me);
+            printf("PE=%d finished chp of id=0 for time=%d\n", i);
             //shmem_barrier_all();
             // if ( cpr_pe_type == CPR_SPARE_PE)
             //     printf("** PE %d 2nd check at iter=%dwith head=%d, tail=%d\n", me, i, cpr_check_queue_head, cpr_check_queue_tail);
             shmem_cpr_checkpoint(1, a, array_size, me);
+            printf("PE=%d finished chp of id=0 for time=%d\n", i);
             //shmem_barrier_all();
         }
 
