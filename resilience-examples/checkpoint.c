@@ -776,8 +776,8 @@ int main ()
     shmem_cpr_reserve(1, a, array_size, me);
     /**/
     shmem_barrier_all();
-    shmem_cpr_reserve(0, &i, 1, me);
-    shmem_barrier_all();
+    // shmem_cpr_reserve(0, &i, 1, me);
+    // shmem_barrier_all();
 
     for ( i=8; i<12; ++i )
     {
