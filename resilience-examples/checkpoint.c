@@ -783,9 +783,9 @@ int main ()
         if ( me == i )
         {
             for ( j=0; j<cpr_resrv_queue_tail; ++j )
-                printf("Me=%d, carr[%d].pe=%d, id=%d, count=%d\n", me, cpr_resrv_queue[j].pe_num, cpr_resrv_queue[j].id, cpr_resrv_queue[j].count);
+                printf("Me=%d, carr[%d].pe=%d, id=%d, count=%d\n", me, j, cpr_resrv_queue[j].pe_num, cpr_resrv_queue[j].id, cpr_resrv_queue[j].count);
+            printf("&&&&&&\n");
         }
-        printf("&&&&&&\n");
         shmem_barrier_all();
     }
 
