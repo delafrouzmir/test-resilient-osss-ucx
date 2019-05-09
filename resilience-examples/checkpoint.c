@@ -478,27 +478,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             // They also might not be able to read all carriers sent to them in 1 function call
             // (because they arrive at different times)
             // during the same function call and read them in the next function call
-            
-            /***** TO DO: check if this works in circular queues *****/
-            // for ( wait_num=0; wait_num < 10; ++wait_num )
-            // {
-            //     if ( cpr_resrv_queue_head >= cpr_resrv_queue_tail )
-            //     {
-            //         // test:
-            //         printf("waiting now in PE=%d for %dth time\n", pe_num, wait_num);
-            //         // struct timespec ts;
-            //         // ts.tv_sec = 1;
-            //         // ts.tv_nsec = 1000000000;
-            //         start = clock();
-            //         //clock_nanosleep(&ts, NULL);
-            //         // pselect(0, NULL, NULL, NULL, &ts, NULL);
-            //         delay(0.01);
-            //         end = clock();
-            //         printf("waited for %f in PE=%d\n", ((double) (end - start)) / CLOCKS_PER_SEC, pe_num);
-            //     }
-            //     else
-            //         break;
-            // }
+
             shmem_wait_until ( &cpr_sig_rsvr, SHMEM_CMP_GT, 0);
             // printf("RESERVING from a SPARE=%d:\t qhead=%d, qtail=%d, reading %d carriers\n", pe_num, cpr_resrv_queue_head, cpr_resrv_queue_tail, cpr_resrv_queue_tail - cpr_resrv_queue_head);
             
@@ -532,8 +512,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
 
                 // Preparing the meta data of this piece of checkpoint for later
                 // e.g: later if they want to checkpoint with id=5, I lookup for id=5 which
-                            // I have assigned here:
-                
+                            // I have assigned here:                
                 shmem_cpr_copy_carrier (carr, cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1]);
                 
                 // TODO: update the hash table. I'm assuming id = index here
@@ -603,6 +582,9 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                     printf("%d original putting to %d with qhead=%d, qtail=%d, with id=%d, count=%d\n", me, i, q_head, q_tail, id, count);
 
                     shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), cpr_storage_pes[i]);
+
+                    if ( shmem_atomic_fetch ( &cpr_sig_check, cpr_storage_pes[i]) == 0 )
+                        shmem_atomic_set( &cpr_sig_check, 1, cpr_storage_pes[i]);
                     //printf("CHP carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
                 }
                 // update hashtable
@@ -617,25 +599,14 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                     //printf("*** entered reservation from checkpointing from pe=%d with %d carriers***\n", pe_num, cpr_resrv_queue_tail-cpr_resrv_queue_head);
                     shmem_cpr_reserve(id, mem, count, pe_num);
                 }
+
                 // waiting to receive the first checkpointing request in the queue:
-                /***** check if this works in circular queues *****/
-                for ( wait_num=0 ; wait_num < 10; ++wait_num )
-                {
-                    if ( cpr_check_queue_head >= cpr_check_queue_tail )
-                    {
-                        //printf("%d is stuck in 1st while with head=%d tail=%d\n", me, cpr_check_queue_head, cpr_check_queue_tail);
-                        struct timespec ts;
-                        ts.tv_sec = 0;
-                        ts.tv_nsec = 1000000;
-                        nanosleep(&ts, NULL);
-                    }
-                    else
-                        break;
-                }
+                shmem_wait_until ( &cpr_sig_rsvr, SHMEM_CMP_GT, 0);
                 //printf("CHPING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_check_queue_tail - cpr_check_queue_head);
                 /***** check if this works in circular queues *****/
                 while (cpr_check_queue_head < cpr_check_queue_tail)
                 {
+                    shmem_wait_until(&cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)].count, SHMEM_CMP_NE, 0);
                     //printf("%d is stuck in 2nd while\n", me);
                     // TEST:
                     read_check++;
@@ -793,8 +764,8 @@ int main ()
 
     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
 
-    array_size = 10 + me;
-    a = (int *) malloc((array_size)*sizeof(int));
+    array_size = 10;
+    a = (int *) shmem_malloc((array_size)*sizeof(int));
     for ( i=0; i<array_size; ++i)
         a[i] = me;
 
