@@ -813,12 +813,12 @@ int main ()
         if ( i%10 == 0)
         {
             shmem_cpr_checkpoint(0, &i, 1, me);
-            printf("PE=%d finished chp of id=0 for time=%d\n", i);
+            printf("PE=%d finished chp of id=0 for time=%d\n", me, i);
             //shmem_barrier_all();
             // if ( cpr_pe_type == CPR_SPARE_PE)
             //     printf("** PE %d 2nd check at iter=%dwith head=%d, tail=%d\n", me, i, cpr_check_queue_head, cpr_check_queue_tail);
             shmem_cpr_checkpoint(1, a, array_size, me);
-            printf("PE=%d finished chp of id=0 for time=%d\n", i);
+            printf("PE=%d finished chp of id=1 for time=%d\n", me, i);
             //shmem_barrier_all();
         }
 
