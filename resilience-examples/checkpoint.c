@@ -774,8 +774,20 @@ int main ()
     i=0;
     shmem_cpr_reserve(0, &i, 1, me);
     shmem_cpr_reserve(1, a, array_size, me);
-    /**/shmem_cpr_reserve(0, &i, 1, me);
+    /**/
+    shmem_cpr_reserve(0, &i, 1, me);
     shmem_barrier_all();
+
+    for ( i=8; i<12; ++i )
+    {
+        if ( me == i )
+        {
+            for ( j=0; j<cpr_resrv_queue_tail; ++j )
+                printf("Me=%d, carr[%d]->pe=%d, id=%d, count=%d\n", me, cpr_resrv_queue[j]->pe_num, cpr_resrv_queue[j]->id, cpr_resrv_queue[j]->count);
+        }
+        printf("&&&&&&\n");
+        shmem_barrier_all();
+    }
 
     for ( i=8; i<12; ++i )
     {
