@@ -555,15 +555,11 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                     posted_check++;
                     // shmem_atomic_fetch_inc returns the amount before increment
                     q_tail = ( shmem_atomic_fetch_inc (&cpr_check_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
-                    // TEST:
-                    q_head = ( shmem_atomic_fetch (&cpr_check_queue_head, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN; 
-                    // printf("%d original putting to %d with qhead=%d, qtail=%d, with id=%d, count=%d\n", me, cpr_storage_pes[i], q_head, q_tail, id, count);
 
                     shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), cpr_storage_pes[i]);
 
                     if ( shmem_atomic_fetch ( &cpr_sig_check, cpr_storage_pes[i]) == 0 )
                         shmem_atomic_set( &cpr_sig_check, 1, cpr_storage_pes[i]);
-                    //printf("CHP carrier posted to pe %d with qtail=%d from pe %d\n", i, q_tail, pe_num);
                 }
                 // update hashtable
                 break;
@@ -596,9 +592,10 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                     {
                         cpr_checkpoint_table[carr-> pe_num][carr-> id] -> data[i] = carr-> data[i];
                         // TEST:
-                        //if ( pe_num == 8 )
-                        //    printf("***cpr_checkpoint_table[%d][%d].data[%d]=%d\n\n", carr-> pe_num, carr-> id, i, cpr_checkpoint_table[carr-> pe_num][carr-> id].data[i]);
+                        if ( pe_num == 8 )
+                           printf("***cpr_checkpoint_table[%d][%d].data[%d]=%d ", carr-> pe_num, carr-> id, i, cpr_checkpoint_table[carr-> pe_num][carr-> id]->data[i]);
                     }
+                    printf("\n");
                     // I'm assuming id = index here
                 }
                 //return FAILURE;     // if SPAREs are not participated in code, they won't call reserve
@@ -785,12 +782,12 @@ int main ()
         if ( i%10 == 0)
         {
             shmem_cpr_checkpoint(0, &i, 1, me);
-            printf("PE=%d finished chp of id=0 for time=%d\n", me, i);
+            // printf("PE=%d finished chp of id=0 for time=%d\n", me, i);
             //shmem_barrier_all();
             // if ( cpr_pe_type == CPR_SPARE_PE)
             //     printf("** PE %d 2nd check at iter=%dwith head=%d, tail=%d\n", me, i, cpr_check_queue_head, cpr_check_queue_tail);
             shmem_cpr_checkpoint(1, a, array_size, me);
-            printf("PE=%d finished chp of id=1 for time=%d\n", me, i);
+            // printf("PE=%d finished chp of id=1 for time=%d\n", me, i);
             //shmem_barrier_all();
         }
         for ( j=0; j<array_size; ++j)
