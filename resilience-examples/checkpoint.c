@@ -343,8 +343,8 @@ int shmem_cpr_is_new_reservation (int id)
         return 0;
 
     // now we have made sure this PE has a shadow mem
-    //if ( id < cpr_shadow_mem_tail && cpr_shadow_mem[id] != NULL )
-    //    return 0;
+    if ( id < cpr_shadow_mem_tail && cpr_shadow_mem[id] != NULL )
+       return 0;
 
     return 1;
 }
