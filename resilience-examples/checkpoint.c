@@ -804,6 +804,8 @@ int main ()
         }*/
     }
 
+    shmem_barrier_all();
+
     // TEST SUCCESSFUL:
     for ( i=8; i<12; ++i )
     {
