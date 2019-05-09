@@ -720,7 +720,7 @@ int main ()
 {
     int spes;
     int success_init;
-    int i, j, array_size;
+    int i, j, k, l, array_size;
     int *a;
 
     shmem_init ();
@@ -745,20 +745,6 @@ int main ()
 
     // not sure if this is necessary here
     shmem_barrier_all ();
-
-    // SUCCESSFUL: printf("PE=%d, adr to reserve_q=%d, adr to check_q=%d\n", me, cpr_resrv_queue, cpr_check_queue);
-
-    // SUCCESSFUL: if ( me == 0 )
-    // {
-    //     printf("size of reserve q is %d\n", sizeof (cpr_resrv_queue));
-    //     for ( i = 1; i<npes; ++i )
-    //     {
-    //         if ( shmem_addr_accessible(&cpr_resrv_queue[0], i) )
-    //             printf("reserve q[0] on pe=%d is accessible\n", i);
-    //         if ( shmem_addr_accessible(&cpr_check_queue[0], i) )
-    //             printf("check q[0] on pe=%d is accessible\n", i);
-    //     }
-    // }
 
     // if ( me == 0 )
     //     printf("Before reservation:\n");
@@ -794,20 +780,6 @@ int main ()
     //     shmem_barrier_all();
     // }
     
-    // TEST SUCCESSFUL:
-    // for ( i=8; i<12; ++i )
-    // {
-    //     if ( me == i )
-    //     {
-    //         printf("PE=%d\n", i);
-    //         for ( j=0; j<cpr_resrv_queue_tail; ++j )
-    //             printf("pe=%d id=%d count=%d is_symmetric=%d\n", cpr_resrv_queue[j].pe_num, cpr_resrv_queue[j].id, cpr_resrv_queue[j].count, cpr_resrv_queue[j].is_symmetric);
-    //         printf("\n");
-    //     }
-    //     shmem_barrier_all();
-    // }
-    
-    
     for ( i=0; i<40; ++i )
     {
         if ( i%10 == 0)
@@ -821,16 +793,42 @@ int main ()
             printf("PE=%d finished chp of id=1 for time=%d\n", me, i);
             //shmem_barrier_all();
         }
+        for ( j=0; j<array_size; ++j)
+            a[j] ++;
+        /*
+        if ( i == 25 ){
+            shmem_cpr_rollback();
+            if ( me == 0)
+                printf("AFTER ROLLBACK:\n");
+            printf("PE %d: \t i=%d \t a[0]=%d\n", me, i, a[0]);
+        }*/
+    }
 
-    //     for ( j=0; j<array_size; ++j)
-    //         a[j] ++;
-    //     /*
-    //     if ( i == 25 ){
-    //         shmem_cpr_rollback();
-    //         if ( me == 0)
-    //             printf("AFTER ROLLBACK:\n");
-    //         printf("PE %d: \t i=%d \t a[0]=%d\n", me, i, a[0]);
-    //     }*/
+    // TEST SUCCESSFUL:
+    for ( i=8; i<12; ++i )
+    {
+        if ( me == i )
+        {
+            printf("PE=%d table:\n", i);
+            for ( j=0; j<cpr_num_active_pes; ++j )
+            {
+                printf("for PE=%d\n", j);
+                for ( k=0; k<cpr_table_tail[j]; ++k )
+                {
+                    printf("id=%d count=%d is_symmetric=%d data=:\n",
+                        cpr_checkpoint_table[j][k].pe_num,
+                        cpr_checkpoint_table[j][k].id,
+                        cpr_checkpoint_table[j][k].count,
+                        cpr_checkpoint_table[j][k].is_symmetric);
+                    for ( l=0; l< cpr_checkpoint_table[j][k].count; ++l )
+                        printf("%d ", cpr_checkpoint_table[j][k].data[l]);
+                    printf("\n----------------");
+                }
+                printf("============***============\n");
+            }
+            printf("\n\n\n");
+        }
+        shmem_barrier_all();
     }
 
     // shmem_barrier_all ();
