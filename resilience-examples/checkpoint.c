@@ -830,7 +830,7 @@ int main ()
         {
             printf("PE=%d\n", i);
             for ( j=0; j<cpr_resrv_queue_tail; ++j )
-                printf("pe=%d id=%d count=%d\n", cpr_resrv_queue[j].pe_num, cpr_resrv_queue[j].id, cpr_resrv_queue[j].count);
+                printf("pe=%d id=%d count=%d is_symmetric=%d\n", cpr_resrv_queue[j].pe_num, cpr_resrv_queue[j].id, cpr_resrv_queue[j].count, cpr_resrv_queue[j].count);
             printf("\n");
         }
         
