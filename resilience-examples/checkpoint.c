@@ -579,7 +579,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                 }
 
                 // waiting to receive the first checkpointing request in the queue:
-                shmem_wait_until ( &cpr_sig_rsvr, SHMEM_CMP_GT, 0);
+                shmem_wait_until ( &cpr_sig_check, SHMEM_CMP_GT, 0);
                 //printf("CHPING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_check_queue_tail - cpr_check_queue_head);
                 
                 while (cpr_check_queue_head < cpr_check_queue_tail)
