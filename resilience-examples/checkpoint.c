@@ -815,14 +815,14 @@ int main ()
                 printf("for PE=%d\n", j);
                 for ( k=0; k<cpr_table_tail[j]; ++k )
                 {
-                    printf("id=%d count=%d is_symmetric=%d data=:\n",
+                    printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
                         cpr_checkpoint_table[j][k]->pe_num,
                         cpr_checkpoint_table[j][k]->id,
                         cpr_checkpoint_table[j][k]->count,
                         cpr_checkpoint_table[j][k]->is_symmetric);
                     for ( l=0; l< cpr_checkpoint_table[j][k]->count; ++l )
                         printf("%d ", cpr_checkpoint_table[j][k]->data[l]);
-                    printf("\n----------------");
+                    printf("\n----------------\n");
                 }
                 printf("============***============\n");
             }
