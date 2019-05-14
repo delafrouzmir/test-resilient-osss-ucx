@@ -859,6 +859,9 @@ int main ()
         }
     }
 
+    if ( cpr_pe_role == CPR_STORAGE_ROLE )
+        shmem_cpr_checkpoint(0, NULL, 0, shmem_cpr_pe_num(me));
+
     shmem_barrier_all();
 
     if ( me == 0 )
@@ -869,6 +872,8 @@ int main ()
         for ( i=0; i<cpr_num_storage_pes; ++i )
             printf("storag[%d]=%d \n", i, cpr_storage_pes[i]);
     }
+
+    shmem_barrier_all();
     // if ( cpr_pe_role == CPR_STORAGE_ROLE )
     //     shmem_cpr_checkpoint(1, a, array_size, me);
     // shmem_barrier_all();
