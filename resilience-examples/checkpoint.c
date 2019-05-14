@@ -87,7 +87,7 @@ int cpr_checkpointing_mode, cpr_sig, cpr_start;
 *  since we want to know both which PE has replaced a dead PE (= the old PE num of a resurrected PE)
 *  as well as know what PE a spare PE has replaces (= the new PE num of a previously spare PE)
 */
-int *cpr_pe, *cpr_all_pe_type, *cpr_all_pe_role;
+int *cpr_pe, *cpr_all_pe_type, *cpr_all_pe_role, *cpr_replaced;
 
 // Part 6: delarrations for the application and testing
 int me, npes;
@@ -253,10 +253,11 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
 
     cpr_num_spare_pes = spes;
     cpr_num_active_pes = npes - spes;
-    cpr_pe = (int *) shmem_malloc (cpr_num_active_pes * sizeof(int));
-    cpr_all_pe_type = (int *) shmem_malloc (npes * sizeof(int));
-    cpr_all_pe_role = (int *) shmem_malloc (npes * sizeof(int));
-    cpr_storage_pes = (int *) shmem_malloc (spes * sizeof (int));
+    cpr_pe = (int *) malloc (npes * sizeof(int));
+    cpr_replaced = (int *) malloc (npes * sizeof(int));
+    cpr_all_pe_type = (int *) malloc (npes * sizeof(int));
+    cpr_all_pe_role = (int *) malloc (npes * sizeof(int));
+    cpr_storage_pes = (int *) malloc (spes * sizeof (int));
 
     // add an if for different checkpointing mode here
     switch (mode)
@@ -329,7 +330,8 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
 
 int shmem_cpr_pe_num ( int pe_num)
 {
-    if ( pe_num >= 0 && pe_num < cpr_num_active_pes )
+    int npes = cpr_num_active_pes + cpr_num_spare_pes;
+    if ( pe_num >= 0 && pe_num < npes )
         return cpr_pe[pe_num];
     return -1;
 }
@@ -413,6 +415,9 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
     should it be the user's responsibility or ours?!
     if ours, then maybe hashtable for pe numbers can help
     */
+
+    // if ( cpr_pe_type == CPR_RESURRECTED_PE )
+    //     pe_num = cpr_replaced[pe_num];
 
     cpr_rsvr_carrier *carr = (cpr_rsvr_carrier *) malloc ( sizeof (cpr_rsvr_carrier) ); 
     int i, q_tail;
@@ -521,6 +526,10 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
         Spare or MSPE: cpr_checkpoint_table[pe_num][index]
     2- check if this request for checkpoint has a reservation first
     */
+
+    if ( pe_num < 0 )
+        return FAILURE;
+
     // TEST Purpose:
     called_check++;
 
@@ -643,12 +652,17 @@ int shmem_cpr_rollback ( int dead_pe, int me )
     *  e.g. replacing every dead PE with a spare from the same node
     */
 
-    if ( me != dead_pe)
+    if ( me != dead_pe && cpr_all_pe_role[dead_pe] == CPR_ACTIVE_ROLE)
     {
         chosen_pe = cpr_storage_pes[cpr_num_storage_pes-1];
+
         cpr_all_pe_role[chosen_pe] = CPR_ACTIVE_ROLE;
         cpr_all_pe_type[chosen_pe] = CPR_RESURRECTED_PE;
-        cpr_pe[dead_pe] = chosen_pe;
+        cpr_pe[dead_pe] = -1;
+        // cpr_pe[i] shows which PE plays the role of PE_i
+        // cpr_replaced[i] shows which PE has replaced PE_i
+        cpr_pe[chosen_pe] = dead_pe;
+        cpr_replaced[dead_pe] = chosen_pe;
 
         cpr_all_pe_type[dead_pe] = CPR_DEAD_PE;
 
@@ -729,6 +743,23 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                 break;
         }
     }
+
+    if ( me != dead_pe && cpr_all_pe_role[dead_pe] == CPR_STORAGE_ROLE){
+        if ( cpr_checkpointing_mode == CPR_TWO_COPY_CHECKPOINT )
+        {
+            int candid_storage = -1;
+            for ( i = cpr_num_active_pes; i < npes; ++i )
+                if ( cpr_all_pe_type[i] == CPR_SPARE_PE && cpr_all_pe_role[i] == CPR_DORMANT_ROLE )
+                {
+                    candid_storage = i;
+                    break;
+                }
+
+            if ( candid_storage != -1 &&(me == candid_storage || me == cpr_storage_pes[0]) )
+                shmem_cpr_copy_check_table ( candid_storage, cpr_storage_pes[0] );
+        }
+    }
+
 
     return SUCCESS;
 }
@@ -848,6 +879,7 @@ int main ()
         if ( i == 35 ){
             shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
             shmem_barrier_all();
+            printf("PE=%d done with rollback!\n", me);
             if ( me == 11)
             {
                 printf("AFTER ROLLBACK:\n");
