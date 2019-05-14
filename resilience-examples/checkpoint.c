@@ -423,6 +423,9 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
     // if ( cpr_pe_type == CPR_RESURRECTED_PE )
     //     pe_num = cpr_replaced[pe_num];
 
+    if ( cpr_pe_type == CPR_DEAD_PE || pe_num < 0 )
+        return FAILURE;
+
     cpr_rsvr_carrier *carr = (cpr_rsvr_carrier *) malloc ( sizeof (cpr_rsvr_carrier) ); 
     int i, q_tail;
     // TO DO: could/should this npes change through the program?
@@ -531,7 +534,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
     2- check if this request for checkpoint has a reservation first
     */
 
-    if ( pe_num < 0 )
+    if ( cpr_pe_type == CPR_DEAD_PE || pe_num < 0 )
         return FAILURE;
 
     // TEST Purpose:
@@ -773,7 +776,7 @@ int main ()
     int spes;
     int success_init;
     int i, j, k, l, array_size, first_rollback;
-    int *a;
+    int *a, *iter;
 
     shmem_init ();
     me = shmem_my_pe ();
@@ -789,6 +792,9 @@ int main ()
         spes = 0;
 
     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
+
+    iter = (int *) shmem_malloc(sizeof(int));
+    iter = &i;
 
     array_size = 10;
     a = (int *) shmem_malloc((array_size)*sizeof(int));
@@ -819,6 +825,8 @@ int main ()
     
     first_rollback = 0;
     i=0;
+    if ( me == 0 )
+        printf("i accessible = %d\n", shmem_addr_accessible(&i, 1));
     shmem_cpr_reserve(0, &i, 1, shmem_cpr_pe_num(me));
     shmem_cpr_reserve(1, a, array_size, shmem_cpr_pe_num(me));
     /**/
