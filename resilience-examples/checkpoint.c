@@ -825,12 +825,12 @@ int main ()
 
     for ( (*iter)=0; (*iter)<40; ++(*iter) )
     {
-        if ( cpr_pe[me] == 3 )
-        {
-            printf("*** me=%d iter=%d\n", me, *iter);
-            for ( j=0; j<array_size; ++j )
-                printf("**%d ", a[j]);
-        }
+        // if ( cpr_pe[me] == 3 )
+        // {
+        //     printf("*** me=%d iter=%d\n", me, *iter);
+        //     for ( j=0; j<array_size; ++j )
+        //         printf("**%d ", a[j]);
+        // }
         if ( (*iter) % 10 == 0)
         {
             shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
