@@ -542,6 +542,9 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
     if ( cpr_pe_type == CPR_DEAD_PE || pe_num < 0 )
         return FAILURE;
 
+    if ( pe_num == 9 || pe_num == 10 )
+        printf("### checkpoint from id=%d to PE=%d\n", id, pe_num);
+
     // TEST Purpose:
     called_check++;
 
@@ -812,75 +815,14 @@ int main ()
     // not sure if this is necessary here
     shmem_barrier_all ();
 
-    // if ( me == 0 )
-    //     printf("Before reservation:\n");
-    // for ( i=0; i<8; ++i )
-    // {
-    //     if ( me == i )
-    //         printf("Me=%d, cpr_shadow_mem_tail=%d, cpr_shadow_mem_size=%d\n", me, cpr_shadow_mem_tail, cpr_shadow_mem_size);
-    //     shmem_barrier_all();
-    // }
-    // for ( i=8; i<12; ++i )
-    // {
-    //     if ( me == i ){
-    //         printf("PE %d: ", i);
-    //         for ( j=0; j<cpr_num_active_pes; ++j )
-    //             printf("cpr_table_tail[%d]=%d, cpr_table_size[%d]=%d\t", j, cpr_table_tail[j], j, cpr_table_size[j]);
-    //         printf("\n");
-    //     }
-    //     shmem_barrier_all();
-    // }
-    
     first_rollback = 0;
     *iter = 0;
-    if ( me == 0 )
-        printf("iter accessible = %d\n", shmem_addr_accessible(iter, 1));
+    
     shmem_cpr_reserve(0, iter, 1, shmem_cpr_pe_num(me));
     shmem_cpr_reserve(1, a, array_size, shmem_cpr_pe_num(me));
     /**/
     shmem_barrier_all();
-    // shmem_cpr_reserve(0, &i, 1, me);
-    // shmem_barrier_all();
 
-    // for ( i=8; i<12; ++i )
-    // {
-    //     if ( me == i )
-    //     {
-    //         for ( j=0; j<cpr_resrv_queue_tail; ++j )
-    //             printf("Me=%d, carr[%d].pe=%d, id=%d, count=%d\n", me, j, cpr_resrv_queue[j].pe_num, cpr_resrv_queue[j].id, cpr_resrv_queue[j].count);
-    //         printf("&&&&&&\n");
-    //     }
-    //     shmem_barrier_all();
-    // }
-
-    // for ( i=8; i<12; ++i )
-    // {
-    //     if ( me == i )
-    //     {
-    //         printf("PE=%d table:\n", i);
-    //         for ( j=0; j<cpr_num_active_pes; ++j )
-    //         {
-    //             printf("for PE=%d\n", j);
-    //             for ( k=0; k<cpr_table_tail[j]; ++k )
-    //             {
-    //                 printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
-    //                     cpr_checkpoint_table[j][k]->pe_num,
-    //                     cpr_checkpoint_table[j][k]->id,
-    //                     cpr_checkpoint_table[j][k]->count,
-    //                     cpr_checkpoint_table[j][k]->is_symmetric);
-    //                 for ( l=0; l< cpr_checkpoint_table[j][k]->count; ++l )
-    //                     printf("%d ", cpr_checkpoint_table[j][k]->data[l]);
-    //                 printf("\n----------------\n");
-    //             }
-    //             printf("============***============\n");
-    //         }
-    //         printf("\n\n\n");
-    //     }
-    //     shmem_barrier_all();
-    // }
-    // shmem_barrier_all();
-    
-    
     for ( (*iter)=0; (*iter)<40; ++(*iter) )
     {
         if ( cpr_pe[me] == 3 )
@@ -892,12 +834,9 @@ int main ()
         if ( (*iter) % 10 == 0)
         {
             shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
-            // printf("PE=%d finished chp of id=0 for time=%d\n", me, i);
             shmem_barrier_all();
-            // if ( cpr_pe_type == CPR_SPARE_PE)
-            //     printf("** PE %d 2nd check at iter=%dwith head=%d, tail=%d\n", me, i, cpr_check_queue_head, cpr_check_queue_tail);
+            
             shmem_cpr_checkpoint(1, a, array_size, shmem_cpr_pe_num(me));
-            // printf("PE=%d finished chp of id=1 for time=%d\n", me, i);
             shmem_barrier_all();
         }
         for ( j=0; j<array_size; ++j)
@@ -907,14 +846,14 @@ int main ()
             first_rollback = 1;
             shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
             shmem_barrier_all();
-            printf("PE=%d done with rollback with iter=%d!\n", me, *iter);
-            if ( me == 11)
-            {
-                printf("AFTER ROLLBACK:\n");
-                for ( j=0; j<array_size; ++j )
-                    printf("%d ", a[j]);
-                printf("\n");
-            }
+            // printf("PE=%d done with rollback with iter=%d!\n", me, *iter);
+            // if ( me == 11)
+            // {
+            //     printf("AFTER ROLLBACK:\n");
+            //     for ( j=0; j<array_size; ++j )
+            //         printf("%d ", a[j]);
+            //     printf("\n");
+            // }
             if ( cpr_pe_role == CPR_STORAGE_ROLE )
                 *iter = 20;
         }
