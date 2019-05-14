@@ -620,10 +620,10 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
     return SUCCESS;
 }
 
-// void shmem_cpr_copy_check_table ( int candid, int storage )
-// {
+void shmem_cpr_copy_check_table ( int candid, int storage )
+{
 
-// }
+}
 
 int shmem_cpr_rollback ( int dead_pe, int me )
 {
