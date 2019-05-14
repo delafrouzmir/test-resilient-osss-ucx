@@ -562,14 +562,14 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                     if ( shmem_atomic_fetch ( &cpr_sig_check, cpr_storage_pes[i]) == 0 )
                         shmem_atomic_set( &cpr_sig_check, 1, cpr_storage_pes[i]);
 
-                    if ( cpr_storage_pes[i] == 8 )
-                    {
-                        if ( carr -> count == 10 )
-                            // printf("**from pe=%d to pe=8 sending: %d %d %d %d %d %d %d %d %d %d\n",
-                                pe_num, carr->data[0], carr->data[1], carr->data[2],
-                                carr->data[3], carr->data[4], carr->data[5],
-                                carr->data[6], carr->data[7], carr->data[8], carr->data[9]);
-                    }
+                    // if ( cpr_storage_pes[i] == 8 )
+                    // {
+                    //     if ( carr -> count == 10 )
+                    //         printf("**from pe=%d to pe=8 sending: %d %d %d %d %d %d %d %d %d %d\n",
+                    //             pe_num, carr->data[0], carr->data[1], carr->data[2],
+                    //             carr->data[3], carr->data[4], carr->data[5],
+                    //             carr->data[6], carr->data[7], carr->data[8], carr->data[9]);
+                    // }
                 }
                 // update hashtable
                 break;
