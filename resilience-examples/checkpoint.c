@@ -154,6 +154,7 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
             for ( i = npes - spes ; i < npes; ++i )
             {
                 cpr_all_pe_type[i] = CPR_SPARE_PE;
+                cpr_all_pe_role[i] = CPR_STORAGE_ROLE;
                 cpr_storage_pes[i-(npes-spes)] = i;
             }
 
