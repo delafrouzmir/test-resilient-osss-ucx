@@ -794,7 +794,6 @@ int main ()
     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
 
     iter = (int *) shmem_malloc(sizeof(int));
-    iter = &i;
 
     array_size = 10;
     a = (int *) shmem_malloc((array_size)*sizeof(int));
@@ -824,10 +823,10 @@ int main ()
     // }
     
     first_rollback = 0;
-    i=0;
+    *iter = 0;
     if ( me == 0 )
-        printf("i accessible = %d\n", shmem_addr_accessible(&i, 1));
-    shmem_cpr_reserve(0, &i, 1, shmem_cpr_pe_num(me));
+        printf("i accessible = %d\n", shmem_addr_accessible(iter, 1));
+    shmem_cpr_reserve(0, iter, 1, shmem_cpr_pe_num(me));
     shmem_cpr_reserve(1, a, array_size, shmem_cpr_pe_num(me));
     /**/
     shmem_barrier_all();
@@ -873,11 +872,11 @@ int main ()
     // shmem_barrier_all();
     
     
-    for ( i=0; i<40; ++i )
+    for ( (*iter)=0; (*iter)<40; ++(*iter) )
     {
-        if ( i%10 == 0)
+        if ( (*iter) % 10 == 0)
         {
-            shmem_cpr_checkpoint(0, &i, 1, shmem_cpr_pe_num(me));
+            shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
             // printf("PE=%d finished chp of id=0 for time=%d\n", me, i);
             shmem_barrier_all();
             // if ( cpr_pe_type == CPR_SPARE_PE)
@@ -889,11 +888,11 @@ int main ()
         for ( j=0; j<array_size; ++j)
             a[j] ++;
         
-        if ( i == 35 && first_rollback == 0 ){
+        if ( (*iter) == 35 && first_rollback == 0 ){
             first_rollback = 1;
             shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
             shmem_barrier_all();
-            printf("PE=%d done with rollback with i=%d!\n", me, i);
+            printf("PE=%d done with rollback with iter=%d!\n", me, *iter);
             if ( me == 11)
             {
                 printf("AFTER ROLLBACK:\n");
