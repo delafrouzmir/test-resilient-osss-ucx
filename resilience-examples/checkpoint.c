@@ -565,7 +565,7 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                     if ( cpr_storage_pes[i] == 8 )
                     {
                         if ( carr -> count == 10 )
-                            printf("**from pe=%d to pe=8 sending: %d %d %d %d %d %d %d %d %d %d\n",
+                            // printf("**from pe=%d to pe=8 sending: %d %d %d %d %d %d %d %d %d %d\n",
                                 pe_num, carr->data[0], carr->data[1], carr->data[2],
                                 carr->data[3], carr->data[4], carr->data[5],
                                 carr->data[6], carr->data[7], carr->data[8], carr->data[9]);
@@ -602,10 +602,10 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                     {
                         cpr_checkpoint_table[carr-> pe_num][carr-> id] -> data[i] = carr-> data[i];
                         // TEST:
-                        if ( pe_num == 8 )
-                           printf("***cpr_checkpoint_table[%d][%d].data[%d]=%d ", carr-> pe_num, carr-> id, i, cpr_checkpoint_table[carr-> pe_num][carr-> id]->data[i]);
+                        // if ( pe_num == 8 )
+                        //    printf("***cpr_checkpoint_table[%d][%d].data[%d]=%d ", carr-> pe_num, carr-> id, i, cpr_checkpoint_table[carr-> pe_num][carr-> id]->data[i]);
                     }
-                    printf("\n");
+                    // printf("\n");
                     // I'm assuming id = index here
                 }
                 //return FAILURE;     // if SPAREs are not participated in code, they won't call reserve
@@ -645,6 +645,14 @@ int shmem_cpr_rollback ( int dead_pe, int me )
 
     if ( me != dead_pe)
     {
+        cpr_all_pe_role[cpr_storage_pes[cpr_num_storage_pes-1]] = CPR_ACTIVE_ROLE;
+        cpr_all_pe_type[cpr_storage_pes[cpr_num_storage_pes-1]] = CPR_RESURRECTED_PE;
+        cpr_pe[dead_pe] = cpr_storage_pes[cpr_num_storage_pes-1];
+
+        cpr_all_pe_type[dead_pe] = CPR_DEAD_PE;
+
+        cpr_num_storage_pes --;
+
         switch (cpr_pe_role)
         {
             // every Original or Resurrected PE should just rollback to the last checkpoint
@@ -673,8 +681,8 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                 {
                     cpr_pe_type = CPR_RESURRECTED_PE;
                     cpr_pe_role = CPR_ACTIVE_ROLE;
-                    cpr_num_storage_pes --;
-                    
+
+
                     cpr_shadow_mem = (cpr_check_carrier **) malloc ( cpr_table_size[dead_pe] * sizeof(cpr_check_carrier *));
                     for ( i=0; i < cpr_table_tail[dead_pe]; ++i )
                     {
@@ -775,8 +783,8 @@ int main ()
     // }
     
     i=0;
-    shmem_cpr_reserve(0, &i, 1, me);
-    shmem_cpr_reserve(1, a, array_size, me);
+    shmem_cpr_reserve(0, &i, 1, shmem_cpr_pe_num(me));
+    shmem_cpr_reserve(1, a, array_size, shmem_cpr_pe_num(me));
     /**/
     shmem_barrier_all();
     // shmem_cpr_reserve(0, &i, 1, me);
@@ -825,12 +833,12 @@ int main ()
     {
         if ( i%10 == 0)
         {
-            shmem_cpr_checkpoint(0, &i, 1, me);
+            shmem_cpr_checkpoint(0, &i, 1, shmem_cpr_pe_num(me));
             // printf("PE=%d finished chp of id=0 for time=%d\n", me, i);
             shmem_barrier_all();
             // if ( cpr_pe_type == CPR_SPARE_PE)
             //     printf("** PE %d 2nd check at iter=%dwith head=%d, tail=%d\n", me, i, cpr_check_queue_head, cpr_check_queue_tail);
-            shmem_cpr_checkpoint(1, a, array_size, me);
+            shmem_cpr_checkpoint(1, a, array_size, shmem_cpr_pe_num(me));
             // printf("PE=%d finished chp of id=1 for time=%d\n", me, i);
             shmem_barrier_all();
         }
@@ -838,9 +846,9 @@ int main ()
             a[j] ++;
         
         if ( i == 25 ){
-            shmem_cpr_rollback(3, me);
+            shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
             shmem_barrier_all();
-            if ( me == 8)
+            if ( me == 11)
             {
                 printf("AFTER ROLLBACK:\n");
                 for ( j=0; j<array_size; ++j )
@@ -851,6 +859,15 @@ int main ()
     }
 
     shmem_barrier_all();
+
+    if ( me == 0 )
+    {
+        for ( i=0; i<npes; ++i )
+            printf("pe[%d]=%d, role=%d, type=%d\n", i, cpr_pe[i], cpr_all_pe_role[i], cpr_all_pe_type[i]);
+        printf("storages=%d\n", cpr_num_storage_pes);
+        for ( i=0; i<cpr_num_storage_pes; ++i )
+            printf("storag[%d]=%d \n", i, cpr_storage_pes[i]);
+    }
     // if ( cpr_pe_role == CPR_STORAGE_ROLE )
     //     shmem_cpr_checkpoint(1, a, array_size, me);
     // shmem_barrier_all();
