@@ -920,31 +920,31 @@ int main ()
     // if (me ==0)
     //     printf("*****\n*****\nAfter Checkpointing\n*****\n*****\n");
     // // // TEST SUCCESSFUL:
-    // for ( i=8; i<12; ++i )
-    // {
-    //     if ( me == i )
-    //     {
-    //         printf("PE=%d table:\n", i);
-    //         for ( j=0; j<cpr_num_active_pes; ++j )
-    //         {
-    //             printf("for PE=%d\n", j);
-    //             for ( k=0; k<cpr_table_tail[j]; ++k )
-    //             {
-    //                 printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
-    //                     cpr_checkpoint_table[j][k]->pe_num,
-    //                     cpr_checkpoint_table[j][k]->id,
-    //                     cpr_checkpoint_table[j][k]->count,
-    //                     cpr_checkpoint_table[j][k]->is_symmetric);
-    //                 for ( l=0; l< cpr_checkpoint_table[j][k]->count; ++l )
-    //                     printf("%d ", cpr_checkpoint_table[j][k]->data[l]);
-    //                 printf("\n----------------\n");
-    //             }
-    //             printf("============***============\n");
-    //         }
-    //         printf("\n\n\n");
-    //     }
-    //     shmem_barrier_all();
-    // }
+    for ( i=8; i<11; ++i )
+    {
+        if ( me == i )
+        {
+            printf("PE=%d table:\n", i);
+            for ( j=0; j<cpr_num_active_pes; ++j )
+            {
+                printf("for PE=%d\n", j);
+                for ( k=0; k<cpr_table_tail[j]; ++k )
+                {
+                    printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
+                        cpr_checkpoint_table[j][k]->pe_num,
+                        cpr_checkpoint_table[j][k]->id,
+                        cpr_checkpoint_table[j][k]->count,
+                        cpr_checkpoint_table[j][k]->is_symmetric);
+                    for ( l=0; l< cpr_checkpoint_table[j][k]->count; ++l )
+                        printf("%d ", cpr_checkpoint_table[j][k]->data[l]);
+                    printf("\n----------------\n");
+                }
+                printf("============***============\n");
+            }
+            printf("\n\n\n");
+        }
+        shmem_barrier_all();
+    }
 
     // shmem_barrier_all ();
     // // I need this part only for testing the whole checkpointing, to make sure nothing's left in queues
