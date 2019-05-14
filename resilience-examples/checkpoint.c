@@ -668,11 +668,13 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                     //printf("*** entered checkpointing from restore from pe=%d with %d carriers***\n", pe_num, cpr_check_queue_tail-cpr_check_queue_head);
                     shmem_cpr_checkpoint(0, NULL, 0, me);
                 }
-                // The first spare replaces the dead PE
-                if ( me == cpr_storage_pes[0] )
+                // The last spare replaces the dead PE
+                if ( me == cpr_storage_pes[cpr_num_storage_pes-1] )
                 {
                     cpr_pe_type = CPR_RESURRECTED_PE;
                     cpr_pe_role = CPR_ACTIVE_ROLE;
+                    cpr_num_storage_pes --;
+                    
                     cpr_shadow_mem = (cpr_check_carrier **) malloc ( cpr_table_size[dead_pe] * sizeof(cpr_check_carrier *));
                     for ( i=0; i < cpr_table_tail[dead_pe]; ++i )
                     {
