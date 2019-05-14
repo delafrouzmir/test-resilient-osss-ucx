@@ -825,12 +825,12 @@ int main ()
 
     for ( (*iter)=0; (*iter)<40; ++(*iter) )
     {
-        // if ( cpr_pe[me] == 3 )
-        // {
-        //     printf("*** me=%d iter=%d\n", me, *iter);
-        //     for ( j=0; j<array_size; ++j )
-        //         printf("**%d ", a[j]);
-        // }
+        if ( cpr_pe[me] == 9 || cpr_pe[me] == 10 )
+        {
+            printf("*** me=%d iter=%d\n", me, *iter);
+            // for ( j=0; j<array_size; ++j )
+            //     printf("**%d ", a[j]);
+        }
         if ( (*iter) % 10 == 0)
         {
             shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
@@ -845,6 +845,8 @@ int main ()
         if ( (*iter) == 25 && first_rollback == 0 ){
             first_rollback = 1;
             shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
+            if ( cpr_pe_role == CPR_STORAGE_ROLE )
+                *iter = 20;
             shmem_barrier_all();
             // printf("PE=%d done with rollback with iter=%d!\n", me, *iter);
             // if ( me == 11)
@@ -854,8 +856,6 @@ int main ()
             //         printf("%d ", a[j]);
             //     printf("\n");
             // }
-            if ( cpr_pe_role == CPR_STORAGE_ROLE )
-                *iter = 20;
         }
     }
 
