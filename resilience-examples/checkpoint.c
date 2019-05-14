@@ -888,7 +888,7 @@ int main ()
         for ( j=0; j<array_size; ++j)
             a[j] ++;
         
-        if ( (*iter) == 35 && first_rollback == 0 ){
+        if ( (*iter) == 25 && first_rollback == 0 ){
             first_rollback = 1;
             shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
             shmem_barrier_all();
