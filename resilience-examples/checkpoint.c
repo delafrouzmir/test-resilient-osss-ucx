@@ -57,6 +57,7 @@ struct check_carrier
     int pe_num;                 // the PE that asked for a reservation or checkpoint
     int is_symmetric;           // if this request is to checkpoint symmetric or private data
     cpr_check_carrier *next;    // the pointer to the next carrier if count>CPR_CARR_DATA_SIZE.
+    int offset;
 };
 
 // Part 1: necessary for keeping checkpoints in shadow mem
@@ -624,103 +625,103 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
 
 // }
 
-// int shmem_cpr_rollback ( int dead_pe, int me )
-// {
-//     /* TO DO:
-//     lookup id in hashtable to get the index
-//     update the index-th element in
-//         original or ressurected: shadow mem
-//         spare: cpr_checkpoint_table[dead_pe][index]
-//                 update the cpr_pe and next_pe
-//     */
-//     int i, j;
-//     cpr_check_carrier *carr;
+int shmem_cpr_rollback ( int dead_pe, int me )
+{
+    /* TO DO:
+    lookup id in hashtable to get the index
+    update the index-th element in
+        original or ressurected: shadow mem
+        spare: cpr_checkpoint_table[dead_pe][index]
+                update the cpr_pe and next_pe
+    */
+    int i, j;
+    cpr_check_carrier *carr;
 
-//     /* TO DO:
-//     *  Right now, the strategy to replace a dead PE with the first remaining spare PE
-//     *  Look into better positioning options:
-//     *  e.g. replacing every dead PE with a spare from the same node
-//     */
+    /* TO DO:
+    *  Right now, the strategy to replace a dead PE with the first remaining spare PE
+    *  Look into better positioning options:
+    *  e.g. replacing every dead PE with a spare from the same node
+    */
 
-//     if ( me != dead_pe)
-//     {
-//         switch (cpr_pe_role)
-//         {
-//             // every Original or Resurrected PE should just rollback to the last checkpoint
-//             case CPR_ACTIVE_ROLE:
-//                 for ( i=0; i<cpr_shadow_mem_tail; ++i)
-//                 {
-//                     carr = cpr_shadow_mem[i];
-//                     for ( j=0; j < carr->count; ++j )
-//                     {
-//                         *((carr->adr)+j) = carr->data[j];
-//                     }
-//                 }
-//                 break;
+    if ( me != dead_pe)
+    {
+        switch (cpr_pe_role)
+        {
+            // every Original or Resurrected PE should just rollback to the last checkpoint
+            case CPR_ACTIVE_ROLE:
+                for ( i=0; i<cpr_shadow_mem_tail; ++i)
+                {
+                    carr = cpr_shadow_mem[i];
+                    for ( j=0; j < carr->count; ++j )
+                    {
+                        *((carr->adr)+j) = carr->data[j];
+                    }
+                }
+                break;
 
-//             // Spare PEs should check first if they have any remaining carriers in checkpoint queues
-//             case CPR_STORAGE_ROLE:
-//                 // First, if there is any checkpoint remaining in the queue, should be checkpointed
-//                 /***** check if this works in circular queues *****/
-//                 if ( cpr_check_queue_head < cpr_check_queue_tail )
-//                 {
-//                     //printf("*** entered checkpointing from restore from pe=%d with %d carriers***\n", pe_num, cpr_check_queue_tail-cpr_check_queue_head);
-//                     shmem_cpr_checkpoint(0, NULL, 0, me);
-//                 }
-//                 // The first spare replaces the dead PE
-//                 if ( me == cpr_storage_pes[0] )
-//                 {
-//                     cpr_pe_type = CPR_RESURRECTED_PE;
-//                     cpr_pe_role = CPR_ACTIVE_ROLE;
-//                     cpr_shadow_mem = (cpr_check_carrier **) malloc ( cpr_table_size[dead_pe] * sizeof(cpr_check_carrier *));
-//                     for ( i=0; i < cpr_table_tail[dead_pe]; ++i )
-//                     {
-//                         cpr_shadow_mem[i] = cpr_checkpoint_table[dead_pe][i];
-//                         // check if the variable is in memory region of symmetrics
-//                         if ( cpr_shadow_mem[i] -> is_symmetric )
-//                         {
-//                             for ( j=0; j < cpr_shadow_mem[i]->count; ++j )
-//                             {
-//                                 *(cpr_shadow_mem[i] -> adr +j) = cpr_shadow_mem[i]->data[j];
-//                             }
-//                         }
-//                         else
-//                         {
-//                             // define an array of tuplets, one addr and one data
-//                         }
-//                     }
-//                 }
+            // Spare PEs should check first if they have any remaining carriers in checkpoint queues
+            case CPR_STORAGE_ROLE:
+                // First, if there is any checkpoint remaining in the queue, should be checkpointed
+                /***** check if this works in circular queues *****/
+                if ( cpr_check_queue_head < cpr_check_queue_tail )
+                {
+                    //printf("*** entered checkpointing from restore from pe=%d with %d carriers***\n", pe_num, cpr_check_queue_tail-cpr_check_queue_head);
+                    shmem_cpr_checkpoint(0, NULL, 0, me);
+                }
+                // The first spare replaces the dead PE
+                if ( me == cpr_storage_pes[0] )
+                {
+                    cpr_pe_type = CPR_RESURRECTED_PE;
+                    cpr_pe_role = CPR_ACTIVE_ROLE;
+                    cpr_shadow_mem = (cpr_check_carrier **) malloc ( cpr_table_size[dead_pe] * sizeof(cpr_check_carrier *));
+                    for ( i=0; i < cpr_table_tail[dead_pe]; ++i )
+                    {
+                        cpr_shadow_mem[i] = cpr_checkpoint_table[dead_pe][i];
+                        // check if the variable is in memory region of symmetrics
+                        if ( cpr_shadow_mem[i] -> is_symmetric )
+                        {
+                            for ( j=0; j < cpr_shadow_mem[i]->count; ++j )
+                            {
+                                *(cpr_shadow_mem[i] -> adr +j) = cpr_shadow_mem[i]->data[j];
+                            }
+                        }
+                        else
+                        {
+                            // define an array of tuplets, one addr and one data
+                        }
+                    }
+                }
 
-//                 // If we are in 2-copy-mode, we should prepare another storage PE to hold the checkpointing-table
-//                 // Precisely: the last storage PE should copy the table to a spare PE
+                // If we are in 2-copy-mode, we should prepare another storage PE to hold the checkpointing-table
+                // Precisely: the last storage PE should copy the table to a spare PE
 
-//                 // TO DO:
-//                 // 1- check for number of spares left
-//                 // 2- reduce the number of storage/spare PEs if necessary
-//                 // 3- add the new storage PE to the array of storage PEs
-//                 if ( cpr_checkpointing_mode == CPR_TWO_COPY_CHECKPOINT )
-//                 {
-//                     int candid_storage;
-//                     for ( i = cpr_num_active_pes; i < npes; ++i )
-//                         if ( cpr_all_pe_type[i] == CPR_SPARE_PE && cpr_all_pe_role[i] == CPR_DORMANT_ROLE )
-//                         {
-//                             candid_storage = i;
-//                             break;
-//                         }
+                // TO DO:
+                // 1- check for number of spares left
+                // 2- reduce the number of storage/spare PEs if necessary
+                // 3- add the new storage PE to the array of storage PEs
+                if ( cpr_checkpointing_mode == CPR_TWO_COPY_CHECKPOINT )
+                {
+                    int candid_storage;
+                    for ( i = cpr_num_active_pes; i < npes; ++i )
+                        if ( cpr_all_pe_type[i] == CPR_SPARE_PE && cpr_all_pe_role[i] == CPR_DORMANT_ROLE )
+                        {
+                            candid_storage = i;
+                            break;
+                        }
 
-//                     if ( me == candid_storage || me == cpr_storage_pes[cpr_num_storage_pes-1] )
-//                         shmem_cpr_copy_check_table ( candid_storage, cpr_storage_pes[cpr_num_storage_pes-1] );
-//                 }
-//                 break;
+                    if ( me == candid_storage || me == cpr_storage_pes[cpr_num_storage_pes-1] )
+                        shmem_cpr_copy_check_table ( candid_storage, cpr_storage_pes[cpr_num_storage_pes-1] );
+                }
+                break;
 
-//             default:
-//             // nothing here for now
-//                 break;
-//         }
-//     }
+            default:
+            // nothing here for now
+                break;
+        }
+    }
 
-//     return SUCCESS;
-// }
+    return SUCCESS;
+}
 
 int main ()
 {
@@ -779,43 +780,43 @@ int main ()
     // shmem_cpr_reserve(0, &i, 1, me);
     // shmem_barrier_all();
 
-    for ( i=8; i<12; ++i )
-    {
-        if ( me == i )
-        {
-            for ( j=0; j<cpr_resrv_queue_tail; ++j )
-                printf("Me=%d, carr[%d].pe=%d, id=%d, count=%d\n", me, j, cpr_resrv_queue[j].pe_num, cpr_resrv_queue[j].id, cpr_resrv_queue[j].count);
-            printf("&&&&&&\n");
-        }
-        shmem_barrier_all();
-    }
+    // for ( i=8; i<12; ++i )
+    // {
+    //     if ( me == i )
+    //     {
+    //         for ( j=0; j<cpr_resrv_queue_tail; ++j )
+    //             printf("Me=%d, carr[%d].pe=%d, id=%d, count=%d\n", me, j, cpr_resrv_queue[j].pe_num, cpr_resrv_queue[j].id, cpr_resrv_queue[j].count);
+    //         printf("&&&&&&\n");
+    //     }
+    //     shmem_barrier_all();
+    // }
 
-    for ( i=8; i<12; ++i )
-    {
-        if ( me == i )
-        {
-            printf("PE=%d table:\n", i);
-            for ( j=0; j<cpr_num_active_pes; ++j )
-            {
-                printf("for PE=%d\n", j);
-                for ( k=0; k<cpr_table_tail[j]; ++k )
-                {
-                    printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
-                        cpr_checkpoint_table[j][k]->pe_num,
-                        cpr_checkpoint_table[j][k]->id,
-                        cpr_checkpoint_table[j][k]->count,
-                        cpr_checkpoint_table[j][k]->is_symmetric);
-                    for ( l=0; l< cpr_checkpoint_table[j][k]->count; ++l )
-                        printf("%d ", cpr_checkpoint_table[j][k]->data[l]);
-                    printf("\n----------------\n");
-                }
-                printf("============***============\n");
-            }
-            printf("\n\n\n");
-        }
-        shmem_barrier_all();
-    }
-    shmem_barrier_all();
+    // for ( i=8; i<12; ++i )
+    // {
+    //     if ( me == i )
+    //     {
+    //         printf("PE=%d table:\n", i);
+    //         for ( j=0; j<cpr_num_active_pes; ++j )
+    //         {
+    //             printf("for PE=%d\n", j);
+    //             for ( k=0; k<cpr_table_tail[j]; ++k )
+    //             {
+    //                 printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
+    //                     cpr_checkpoint_table[j][k]->pe_num,
+    //                     cpr_checkpoint_table[j][k]->id,
+    //                     cpr_checkpoint_table[j][k]->count,
+    //                     cpr_checkpoint_table[j][k]->is_symmetric);
+    //                 for ( l=0; l< cpr_checkpoint_table[j][k]->count; ++l )
+    //                     printf("%d ", cpr_checkpoint_table[j][k]->data[l]);
+    //                 printf("\n----------------\n");
+    //             }
+    //             printf("============***============\n");
+    //         }
+    //         printf("\n\n\n");
+    //     }
+    //     shmem_barrier_all();
+    // }
+    // shmem_barrier_all();
     
     
     for ( i=0; i<40; ++i )
@@ -833,48 +834,53 @@ int main ()
         }
         for ( j=0; j<array_size; ++j)
             a[j] ++;
-        /*
+        
         if ( i == 25 ){
-            shmem_cpr_rollback();
-            if ( me == 0)
-                printf("AFTER ROLLBACK:\n");
-            printf("PE %d: \t i=%d \t a[0]=%d\n", me, i, a[0]);
-        }*/
-    }
-
-    shmem_barrier_all();
-    if ( cpr_pe_role == CPR_STORAGE_ROLE )
-        shmem_cpr_checkpoint(1, a, array_size, me);
-    shmem_barrier_all();
-
-    if (me ==0)
-        printf("*****\n*****\nAfter Checkpointing\n*****\n*****\n");
-    // // TEST SUCCESSFUL:
-    for ( i=8; i<12; ++i )
-    {
-        if ( me == i )
-        {
-            printf("PE=%d table:\n", i);
-            for ( j=0; j<cpr_num_active_pes; ++j )
+            shmem_cpr_rollback(3, me);
+            shmem_barrier_all();
+            if ( me == 8)
             {
-                printf("for PE=%d\n", j);
-                for ( k=0; k<cpr_table_tail[j]; ++k )
-                {
-                    printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
-                        cpr_checkpoint_table[j][k]->pe_num,
-                        cpr_checkpoint_table[j][k]->id,
-                        cpr_checkpoint_table[j][k]->count,
-                        cpr_checkpoint_table[j][k]->is_symmetric);
-                    for ( l=0; l< cpr_checkpoint_table[j][k]->count; ++l )
-                        printf("%d ", cpr_checkpoint_table[j][k]->data[l]);
-                    printf("\n----------------\n");
-                }
-                printf("============***============\n");
+                printf("AFTER ROLLBACK:\n");
+                for ( j=0; j<array_size; ++j )
+                    printf("%d ", a[j]);
             }
-            printf("\n\n\n");
+            printf("\n");
         }
-        shmem_barrier_all();
     }
+
+    shmem_barrier_all();
+    // if ( cpr_pe_role == CPR_STORAGE_ROLE )
+    //     shmem_cpr_checkpoint(1, a, array_size, me);
+    // shmem_barrier_all();
+
+    // if (me ==0)
+    //     printf("*****\n*****\nAfter Checkpointing\n*****\n*****\n");
+    // // // TEST SUCCESSFUL:
+    // for ( i=8; i<12; ++i )
+    // {
+    //     if ( me == i )
+    //     {
+    //         printf("PE=%d table:\n", i);
+    //         for ( j=0; j<cpr_num_active_pes; ++j )
+    //         {
+    //             printf("for PE=%d\n", j);
+    //             for ( k=0; k<cpr_table_tail[j]; ++k )
+    //             {
+    //                 printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
+    //                     cpr_checkpoint_table[j][k]->pe_num,
+    //                     cpr_checkpoint_table[j][k]->id,
+    //                     cpr_checkpoint_table[j][k]->count,
+    //                     cpr_checkpoint_table[j][k]->is_symmetric);
+    //                 for ( l=0; l< cpr_checkpoint_table[j][k]->count; ++l )
+    //                     printf("%d ", cpr_checkpoint_table[j][k]->data[l]);
+    //                 printf("\n----------------\n");
+    //             }
+    //             printf("============***============\n");
+    //         }
+    //         printf("\n\n\n");
+    //     }
+    //     shmem_barrier_all();
+    // }
 
     // shmem_barrier_all ();
     // // I need this part only for testing the whole checkpointing, to make sure nothing's left in queues
