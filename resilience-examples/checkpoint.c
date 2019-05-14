@@ -711,7 +711,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                 // 3- add the new storage PE to the array of storage PEs
                 if ( cpr_checkpointing_mode == CPR_TWO_COPY_CHECKPOINT )
                 {
-                    int candid_storage;
+                    int candid_storage = -1;
                     for ( i = cpr_num_active_pes; i < npes; ++i )
                         if ( cpr_all_pe_type[i] == CPR_SPARE_PE && cpr_all_pe_role[i] == CPR_DORMANT_ROLE )
                         {
@@ -719,8 +719,8 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                             break;
                         }
 
-                    if ( me == candid_storage || me == cpr_storage_pes[cpr_num_storage_pes-1] )
-                        shmem_cpr_copy_check_table ( candid_storage, cpr_storage_pes[cpr_num_storage_pes-1] );
+                    if ( candid_storage != -1 &&(me == candid_storage || me == cpr_storage_pes[0]) )
+                        shmem_cpr_copy_check_table ( candid_storage, cpr_storage_pes[0] );
                 }
                 break;
 
@@ -845,17 +845,17 @@ int main ()
         for ( j=0; j<array_size; ++j)
             a[j] ++;
         
-        // if ( i == 35 ){
-        //     shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
-        //     shmem_barrier_all();
-        //     if ( me == 11)
-        //     {
-        //         printf("AFTER ROLLBACK:\n");
-        //         for ( j=0; j<array_size; ++j )
-        //             printf("%d ", a[j]);
-        //         printf("\n");
-        //     }
-        // }
+        if ( i == 35 ){
+            shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
+            shmem_barrier_all();
+            if ( me == 11)
+            {
+                printf("AFTER ROLLBACK:\n");
+                for ( j=0; j<array_size; ++j )
+                    printf("%d ", a[j]);
+                printf("\n");
+            }
+        }
     }
 
     shmem_barrier_all();
