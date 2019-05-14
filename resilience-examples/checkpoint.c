@@ -879,7 +879,7 @@ int main ()
         if ( i == 35 ){
             shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
             shmem_barrier_all();
-            printf("PE=%d done with rollback!\n", me);
+            printf("PE=%d done with rollback with i=%d!\n", me, i);
             if ( me == 11)
             {
                 printf("AFTER ROLLBACK:\n");
