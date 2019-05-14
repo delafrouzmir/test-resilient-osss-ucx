@@ -634,7 +634,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
         spare: cpr_checkpoint_table[dead_pe][index]
                 update the cpr_pe and next_pe
     */
-    int i, j;
+    int i, j, chosen_pe;
     cpr_check_carrier *carr;
 
     /* TO DO:
@@ -645,9 +645,10 @@ int shmem_cpr_rollback ( int dead_pe, int me )
 
     if ( me != dead_pe)
     {
-        cpr_all_pe_role[cpr_storage_pes[cpr_num_storage_pes-1]] = CPR_ACTIVE_ROLE;
-        cpr_all_pe_type[cpr_storage_pes[cpr_num_storage_pes-1]] = CPR_RESURRECTED_PE;
-        cpr_pe[dead_pe] = cpr_storage_pes[cpr_num_storage_pes-1];
+        chosen_pe = cpr_storage_pes[cpr_num_storage_pes-1];
+        cpr_all_pe_role[chosen_pe] = CPR_ACTIVE_ROLE;
+        cpr_all_pe_type[chosen_pe] = CPR_RESURRECTED_PE;
+        cpr_pe[dead_pe] = chosen_pe;
 
         cpr_all_pe_type[dead_pe] = CPR_DEAD_PE;
 
@@ -677,11 +678,10 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                     shmem_cpr_checkpoint(0, NULL, 0, me);
                 }
                 // The last spare replaces the dead PE
-                if ( me == cpr_storage_pes[cpr_num_storage_pes-1] )
+                if ( me == chosen_pe )
                 {
                     cpr_pe_type = CPR_RESURRECTED_PE;
                     cpr_pe_role = CPR_ACTIVE_ROLE;
-
 
                     cpr_shadow_mem = (cpr_check_carrier **) malloc ( cpr_table_size[dead_pe] * sizeof(cpr_check_carrier *));
                     for ( i=0; i < cpr_table_tail[dead_pe]; ++i )
@@ -845,7 +845,7 @@ int main ()
         for ( j=0; j<array_size; ++j)
             a[j] ++;
         
-        if ( i == 25 ){
+        if ( i == 35 ){
             shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
             shmem_barrier_all();
             if ( me == 11)
@@ -853,8 +853,8 @@ int main ()
                 printf("AFTER ROLLBACK:\n");
                 for ( j=0; j<array_size; ++j )
                     printf("%d ", a[j]);
+                printf("\n");
             }
-            printf("\n");
         }
     }
 
