@@ -768,7 +768,7 @@ int main ()
 {
     int spes;
     int success_init;
-    int i, j, k, l, array_size;
+    int i, j, k, l, array_size, first_rollback;
     int *a;
 
     shmem_init ();
@@ -813,6 +813,7 @@ int main ()
     //     shmem_barrier_all();
     // }
     
+    first_rollback = 0;
     i=0;
     shmem_cpr_reserve(0, &i, 1, shmem_cpr_pe_num(me));
     shmem_cpr_reserve(1, a, array_size, shmem_cpr_pe_num(me));
@@ -876,7 +877,8 @@ int main ()
         for ( j=0; j<array_size; ++j)
             a[j] ++;
         
-        if ( i == 35 ){
+        if ( i == 35 && first_rollback == 0 ){
+            first_rollback = 1;
             shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
             shmem_barrier_all();
             printf("PE=%d done with rollback with i=%d!\n", me, i);
