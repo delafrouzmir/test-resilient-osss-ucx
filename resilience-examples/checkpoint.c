@@ -119,10 +119,13 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
     // instead of pe number i, we should use cpr_pe[i]
     // e.g: shmem_int_put(dest, &source, nelems, cpr_pe[j]);
 
-    int i=0;
-    for (; i<cpr_num_active_pes; ++i)
-    {
+    int i;
+
+    for ( i=0; i<npes; ++i )
         cpr_pe[i] = i;
+
+    for ( i=0; i<cpr_num_active_pes; ++i)
+    {
         // PEs 0 to npes-spes-1 are originals in any case
         cpr_all_pe_type[i] = CPR_ORIGINAL_PE;
         cpr_all_pe_role[i] = CPR_ACTIVE_ROLE;
