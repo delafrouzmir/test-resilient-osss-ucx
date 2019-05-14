@@ -845,17 +845,17 @@ int main ()
         for ( j=0; j<array_size; ++j)
             a[j] ++;
         
-        if ( i == 35 ){
-            shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
-            shmem_barrier_all();
-            if ( me == 11)
-            {
-                printf("AFTER ROLLBACK:\n");
-                for ( j=0; j<array_size; ++j )
-                    printf("%d ", a[j]);
-                printf("\n");
-            }
-        }
+        // if ( i == 35 ){
+        //     shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
+        //     shmem_barrier_all();
+        //     if ( me == 11)
+        //     {
+        //         printf("AFTER ROLLBACK:\n");
+        //         for ( j=0; j<array_size; ++j )
+        //             printf("%d ", a[j]);
+        //         printf("\n");
+        //     }
+        // }
     }
 
     shmem_barrier_all();
