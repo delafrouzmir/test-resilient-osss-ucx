@@ -463,14 +463,15 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 // and update the cpr_table_tail of all spare PEs
                 for ( i=0; i < cpr_num_storage_pes; ++i )
                 {
-                    q_tail = ( shmem_atomic_fetch_inc ( &cpr_resrv_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
-                    
-                    shmem_putmem (&cpr_resrv_queue[q_tail], (void *) carr, 1 * sizeof(cpr_rsvr_carrier), cpr_storage_pes[i]);
-                    
-                    if ( shmem_atomic_fetch ( &cpr_sig_rsvr, cpr_storage_pes[i]) == 0 )
-                        shmem_atomic_set( &cpr_sig_rsvr, 1, cpr_storage_pes[i]);
-                    
-                    posted_resrv++;
+                    if ( cpr_all_pe_type[cpr_storage_pes[i]] != CPR_DEAD_PE )
+                    {
+                        q_tail = ( shmem_atomic_fetch_inc ( &cpr_resrv_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
+                        
+                        shmem_putmem (&cpr_resrv_queue[q_tail], (void *) carr, 1 * sizeof(cpr_rsvr_carrier), cpr_storage_pes[i]);
+                        
+                        if ( shmem_atomic_fetch ( &cpr_sig_rsvr, cpr_storage_pes[i]) == 0 )
+                            shmem_atomic_set( &cpr_sig_rsvr, 1, cpr_storage_pes[i]);
+                    }
                 }
             }
             break;
@@ -483,37 +484,41 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
             // (because they arrive at different times)
             // during the same function call and read them in the next function call
 
-            shmem_wait_until ( &cpr_sig_rsvr, SHMEM_CMP_GT, 0);
-            
-            while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
+            if ( cpr_pe_type != CPR_DEAD_PE )
             {
-                
-                shmem_wait_until(&cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)].count, SHMEM_CMP_NE, 0);
-                read_resrv++;
-                // TO DO: head and tail might overflow the int size... add code to check
-                *carr = cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)];
 
-                cpr_resrv_queue_head ++;
-                // TO DO: I should reserve count/1000+1 carriers
-                if ( cpr_table_tail[ carr-> pe_num] >= cpr_table_size[ carr-> pe_num] )
+                shmem_wait_until ( &cpr_sig_rsvr, SHMEM_CMP_GT, 0);
+                
+                while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
                 {
-                    cpr_table_size[ carr-> pe_num] *= 2;
-                    cpr_checkpoint_table[carr-> pe_num] =
-                            (cpr_check_carrier **) realloc (cpr_checkpoint_table[carr-> pe_num], 
-                                cpr_table_size[carr-> pe_num] * sizeof(cpr_check_carrier *));
+                    
+                    shmem_wait_until(&cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)].count, SHMEM_CMP_NE, 0);
+                    read_resrv++;
+                    // TO DO: head and tail might overflow the int size... add code to check
+                    *carr = cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)];
+
+                    cpr_resrv_queue_head ++;
+                    // TO DO: I should reserve count/1000+1 carriers
+                    if ( cpr_table_tail[ carr-> pe_num] >= cpr_table_size[ carr-> pe_num] )
+                    {
+                        cpr_table_size[ carr-> pe_num] *= 2;
+                        cpr_checkpoint_table[carr-> pe_num] =
+                                (cpr_check_carrier **) realloc (cpr_checkpoint_table[carr-> pe_num], 
+                                    cpr_table_size[carr-> pe_num] * sizeof(cpr_check_carrier *));
+                    }
+                    cpr_table_tail[ carr-> pe_num] ++;
+
+                    cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] = (cpr_check_carrier *) malloc ( 1* sizeof(cpr_check_carrier));
+
+                    // Preparing the meta data of this piece of checkpoint for later
+                    // e.g: later if they want to checkpoint with id=5, I lookup for id=5 which
+                                // I have assigned here:                
+                    shmem_cpr_copy_carrier (carr, cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1]);
+                    
+                    // TODO: update the hash table. I'm assuming id = index here
                 }
-                cpr_table_tail[ carr-> pe_num] ++;
-
-                cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1] = (cpr_check_carrier *) malloc ( 1* sizeof(cpr_check_carrier));
-
-                // Preparing the meta data of this piece of checkpoint for later
-                // e.g: later if they want to checkpoint with id=5, I lookup for id=5 which
-                            // I have assigned here:                
-                shmem_cpr_copy_carrier (carr, cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]-1]);
-                
-                // TODO: update the hash table. I'm assuming id = index here
+                cpr_sig_rsvr = 0;
             }
-            cpr_sig_rsvr = 0;
             break;
 
         default:
@@ -568,15 +573,17 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                 
                 for ( i= 0; i < cpr_num_storage_pes; ++i)
                 {
-                    // TEST Purpose:
-                    posted_check++;
-                    // shmem_atomic_fetch_inc returns the amount before increment
-                    q_tail = ( shmem_atomic_fetch_inc (&cpr_check_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
+                    if ( cpr_all_pe_type[cpr_storage_pes[i]] != CPR_DEAD_PE )
+                    {
+                        // shmem_atomic_fetch_inc returns the amount before increment
+                        q_tail = ( shmem_atomic_fetch_inc (&cpr_check_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
 
-                    shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), cpr_storage_pes[i]);
+                        shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), cpr_storage_pes[i]);
 
-                    if ( shmem_atomic_fetch ( &cpr_sig_check, cpr_storage_pes[i]) == 0 )
-                        shmem_atomic_set( &cpr_sig_check, 1, cpr_storage_pes[i]);
+                        if ( shmem_atomic_fetch ( &cpr_sig_check, cpr_storage_pes[i]) == 0 )
+                            shmem_atomic_set( &cpr_sig_check, 1, cpr_storage_pes[i]);
+                        
+                    }
 
                     // if ( cpr_storage_pes[i] == 8 )
                     // {
@@ -591,38 +598,36 @@ int shmem_cpr_checkpoint ( int id, int* mem, int count, int pe_num )
                 break;
 
             case CPR_STORAGE_ROLE:
-                //printf("%d spare is entering chp with head=%d tail=%d\n", me, cpr_check_queue_head, cpr_check_queue_tail);
-                // First, we need to check reservation queue is empty. if not, call reservation
-                
-                if ( cpr_resrv_queue_head < cpr_resrv_queue_tail )
-                {
-                    //printf("*** entered reservation from checkpointing from pe=%d with %d carriers***\n", pe_num, cpr_resrv_queue_tail-cpr_resrv_queue_head);
-                    shmem_cpr_reserve(id, mem, count, pe_num);
-                }
 
-                // waiting to receive the first checkpointing request in the queue:
-                shmem_wait_until ( &cpr_sig_check, SHMEM_CMP_GT, 0);
-                //printf("CHPING from a SPARE=%d:\treading %d carriers\n", pe_num, cpr_check_queue_tail - cpr_check_queue_head);
-                
-                while (cpr_check_queue_head < cpr_check_queue_tail)
+                // First, we need to check reservation queue is empty. if not, call reservation
+                if ( cpr_pe_type != CPR_DEAD_PE )
                 {
-                    shmem_wait_until(&cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)].count, SHMEM_CMP_NE, 0);
-                    
-                    // TEST:
-                    read_check++;
-                    // head and tail might overflow the int size... add code to check
-                    *carr = cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];
-                    cpr_check_queue_head ++;
-                    
-                    for ( i=0; i< carr-> count; ++i)
+                    if ( cpr_resrv_queue_head < cpr_resrv_queue_tail )
                     {
-                        cpr_checkpoint_table[carr-> pe_num][carr-> id] -> data[i] = carr-> data[i];
-                        // TEST:
-                        // if ( pe_num == 8 )
-                        //    printf("***cpr_checkpoint_table[%d][%d].data[%d]=%d ", carr-> pe_num, carr-> id, i, cpr_checkpoint_table[carr-> pe_num][carr-> id]->data[i]);
+                        shmem_cpr_reserve(id, mem, count, pe_num);
                     }
-                    // printf("\n");
-                    // I'm assuming id = index here
+
+                    // waiting to receive the first checkpointing request in the queue:
+                    shmem_wait_until ( &cpr_sig_check, SHMEM_CMP_GT, 0);
+                    
+                    while (cpr_check_queue_head < cpr_check_queue_tail)
+                    {
+                        shmem_wait_until(&cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)].count, SHMEM_CMP_NE, 0);
+                        
+                        // head and tail might overflow the int size... add code to check
+                        *carr = cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];
+                        cpr_check_queue_head ++;
+                        
+                        for ( i=0; i< carr-> count; ++i)
+                        {
+                            cpr_checkpoint_table[carr-> pe_num][carr-> id] -> data[i] = carr-> data[i];
+                            // TEST:
+                            // if ( pe_num == 8 )
+                            //    printf("***cpr_checkpoint_table[%d][%d].data[%d]=%d ", carr-> pe_num, carr-> id, i, cpr_checkpoint_table[carr-> pe_num][carr-> id]->data[i]);
+                        }
+                        // printf("\n");
+                        // I'm assuming id = index here
+                    }
                 }
                 //return FAILURE;     // if SPAREs are not participated in code, they won't call reserve
                 break;
@@ -662,18 +667,6 @@ int shmem_cpr_rollback ( int dead_pe, int me )
     if ( me != dead_pe && cpr_all_pe_role[dead_pe] == CPR_ACTIVE_ROLE)
     {
         chosen_pe = cpr_storage_pes[cpr_num_storage_pes-1];
-
-        cpr_all_pe_role[chosen_pe] = CPR_ACTIVE_ROLE;
-        cpr_all_pe_type[chosen_pe] = CPR_RESURRECTED_PE;
-        cpr_pe[dead_pe] = -1;
-        // cpr_pe[i] shows which PE plays the role of PE_i
-        // cpr_replaced[i] shows which PE has replaced PE_i
-        cpr_pe[chosen_pe] = dead_pe;
-        cpr_replaced[dead_pe] = chosen_pe;
-
-        cpr_all_pe_type[dead_pe] = CPR_DEAD_PE;
-
-        cpr_num_storage_pes --;
 
         switch (cpr_pe_role)
         {
@@ -749,9 +742,26 @@ int shmem_cpr_rollback ( int dead_pe, int me )
             // nothing here for now
                 break;
         }
+
+        cpr_all_pe_role[chosen_pe] = CPR_ACTIVE_ROLE;
+        cpr_all_pe_type[chosen_pe] = CPR_RESURRECTED_PE;
+        cpr_pe[dead_pe] = -1;
+        // cpr_pe[i] shows which PE plays the role of PE_i
+        // cpr_replaced[i] shows which PE has replaced PE_i
+        cpr_pe[chosen_pe] = dead_pe;
+        cpr_replaced[dead_pe] = chosen_pe;
+
+        cpr_all_pe_type[dead_pe] = CPR_DEAD_PE;
+
+        cpr_num_storage_pes --;
     }
 
     if ( me != dead_pe && cpr_all_pe_role[dead_pe] == CPR_STORAGE_ROLE){
+
+        cpr_pe[dead_pe] = -1;
+        cpr_num_storage_pes --;
+        cpr_all_pe_type[dead_pe] = CPR_DEAD_PE;
+
         if ( cpr_checkpointing_mode == CPR_TWO_COPY_CHECKPOINT )
         {
             int candid_storage = -1;
@@ -766,7 +776,6 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                 shmem_cpr_copy_check_table ( candid_storage, cpr_storage_pes[0] );
         }
     }
-
 
     return SUCCESS;
 }
@@ -825,7 +834,7 @@ int main ()
     first_rollback = 0;
     *iter = 0;
     if ( me == 0 )
-        printf("i accessible = %d\n", shmem_addr_accessible(iter, 1));
+        printf("iter accessible = %d\n", shmem_addr_accessible(iter, 1));
     shmem_cpr_reserve(0, iter, 1, shmem_cpr_pe_num(me));
     shmem_cpr_reserve(1, a, array_size, shmem_cpr_pe_num(me));
     /**/
@@ -874,6 +883,8 @@ int main ()
     
     for ( (*iter)=0; (*iter)<40; ++(*iter) )
     {
+        if ( me == 0 )
+            printf("*** iter=%d\n", *iter);
         if ( (*iter) % 10 == 0)
         {
             shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
