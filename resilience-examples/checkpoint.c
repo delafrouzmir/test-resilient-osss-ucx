@@ -885,7 +885,7 @@ int main ()
     {
         if ( cpr_pe[me] == 3 )
         {
-            printf("*** me=%d iter=%d\n", *iter);
+            printf("*** me=%d iter=%d\n", me, *iter);
             for ( j=0; j<array_size; ++j )
                 printf("**%d ", a[j]);
         }
