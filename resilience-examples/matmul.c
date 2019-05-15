@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include <shmem.h>
 
@@ -38,6 +39,7 @@ int main() {
     uint64_t npes, me, i, s, block_num;
     int64_t *As, *Bs, *Cs, *Bs_nxt, *temp;
     int64_t* C;
+    clock_t start, end;
     
     npes = shmem_n_pes();
     me = shmem_my_pe();
@@ -62,6 +64,8 @@ int main() {
 
     // Make sure all the stripes are initialized
     shmem_barrier_all();
+
+    start = clock();
 
     for (s = 0; s < npes; s++) {
         block_num = (me + s) % npes;
@@ -95,6 +99,10 @@ int main() {
     }
 
     shmem_barrier_all();
+    end = clock();
+
+    if ( me == 0 )
+        printf("%f\n", (double)(end - start) / CLOCKS_PER_SEC);
 
     shmem_free(As);
     shmem_free(Bs);
