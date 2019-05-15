@@ -9,13 +9,14 @@ void mmul(const uint64_t Is, const uint64_t Ks, const uint64_t Js,
           const uint64_t Bdist, const int64_t* B,
           const uint64_t Cdist, int64_t* C) {
 
-    uint64_t i, j, k, *a_ik;
+    uint64_t i, j, k;
+    int64_t a_ik;
 
     for (i = 0; i < Is; i++) {
         for (k = 0; k < Ks; k++) {
             a_ik = A[i * Adist + k];
             for (j = 0; j < Js; j++) {
-                C[i * Cdist + j] += a_ik * B[k * Bdist + j];
+                C[i * Cdist + j] += (a_ik * B[k * Bdist + j]);
             }
         }
     }
