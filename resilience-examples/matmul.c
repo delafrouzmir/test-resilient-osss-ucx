@@ -44,7 +44,8 @@ int main() {
     npes = shmem_n_pes();
     me = shmem_my_pe();
 
-    const uint64_t N = 8;           // Size of the matrices
+    const uint64_t N;           // Size of the matrices
+    scanf("%d", N);
     const uint64_t Ns = N / npes;   // Width of the stripes
     const uint64_t stripe_n_bytes = N * Ns * sizeof(int64_t);
 
