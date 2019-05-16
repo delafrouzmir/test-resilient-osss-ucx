@@ -654,8 +654,7 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                         *carr = cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];
                         if ( me == 8 && carr->count == 1)
                         {
-                            printf("check_Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n
-                                %lu\n",
+                            printf("check_Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n%lu\n",
                                 cpr_check_queue_head, carr->pe_num, carr->id,
                                 carr->is_symmetric, carr->count, carr->rand_num,
                                 carr->offset, carr->data[0]);
@@ -663,8 +662,7 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                         }
                         if ( me == 8 && carr->count == 10)
                         {
-                            printf("check_Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n
-                                %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu\n",
+                            printf("check_Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n%lu %lu %lu %lu %lu %lu %lu %lu %lu %lu\n",
                                 cpr_check_queue_head, carr->pe_num, carr->id,
                                 carr->is_symmetric, carr->count, carr->rand_num,
                                 carr->offset, carr->data[0], carr->data[1],
