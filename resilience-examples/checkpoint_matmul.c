@@ -1060,8 +1060,8 @@ int main ()
 
     // shmem_barrier_all ();
 
-    // for ( l=8; l<11; ++l ){
-        if ( me == 8 )
+    for ( l=8; l<11; ++l ){
+        if ( me == l )
         {
             cpr_check_carrier *carr;
             
@@ -1083,7 +1083,7 @@ int main ()
             printf("\n\n\n");
         }
         shmem_barrier_all();
-    // }
+    }
 
     // // shmem_barrier_all();
 
