@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 
 #include <shmem.h>
 
@@ -315,8 +316,8 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
             cpr_checkpoint_table = (cpr_check_carrier ***) malloc (cpr_num_active_pes * sizeof(cpr_check_carrier **));
             cpr_table_size = (int *) malloc(cpr_num_active_pes * sizeof(int *));
             cpr_table_tail = (int *) malloc(cpr_num_active_pes * sizeof(int *));
-            rsrv_randomness = (int *) malloc(CPR_STARTING_QUEUE_LEN * sizeof(int *));
-            check_randomness = (int *) malloc(CPR_STARTING_QUEUE_LEN * sizeof(int *));
+            rsrv_randomness = (int *) malloc(CPR_STARTING_QUEUE_LEN * sizeof(int));
+            check_randomness = (int *) malloc(CPR_STARTING_QUEUE_LEN * sizeof(int));
 
             for (i=0; i<cpr_num_active_pes; ++i)
             {
@@ -591,6 +592,7 @@ int shmem_cpr_checkpoint ( int id, int64_t* mem, int count, int pe_num )
                         for ( j=0; j < space_needed; ++j )
                         {
                             carr -> offset = j * CPR_CARR_DATA_SIZE;
+                            carr -> rand_num = rand();
 
                             last_data = (j == space_needed-1) ? 
                                 count - (j*CPR_CARR_DATA_SIZE) : CPR_CARR_DATA_SIZE;
@@ -628,7 +630,7 @@ int shmem_cpr_checkpoint ( int id, int64_t* mem, int count, int pe_num )
                         shmem_wait_until(cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num,
                             SHMEM_CMP_NE, check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN]);
                         check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN] = 
-                            cpr_resrv_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num;
+                            cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num;
                         
                         // head and tail might overflow the int size... add code to check
                         *carr = cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];

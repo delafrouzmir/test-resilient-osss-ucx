@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #include <shmem.h>
-
 
 void mmul(const uint64_t Is, const uint64_t Ks, const uint64_t Js,
           const uint64_t Adist, const int64_t* A,
@@ -32,8 +32,7 @@ void print_matrix(const int64_t* mat, const uint64_t Is, const uint64_t Js) {
     }
 }
 
-
-int main() {
+int main(int argc, char const *argv[]) {
     shmem_init();
 
     uint64_t npes, me, i, s, block_num;
@@ -44,8 +43,7 @@ int main() {
     npes = shmem_n_pes();
     me = shmem_my_pe();
 
-    const uint64_t N;           // Size of the matrices
-    scanf("%d", N);
+    const uint64_t N = atoi(argv[argc-1]);           // Size of the matrices
     const uint64_t Ns = N / npes;   // Width of the stripes
     const uint64_t stripe_n_bytes = N * Ns * sizeof(int64_t);
 
