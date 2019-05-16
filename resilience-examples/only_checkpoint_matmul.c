@@ -976,6 +976,12 @@ int main(int argc, char const *argv[]) {
         shmem_barrier_all();
     }
 
+    end = clock();
+
+    if ( me == 0 )
+        fprintf(fp, "npes=%lu spes=%lu N=%lu time=%f\n",
+            npes, spes, N, (double)(end - start) / CLOCKS_PER_SEC);
+
     // Collect and print the matrix product
     if (me == 0) {
         C = (unsigned long *) malloc (N * N * sizeof (unsigned long));
@@ -994,11 +1000,6 @@ int main(int argc, char const *argv[]) {
     }
 
     shmem_barrier_all();
-    end = clock();
-
-    if ( me == 0 )
-        fprintf(fp, "npes=%lu spes=%lu N=%lu time=%f\n",
-            npes, spes, N, (double)(end - start) / CLOCKS_PER_SEC);
 
     shmem_free(As);
     shmem_free(Bs);
