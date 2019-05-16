@@ -1005,21 +1005,21 @@ int main ()
         for ( j=0; j<array_size; ++j)
             a[j] ++;
         
-        // if ( (*iter) == 25 && first_rollback == 0 ){
-        //     first_rollback = 1;
-        //     shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
-        //     // if ( cpr_pe_role == CPR_STORAGE_ROLE )
-        //     // *iter = 20;
-        //     shmem_barrier_all();
-        //     // printf("PE=%d done with rollback with iter=%d!\n", me, *iter);
-        //     // if ( me == 11)
-        //     // {
-        //     //     printf("AFTER ROLLBACK:\n");
-        //     //     for ( j=0; j<array_size; ++j )
-        //     //         printf("%d ", a[j]);
-        //     //     printf("\n");
-        //     // }
-        // }
+        if ( (*iter) == 25 && first_rollback == 0 ){
+            first_rollback = 1;
+            shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
+            // if ( cpr_pe_role == CPR_STORAGE_ROLE )
+            // *iter = 20;
+            shmem_barrier_all();
+            // printf("PE=%d done with rollback with iter=%d!\n", me, *iter);
+            // if ( me == 11)
+            // {
+            //     printf("AFTER ROLLBACK:\n");
+            //     for ( j=0; j<array_size; ++j )
+            //         printf("%d ", a[j]);
+            //     printf("\n");
+            // }
+        }
     }
 
     if ( cpr_pe_role == CPR_STORAGE_ROLE )
