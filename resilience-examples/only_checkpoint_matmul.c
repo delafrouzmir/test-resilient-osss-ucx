@@ -919,7 +919,7 @@ int main(int argc, char const *argv[]) {
     
     shmem_init();
 
-    uunsigned long npes, spes, me, i, s, block_num;
+    unsigned long npes, spes, me, i, s, block_num;
     unsigned long *As, *Bs, *Cs, *Bs_nxt, *temp;
     unsigned long* C;
     clock_t start, end;
@@ -933,9 +933,9 @@ int main(int argc, char const *argv[]) {
 
     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
 
-    const uunsigned long N = atoi(argv[argc-1]);           // Size of the matrices
-    const uunsigned long Ns = N / npes;   // Width of the stripes
-    const uunsigned long stripe_n_bytes = N * Ns * sizeof(unsigned long);
+    const unsigned long N = atoi(argv[argc-1]);           // Size of the matrices
+    const unsigned long Ns = N / npes;   // Width of the stripes
+    const unsigned long stripe_n_bytes = N * Ns * sizeof(unsigned long);
 
     As = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of A
     Bs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Vertical stripes of B
