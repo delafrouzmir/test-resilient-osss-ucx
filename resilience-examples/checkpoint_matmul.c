@@ -839,7 +839,7 @@ int main ()
     int spes;
     int success_init;
     int i, j, k, l, array_size, first_rollback;
-    int *a, *iter;
+    int64_t* a, *iter;
 
     shmem_init ();
     me = shmem_my_pe ();
@@ -856,10 +856,10 @@ int main ()
 
     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
 
-    iter = (int *) shmem_malloc(sizeof(int));
+    iter = (int64_t *) shmem_malloc(sizeof(int64_t));
 
     array_size = 10;
-    a = (int *) shmem_malloc((array_size)*sizeof(int));
+    a = (int64_t *) shmem_malloc((array_size)*sizeof(int64_t));
     for ( i=0; i<array_size; ++i)
         a[i] = me;
 
