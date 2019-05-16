@@ -976,12 +976,12 @@ int main ()
                         for ( k=0; k<cpr_table_tail[j]; ++k )
                         {
                             printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
-                                cpr_checkpoint_table[j][k][0].pe_num,
-                                cpr_checkpoint_table[j][k][0].id,
-                                cpr_checkpoint_table[j][k][0].count,
-                                cpr_checkpoint_table[j][k][0].is_symmetric);
-                            for ( l=0; l< cpr_checkpoint_table[j][k][0].count; ++l )
-                                printf("%d ", cpr_checkpoint_table[j][k][0].data[l]);
+                                cpr_checkpoint_table[j][k][0]->pe_num,
+                                cpr_checkpoint_table[j][k][0]->id,
+                                cpr_checkpoint_table[j][k][0]->count,
+                                cpr_checkpoint_table[j][k][0]->is_symmetric);
+                            for ( l=0; l< cpr_checkpoint_table[j][k][0]->count; ++l )
+                                printf("%d ", cpr_checkpoint_table[j][k][0]->data[l]);
                             printf("\n----------------\n");
                         }
                         printf("============***============\n");
