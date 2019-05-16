@@ -906,6 +906,31 @@ int main ()
             shmem_cpr_checkpoint(1, a, array_size, shmem_cpr_pe_num(me));
             shmem_barrier_all();
             printf("pe=%d done with %d chp id=1\n", me, i);
+
+            for ( i=8; i<11; ++i )
+            {
+                if ( me == i )
+                {
+                    printf("PE=%d table:\n", i);
+                    for ( j=0; j<cpr_num_active_pes; ++j )
+                    {
+                        printf("for PE=%d\n", j);
+                        for ( k=0; k<cpr_table_tail[j]; ++k )
+                        {
+                            printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
+                                cpr_checkpoint_table[j][k][0].pe_num,
+                                cpr_checkpoint_table[j][k][0].id,
+                                cpr_checkpoint_table[j][k][0].count,
+                                cpr_checkpoint_table[j][k][0].is_symmetric);
+                            for ( l=0; l< cpr_checkpoint_table[j][k][0].count; ++l )
+                                printf("%d ", cpr_checkpoint_table[j][k][0].data[l]);
+                            printf("\n----------------\n");
+                        }
+                        printf("============***============\n");
+                    }
+                    printf("\n\n\n");
+                }
+                shmem_barrier_all();
         }
         for ( j=0; j<array_size; ++j)
             a[j] ++;
