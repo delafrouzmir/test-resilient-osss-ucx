@@ -455,7 +455,7 @@ int shmem_cpr_reserve (int id, int64_t * mem, int count, int pe_num)
                 carr->is_symmetric = shmem_addr_accessible(mem, cpr_storage_pes[0]);
 
                 // calculating ceiling of num of carriers needed in chp table
-                space_needed = ceil ( (double)(carr->count) / CPR_CARR_DATA_SIZE);
+                space_needed = 1+ (double)(carr->count-1) / CPR_CARR_DATA_SIZE;
 
                 if ( cpr_shadow_mem_tail + 1 > cpr_shadow_mem_size )
                 {
@@ -515,7 +515,7 @@ int shmem_cpr_reserve (int id, int64_t * mem, int count, int pe_num)
                     cpr_resrv_queue_head ++;
                     
                     // calculating ceiling of num of carriers needed in chp table
-                    space_needed = ceil ( (double)(carr->count) / CPR_CARR_DATA_SIZE);
+                    space_needed = 1+ (double)(carr->count-1) / CPR_CARR_DATA_SIZE;
 
                     if ( cpr_table_tail[carr-> pe_num] + 1 > cpr_table_size[ carr-> pe_num] )
                     {
@@ -576,7 +576,7 @@ int shmem_cpr_checkpoint ( int id, int64_t* mem, int count, int pe_num )
             case CPR_ACTIVE_ROLE:
                 // TO DO: differential checkpointing? what if count is smaller than the count that was reserved?
 
-                space_needed = ceil ( (double)count / CPR_CARR_DATA_SIZE );
+                space_needed = 1+ (double)(count-1) / CPR_CARR_DATA_SIZE;
 
                 for ( i=0; i < count; ++i )
                     cpr_shadow_mem[id][i/CPR_CARR_DATA_SIZE] . data[i % CPR_CARR_DATA_SIZE] = mem[i];
@@ -688,7 +688,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
             case CPR_ACTIVE_ROLE:
                 for ( i=0; i<cpr_shadow_mem_tail; ++i)
                 {
-                    reading_carr = ceil ((double)(cpr_shadow_mem[i][0].count) / CPR_CARR_DATA_SIZE);
+                    reading_carr = 1+ (double)(cpr_shadow_mem[i][0].count-1) / CPR_CARR_DATA_SIZE;
                     for ( k=0; k < reading_carr; ++k )
                     {
                         carr = &cpr_shadow_mem[i][k];
@@ -716,8 +716,8 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                     cpr_shadow_mem = (cpr_check_carrier **) malloc ( cpr_table_size[dead_pe] * sizeof(cpr_check_carrier *));
                     for ( i=0; i < cpr_table_tail[dead_pe]; ++i )
                     {
-                        reading_carr = ceil (
-                            (double)(cpr_checkpoint_table[dead_pe][i][0].count) / CPR_CARR_DATA_SIZE);
+                        reading_carr = 1+
+                            (double)(cpr_checkpoint_table[dead_pe][i][0].count-1) / CPR_CARR_DATA_SIZE;
                         
                         cpr_shadow_mem[i] = (cpr_check_carrier *) malloc ( reading_carr * sizeof(cpr_check_carrier));
 
