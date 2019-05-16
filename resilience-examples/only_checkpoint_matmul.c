@@ -931,7 +931,7 @@ int main(int argc, char const *argv[]) {
     me = shmem_my_pe();
     spes = 4;
 
-    success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
+    shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
 
     const unsigned long N = atoi(argv[argc-1]);           // Size of the matrices
     const unsigned long Ns = N / npes;   // Width of the stripes
