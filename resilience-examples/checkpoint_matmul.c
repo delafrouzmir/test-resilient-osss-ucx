@@ -42,7 +42,7 @@
 typedef struct resrv_carrier
 {
     int id;                     // ID of memory part that is being reserved
-    uint64_t *adr;                   // Address of memory part that is being reserved
+    uunsigned long *adr;                   // Address of memory part that is being reserved
     int count;                  // number of data items that needs to be stored
     int pe_num;                 // the PE that asked for a reservation or checkpoint
     int is_symmetric;           // if this request is to checkpoint symmetric or private data
@@ -53,11 +53,11 @@ typedef struct check_carrier cpr_check_carrier;
 struct check_carrier
 {
     int id;                     // ID of memory part that is being checkpointed
-    uint64_t *adr;                   // Address of memory part that is being checkpointed
+    uunsigned long *adr;                   // Address of memory part that is being checkpointed
     // TO DO: maybe if change from count to size=count*sizeof(data),
     // it can be generalized to all 
     int count;                  // number of data items that needs to be stored
-    int64_t data[CPR_CARR_DATA_SIZE];   // an array of data that will be stored
+    unsigned long data[CPR_CARR_DATA_SIZE];   // an array of data that will be stored
     int pe_num;                 // the PE that asked for a reservation or checkpoint
     int is_symmetric;           // if this request is to checkpoint symmetric or private data
     cpr_check_carrier *next;    // the pointer to the next carrier if count>CPR_CARR_DATA_SIZE.
@@ -380,7 +380,7 @@ void shmem_cpr_copy_carrier ( cpr_rsvr_carrier *frst, cpr_check_carrier *scnd )
     scnd -> is_symmetric = frst -> is_symmetric;
 }
 
-int shmem_cpr_is_reserved (int id, uint64_t *mem, int pe_num)
+int shmem_cpr_is_reserved (int id, uunsigned long *mem, int pe_num)
 {
     switch(cpr_pe_type)
     {
@@ -416,7 +416,7 @@ int shmem_cpr_is_reserved (int id, uint64_t *mem, int pe_num)
     }
 }
 
-int shmem_cpr_reserve (int id, int64_t * mem, int count, int pe_num)
+int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
 {
     /* TO DO:
     1- create a hash table for id s and the index in cpr_shadow_mem or cpr_checkpoint_table
@@ -546,7 +546,7 @@ int shmem_cpr_reserve (int id, int64_t * mem, int count, int pe_num)
 }
 
 // for now, assuming we are checkpointing ints
-int shmem_cpr_checkpoint ( int id, int64_t* mem, int count, int pe_num )
+int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
 {
     /* TO DO:
     1- lookup id in hashtable to get the index
@@ -826,13 +826,13 @@ int shmem_cpr_rollback ( int dead_pe, int me )
     return SUCCESS;
 }
 
-void mmul(const uint64_t Is, const uint64_t Ks, const uint64_t Js,
-          const uint64_t Adist, const int64_t* A,
-          const uint64_t Bdist, const int64_t* B,
-          const uint64_t Cdist, int64_t* C) {
+void mmul(const uunsigned long Is, const uunsigned long Ks, const uunsigned long Js,
+          const uunsigned long Adist, const unsigned long* A,
+          const uunsigned long Bdist, const unsigned long* B,
+          const uunsigned long Cdist, unsigned long* C) {
 
-    uint64_t i, j, k;
-    int64_t a_ik;
+    uunsigned long i, j, k;
+    unsigned long a_ik;
 
     for (i = 0; i < Is; i++) {
         for (k = 0; k < Ks; k++) {
@@ -845,9 +845,9 @@ void mmul(const uint64_t Is, const uint64_t Ks, const uint64_t Js,
 }
 
 
-void print_matrix(const int64_t* mat, const uint64_t Is, const uint64_t Js) {
-    for (uint64_t i = 0; i < Is; i++) {
-        for (uint64_t j = 0; j < Js; j++)
+void print_matrix(const unsigned long* mat, const uunsigned long Is, const uunsigned long Js) {
+    for (uunsigned long i = 0; i < Is; i++) {
+        for (uunsigned long j = 0; j < Js; j++)
             printf("%d ", mat[i * Js + j]);
         printf("\n");
     }
@@ -859,7 +859,7 @@ int main ()
     int spes;
     int success_init;
     int i, j, k, l, array_size, first_rollback;
-    int64_t* a, *iter;
+    unsigned long* a, *iter;
 
     shmem_init ();
     me = shmem_my_pe ();
@@ -876,10 +876,10 @@ int main ()
 
     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
 
-    iter = (int64_t *) shmem_malloc(sizeof(int64_t));
+    iter = (unsigned long *) shmem_malloc(sizeof(unsigned long));
 
     array_size = 10;
-    a = (int64_t *) shmem_malloc((array_size)*sizeof(int64_t));
+    a = (unsigned long *) shmem_malloc((array_size)*sizeof(unsigned long));
     for ( i=0; i<array_size; ++i)
         a[i] = me;
 
