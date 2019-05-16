@@ -605,8 +605,8 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                 {
                     if ( cpr_all_pe_type[cpr_storage_pes[i]] != CPR_DEAD_PE )
                     {
-                        // if ( me == 0 )
-                        //     printf("me=%d 2nd\n", me);
+                        if ( me == 0 )
+                            printf("me=%d 2nd\n", me);
                         for ( j=0; j < space_needed; ++j )
                         {
                             carr -> offset = j * CPR_CARR_DATA_SIZE;
@@ -615,8 +615,8 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                             last_data = (j == space_needed-1) ? 
                                 count - (j*CPR_CARR_DATA_SIZE) : CPR_CARR_DATA_SIZE;
 
-                            // if ( me == 0 )
-                            //     printf("me=%d 3rd\n", me);
+                            if ( me == 0 )
+                                printf("me=%d 3rd\n", me);
 
                             for ( k=0; k < last_data; ++k )
                                 carr -> data[k] = mem[k + j*CPR_CARR_DATA_SIZE];
@@ -626,8 +626,8 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
 
                             shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), cpr_storage_pes[i]);
 
-                            // if ( me == 0 )
-                            //     printf("me=%d 4th\n", me);
+                            if ( me == 0 )
+                                printf("me=%d 4th\n", me);
                         }
 
                         if ( shmem_atomic_fetch ( &cpr_sig_check, cpr_storage_pes[i]) == 0 )
@@ -645,12 +645,12 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                 {
                     if ( cpr_resrv_queue_head < cpr_resrv_queue_tail )
                         shmem_cpr_reserve(id, mem, count, pe_num);
-                    // if ( me == 8 )
-                    //     printf("me=%d 5th\n", me);
+                    if ( me == 8 )
+                        printf("me=%d 5th\n", me);
                     // waiting to receive the first checkpointing request in the queue:
                     shmem_wait_until ( &cpr_sig_check, SHMEM_CMP_GT, 0);
-                    // if ( me == 8 )
-                    //     printf("me=%d 6th\n", me);
+                    if ( me == 8 )
+                        printf("me=%d 6th\n", me);
                     while (cpr_check_queue_head < cpr_check_queue_tail)
                     {
                         // almost making sure the carrier has arrived
@@ -658,8 +658,8 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                             SHMEM_CMP_NE, check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN]);
                         check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN] = 
                             cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num;
-                        // if ( me == 8 )
-                        //     printf("me=%d 7th\n", me);
+                        if ( me == 8 )
+                            printf("me=%d 7th\n", me);
                         // head and tail might overflow the int size... add code to check
                         carr = &cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];
                         // if ( me == 8 && carr->count == 1)
