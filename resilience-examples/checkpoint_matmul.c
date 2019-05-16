@@ -470,6 +470,7 @@ int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
                 {
                     cpr_shadow_mem[cpr_shadow_mem_tail-1][i] =
                         (cpr_check_carrier *) malloc ( 1* sizeof(cpr_check_carrier));
+                    printf("pe=%d mallocing shado_mem for id=%d\n", pe_num, id);
                     shmem_cpr_copy_carrier (carr, cpr_shadow_mem[cpr_shadow_mem_tail-1][i]);
                 }
 
@@ -542,6 +543,7 @@ int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
                     {
                         cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]][i] = 
                             (cpr_check_carrier *) malloc ( 1 * sizeof(cpr_check_carrier));
+                        printf("pe=%d mallocing chp_table for pe=%d, id=%d\n", pe_num, carr-> pe_num, id);
                         shmem_cpr_copy_carrier (carr, cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]][i]);
                     }
                     
