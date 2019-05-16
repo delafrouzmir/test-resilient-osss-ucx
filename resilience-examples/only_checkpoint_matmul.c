@@ -971,6 +971,8 @@ int main(int argc, char const *argv[]) {
 
         shmem_cpr_checkpoint(0, Cs, N * Ns, shmem_cpr_pe_num(me));
 
+        printf("%f\n", (clock()-start) / CLOCKS_PER_SEC);
+
         shmem_barrier_all();
     }
 
@@ -995,7 +997,7 @@ int main(int argc, char const *argv[]) {
     end = clock();
 
     if ( me == 0 )
-        fprintf(fp, "npes=%d spes=%d N=%d time=%f\n",
+        printf("npes=%d spes=%d N=%d time=%f\n",
             npes, spes, N, (double)(end - start) / CLOCKS_PER_SEC);
 
     shmem_free(As);
