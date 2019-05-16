@@ -754,6 +754,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                 for ( i=0; i<cpr_shadow_mem_tail; ++i)
                 {
                     reading_carr = 1+ (cpr_shadow_mem[i][0]->count-1) / CPR_CARR_DATA_SIZE;
+                    printf("PE=%d at rollback!!\n", me);
                     for ( k=0; k < reading_carr; ++k )
                     {
                         carr = cpr_shadow_mem[i][k];
@@ -773,10 +774,12 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                 // First, if there is any checkpoint remaining in the queue, should be checkpointed
                 if ( cpr_check_queue_head < cpr_check_queue_tail )
                     shmem_cpr_checkpoint(0, NULL, 0, me);
-                
+                printf("PE=%d at rollback!!\n", me);
                 // The last spare replaces the dead PE
                 if ( me == chosen_pe )
                 {
+
+                    printf("PE=%d is chosen!!\n", me);
                     cpr_pe_type = CPR_RESURRECTED_PE;
                     cpr_pe_role = CPR_ACTIVE_ROLE;
 
