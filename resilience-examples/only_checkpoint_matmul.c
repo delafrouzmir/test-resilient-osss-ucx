@@ -971,7 +971,7 @@ int main(int argc, char const *argv[]) {
 
         shmem_cpr_checkpoint(0, Cs, N * Ns, shmem_cpr_pe_num(me));
 
-        printf("%f\n", (clock()-start) / CLOCKS_PER_SEC);
+        printf("pe=%d , iter=%lu, %f\n", me, s, (clock()-start) / CLOCKS_PER_SEC);
 
         shmem_barrier_all();
     }
@@ -979,7 +979,7 @@ int main(int argc, char const *argv[]) {
     end = clock();
 
     if ( me == 0 )
-        fprintf(fp, "npes=%lu spes=%lu N=%lu time=%f\n",
+        printf("npes=%lu spes=%lu N=%lu time=%f\n",
             npes, spes, N, (double)(end - start) / CLOCKS_PER_SEC);
 
     // Collect and print the matrix product
