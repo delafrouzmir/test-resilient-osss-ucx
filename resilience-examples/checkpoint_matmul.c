@@ -670,13 +670,13 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                         //         carr->offset, carr->data[0]);
 
                         // }
-                        if ( me == 8 && carr->count == 10)
-                        {
-                            printf("check_Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n",
-                                cpr_check_queue_head, carr->pe_num, carr->id,
-                                carr->is_symmetric, carr->count, carr->rand_num,
-                                carr->offset);
-                        }
+                        // if ( me == 8 && carr->count == 10)
+                        // {
+                        //     printf("check_Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n",
+                        //         cpr_check_queue_head, carr->pe_num, carr->id,
+                        //         carr->is_symmetric, carr->count, carr->rand_num,
+                        //         carr->offset);
+                        // }
                         cpr_check_queue_head ++;
                         
                         // if ( me == 8 )
