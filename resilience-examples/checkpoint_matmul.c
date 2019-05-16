@@ -585,11 +585,14 @@ int shmem_cpr_checkpoint ( int id, int64_t* mem, int count, int pe_num )
                 carr->count = count;
                 carr->pe_num = pe_num;
                 carr->adr = mem;
-                
+                if ( me == 0 )
+                    printf("me=%d 1st\n", me);
                 for ( i= 0; i < cpr_num_storage_pes; ++i)
                 {
                     if ( cpr_all_pe_type[cpr_storage_pes[i]] != CPR_DEAD_PE )
                     {
+                        if ( me == 0 )
+                            printf("me=%d 2nd\n", me);
                         for ( j=0; j < space_needed; ++j )
                         {
                             carr -> offset = j * CPR_CARR_DATA_SIZE;
@@ -597,6 +600,10 @@ int shmem_cpr_checkpoint ( int id, int64_t* mem, int count, int pe_num )
 
                             last_data = (j == space_needed-1) ? 
                                 count - (j*CPR_CARR_DATA_SIZE) : CPR_CARR_DATA_SIZE;
+
+                            if ( me == 0 )
+                                printf("me=%d 3rd\n", me);
+
                             for ( k=0; k < last_data; ++k )
                                 carr -> data[k] = mem[k + j*CPR_CARR_DATA_SIZE];
 
@@ -604,6 +611,9 @@ int shmem_cpr_checkpoint ( int id, int64_t* mem, int count, int pe_num )
                             q_tail = ( shmem_atomic_fetch_inc (&cpr_check_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
 
                             shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), cpr_storage_pes[i]);
+
+                            if ( me == 0 )
+                                printf("me=%d 4th\n", me);
                         }
 
                         if ( shmem_atomic_fetch ( &cpr_sig_check, cpr_storage_pes[i]) == 0 )
@@ -621,10 +631,12 @@ int shmem_cpr_checkpoint ( int id, int64_t* mem, int count, int pe_num )
                 {
                     if ( cpr_resrv_queue_head < cpr_resrv_queue_tail )
                         shmem_cpr_reserve(id, mem, count, pe_num);
-
+                    if ( me == 8 )
+                        printf("me=%d 5th\n", me);
                     // waiting to receive the first checkpointing request in the queue:
                     shmem_wait_until ( &cpr_sig_check, SHMEM_CMP_GT, 0);
-                    
+                    if ( me == 8 )
+                        printf("me=%d 6th\n", me);
                     while (cpr_check_queue_head < cpr_check_queue_tail)
                     {
                         // almost making sure the carrier has arrived
@@ -632,14 +644,16 @@ int shmem_cpr_checkpoint ( int id, int64_t* mem, int count, int pe_num )
                             SHMEM_CMP_NE, check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN]);
                         check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN] = 
                             cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num;
-                        
+                        if ( me == 8 )
+                            printf("me=%d 7th\n", me);
                         // head and tail might overflow the int size... add code to check
                         *carr = cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];
                         cpr_check_queue_head ++;
                         
                         for ( i=0; i< carr-> count; ++i)
                             cpr_checkpoint_table[carr-> pe_num][carr-> id][(carr->offset)/CPR_CARR_DATA_SIZE].data[i] = carr-> data[i];
-                        
+                        if ( me == 8 )
+                            printf("me=%d 8th\n", me);
                         // I'm assuming id = index here
                     }
                 }
@@ -871,9 +885,7 @@ int main ()
     *iter = 0;
     
     shmem_cpr_reserve(0, iter, 1, shmem_cpr_pe_num(me));
-    printf("me=%d done with 1 reserve\n", me);
     shmem_cpr_reserve(1, a, array_size, shmem_cpr_pe_num(me));
-    printf("me=%d done with 2 reserve\n", me);
     /**/
     shmem_barrier_all();
 
