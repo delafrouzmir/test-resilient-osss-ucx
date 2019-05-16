@@ -969,7 +969,7 @@ int main ()
 
             // for ( i=8; i<11; ++i )
             // {
-                if ( me == 8 )
+                if ( me == 8 && (*iter) == 30 )
                 {
                     printf("PE=8 table at iter=%d:\n", *iter);
                     for ( j=0; j<cpr_num_active_pes; ++j )
@@ -977,13 +977,24 @@ int main ()
                         printf("for PE=%d\n", j);
                         for ( k=0; k<cpr_table_tail[j]; ++k )
                         {
-                            printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
+                            printf("pe=%d id=%d count=%d is_symmetric=%d offset=%d data=:\n",
                                 cpr_checkpoint_table[j][k][0]->pe_num,
                                 cpr_checkpoint_table[j][k][0]->id,
                                 cpr_checkpoint_table[j][k][0]->count,
+                                cpr_checkpoint_table[j][k][0]->offset,
                                 cpr_checkpoint_table[j][k][0]->is_symmetric);
-                            for ( l=0; l< cpr_checkpoint_table[j][k][0]->count; ++l )
+                            for ( l=0; l< CPR_CARR_DATA_SIZE; ++l )
                                 printf("%d ", cpr_checkpoint_table[j][k][0]->data[l]);
+                            printf("\n----------------\n");
+
+                            printf("pe=%d id=%d count=%d is_symmetric=%d offset=%d data=:\n",
+                                cpr_checkpoint_table[j][k][1]->pe_num,
+                                cpr_checkpoint_table[j][k][1]->id,
+                                cpr_checkpoint_table[j][k][1]->count,
+                                cpr_checkpoint_table[j][k][1]->offset,
+                                cpr_checkpoint_table[j][k][1]->is_symmetric);
+                            for ( l=0; l< cpr_checkpoint_table[j][k][1]->count % CPR_CARR_DATA_SIZE; ++l )
+                                printf("%d ", cpr_checkpoint_table[j][k][1]->data[l]);
                             printf("\n----------------\n");
                         }
                         printf("============***============\n");
