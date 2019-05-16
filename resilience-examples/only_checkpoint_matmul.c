@@ -605,8 +605,8 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                 {
                     if ( cpr_all_pe_type[cpr_storage_pes[i]] != CPR_DEAD_PE )
                     {
-                        if ( me == 0 )
-                            printf("me=%d 2nd\n", me);
+                        // if ( me == 0 )
+                        //     printf("me=%d 2nd\n", me);
                         for ( j=0; j < space_needed; ++j )
                         {
                             carr -> offset = j * CPR_CARR_DATA_SIZE;
@@ -615,8 +615,8 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                             last_data = (j == space_needed-1) ? 
                                 count - (j*CPR_CARR_DATA_SIZE) : CPR_CARR_DATA_SIZE;
 
-                            if ( me == 0 )
-                                printf("me=%d 3rd\n", me);
+                            // if ( me == 0 )
+                            //     printf("me=%d 3rd\n", me);
 
                             for ( k=0; k < last_data; ++k )
                                 carr -> data[k] = mem[k + j*CPR_CARR_DATA_SIZE];
@@ -626,8 +626,8 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
 
                             shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), cpr_storage_pes[i]);
 
-                            if ( me == 0 )
-                                printf("me=%d 4th\n", me);
+                            // if ( me == 0 )
+                                // printf("me=%d 4th\n", me);
                         }
 
                         if ( shmem_atomic_fetch ( &cpr_sig_check, cpr_storage_pes[i]) == 0 )
@@ -640,6 +640,8 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
 
             case CPR_STORAGE_ROLE:
 
+                if ( me == 8 )
+                        printf("me=%d 4th\n", me);
                 // First, we need to check reservation queue is empty. if not, call reservation
                 if ( cpr_pe_type != CPR_DEAD_PE )
                 {
@@ -932,6 +934,8 @@ int main(int argc, char const *argv[]) {
     spes = 4;
 
     shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
+
+    printf("me=%d role=%d type=%d\n", me, cpr_pe_role, cpr_pe_type);
 
     const unsigned long N = atoi(argv[argc-1]);           // Size of the matrices
     const unsigned long Ns = N / cpr_num_active_pes;   // Width of the stripes
