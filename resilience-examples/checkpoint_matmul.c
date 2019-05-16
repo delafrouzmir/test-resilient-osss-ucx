@@ -510,6 +510,14 @@ int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
                     *carr = cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)];
 
                     cpr_resrv_queue_head ++;
+
+                    if ( me == 8 )
+                    {
+                        printf("rsrv_Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n",
+                            cpr_check_queue_head, carr->pe_num, carr->id,
+                            carr->is_symmetric, carr->count, carr->rand_num,
+                            carr->offset);
+                    }
                     
                     // calculating ceiling of num of carriers needed in chp table
                     space_needed = 1+ (carr->count-1) / CPR_CARR_DATA_SIZE;
@@ -647,14 +655,23 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                         *carr = cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];
                         if ( me == 8 )
                         {
-                            printf("Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n",
+                            printf("check_Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n",
                                 cpr_check_queue_head, carr->pe_num, carr->id,
                                 carr->is_symmetric, carr->count, carr->rand_num,
                                 carr->offset);
                         }
                         cpr_check_queue_head ++;
                         
-                        for ( i=0; i< carr-> count; ++i)
+                        if ( carr->count <= CPR_CARR_DATA_SIZE )
+                            last_data = count;
+                        else
+                        {
+                            if ( carr->count - carr->offset <= CPR_CARR_DATA_SIZE )
+                                last_data = carr->count - carr->offset;
+                            else
+                                last_data = CPR_CARR_DATA_SIZE;
+                        }
+                        for ( i=0; i< last_data; ++i)
                             cpr_checkpoint_table[carr-> pe_num][carr-> id][(carr->offset)/CPR_CARR_DATA_SIZE].data[i] = carr-> data[i];
                         // if ( me == 8 )
                         //     printf("me=%d 8th\n", me);
@@ -905,7 +922,7 @@ int main ()
         {
             shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
             shmem_barrier_all();
-            printf("pe=%d done with %lu chp id=0\n", me, i);
+            printf("pe=%d done with %lu chp id=0\n", me, *iter);
             
             shmem_cpr_checkpoint(1, a, array_size, shmem_cpr_pe_num(me));
             shmem_barrier_all();
