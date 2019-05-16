@@ -934,23 +934,24 @@ int main(int argc, char const *argv[]) {
     shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
 
     const unsigned long N = atoi(argv[argc-1]);           // Size of the matrices
-    const unsigned long Ns = N / npes;   // Width of the stripes
+    const unsigned long Ns = N / cpr_num_active_pes;   // Width of the stripes
     const unsigned long stripe_n_bytes = N * Ns * sizeof(unsigned long);
 
-    As = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of A
-    Bs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Vertical stripes of B
-    Cs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of C
+    if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
+        As = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of A
+        Bs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Vertical stripes of B
+        Cs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of C
 
-    Bs_nxt = (unsigned long*) shmem_align(4096, stripe_n_bytes); // Buffer that stores stripes of B
-    temp = (unsigned long*) shmem_malloc (sizeof(int));
+        Bs_nxt = (unsigned long*) shmem_align(4096, stripe_n_bytes); // Buffer that stores stripes of B
+        temp = (unsigned long*) shmem_malloc (sizeof(int));
 
-    // Initialize the matrices
-    for(i = 0; i < N * Ns; i++) {
-        As[i] = (i + me) % 5 + 1;
-        Bs[i] = (i + me) % 5 + 3;
-        Cs[i] = 0;
+        // Initialize the matrices
+        for(i = 0; i < N * Ns; i++) {
+            As[i] = (i + me) % 5 + 1;
+            Bs[i] = (i + me) % 5 + 3;
+            Cs[i] = 0;
+        }
     }
-
     // Make sure all the stripes are initialized
     shmem_barrier_all();
 
@@ -958,17 +959,19 @@ int main(int argc, char const *argv[]) {
 
     shmem_cpr_reserve(0, Cs, N * Ns, shmem_cpr_pe_num(me));;
 
-    for (s = 0; s < npes; s++) {
-        block_num = (me + s) % npes;
+    for (s = 0; s < cpr_num_active_pes; s++) {
 
-        shmem_getmem_nbi(Bs_nxt, Bs, stripe_n_bytes, (me + 1) % npes);
+        if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
+            block_num = (me + s) % cpr_num_active_pes;
 
-        mmul(Ns, N, Ns, N, As, Ns, Bs, N, Cs + block_num * Ns);
+            shmem_getmem_nbi(Bs_nxt, Bs, stripe_n_bytes, (me + 1) % npes);
 
-        temp = Bs;
-        Bs = Bs_nxt;
-        Bs_nxt = temp;
+            mmul(Ns, N, Ns, N, As, Ns, Bs, N, Cs + block_num * Ns);
 
+            temp = Bs;
+            Bs = Bs_nxt;
+            Bs_nxt = temp;
+        }
         shmem_cpr_checkpoint(0, Cs, N * Ns, shmem_cpr_pe_num(me));
 
         printf("pe=%d , iter=%lu, %f\n", me, s, (clock()-start) / CLOCKS_PER_SEC);
