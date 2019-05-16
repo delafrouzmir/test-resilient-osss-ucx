@@ -921,7 +921,7 @@ int main(int argc, char const *argv[]) {
     
     shmem_init();
 
-    unsigned long npes, spes, me, i, s, block_num;
+    unsigned long npes, spes, me, i, j, k, s, block_num;
     unsigned long *As, *Bs, *Cs, *Bs_nxt, *temp;
     unsigned long* C;
     clock_t start, end;
@@ -935,7 +935,7 @@ int main(int argc, char const *argv[]) {
 
     shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
 
-    printf("me=%d role=%d type=%d\n", me, cpr_pe_role, cpr_pe_type);
+    // printf("me=%d role=%d type=%d\n", me, cpr_pe_role, cpr_pe_type);
 
     const unsigned long N = atoi(argv[argc-1]);           // Size of the matrices
     const unsigned long Ns = N / cpr_num_active_pes;   // Width of the stripes
@@ -961,7 +961,13 @@ int main(int argc, char const *argv[]) {
 
     start = clock();
 
-    shmem_cpr_reserve(0, Cs, N * Ns, shmem_cpr_pe_num(me));;
+    shmem_cpr_reserve(0, Cs, N * Ns, shmem_cpr_pe_num(me));
+
+    for ( i=8; i<12; ++i ){
+        for ( j=0; j<cpr_num_active_pes; ++j )
+            printf("PE=%lu for pe=%lu table_tail=%d table_size=%d shadow_tail=%d shadow_size=%d\n",
+                i, j, cpr_table_tail[j], cpr_table_size[j], cpr_shadow_mem_tail, cpr_shadow_mem_size);
+    }
 
     for (s = 0; s < cpr_num_active_pes; s++) {
 
