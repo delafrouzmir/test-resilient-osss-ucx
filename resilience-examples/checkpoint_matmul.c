@@ -246,6 +246,7 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
 
 int shmem_cpr_init (int me, int npes, int spes, int mode)
 {
+    int i;
     /*
     * Incorrect input
     */
@@ -292,8 +293,6 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
         
     shmem_cpr_set_pe_type (me, npes, spes, cpr_checkpointing_mode);
 
-    //seed the random function that creates 
-    srand(time(0));
     // * ORIGINAL or RESURRECTED PEs have a shadow_mem for chckpointing their own data
     // * SPARE PEs:
     //     ** if in MANY_COPY mode: have a checkpoint_table which is a copy of all
@@ -336,11 +335,11 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
             break;
     }
 
+    srand(me); // to make PEs generate different rands than each other
+
     shmem_barrier_all();
     cpr_start = 1;
-    //  THIS IF IS FOR WHEN SPARES DO NOT PARTICIPATE IN RUNNING THE CODE
-    //if ( cpr_pe_type == CPR_SPARE_PE )
-    //    shmem_cpr_spare_wait(me, npes, spes);
+
     return SUCCESS;
 }
 
