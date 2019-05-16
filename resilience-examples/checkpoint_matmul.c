@@ -967,28 +967,28 @@ int main ()
 
             // for ( i=8; i<11; ++i )
             // {
-            //     if ( me == i )
-            //     {
-            //         printf("PE=%d table:\n", i);
-            //         for ( j=0; j<cpr_num_active_pes; ++j )
-            //         {
-            //             printf("for PE=%d\n", j);
-            //             for ( k=0; k<cpr_table_tail[j]; ++k )
-            //             {
-            //                 printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
-            //                     cpr_checkpoint_table[j][k][0].pe_num,
-            //                     cpr_checkpoint_table[j][k][0].id,
-            //                     cpr_checkpoint_table[j][k][0].count,
-            //                     cpr_checkpoint_table[j][k][0].is_symmetric);
-            //                 for ( l=0; l< cpr_checkpoint_table[j][k][0].count; ++l )
-            //                     printf("%d ", cpr_checkpoint_table[j][k][0].data[l]);
-            //                 printf("\n----------------\n");
-            //             }
-            //             printf("============***============\n");
-            //         }
-            //         printf("\n\n\n");
-            //     }
-            //     shmem_barrier_all();
+                if ( me == 8 )
+                {
+                    printf("PE=8 table at iter=%d:\n", *iter);
+                    for ( j=0; j<cpr_num_active_pes; ++j )
+                    {
+                        printf("for PE=%d\n", j);
+                        for ( k=0; k<cpr_table_tail[j]; ++k )
+                        {
+                            printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
+                                cpr_checkpoint_table[j][k][0].pe_num,
+                                cpr_checkpoint_table[j][k][0].id,
+                                cpr_checkpoint_table[j][k][0].count,
+                                cpr_checkpoint_table[j][k][0].is_symmetric);
+                            for ( l=0; l< cpr_checkpoint_table[j][k][0].count; ++l )
+                                printf("%d ", cpr_checkpoint_table[j][k][0].data[l]);
+                            printf("\n----------------\n");
+                        }
+                        printf("============***============\n");
+                    }
+                    printf("\n\n\n");
+                }
+                shmem_barrier_all();
             // }
         }
         for ( j=0; j<array_size; ++j)
@@ -1025,7 +1025,7 @@ int main ()
     //         printf("storag[%d]=%d \n", i, cpr_storage_pes[i]);
     // }
 
-    shmem_barrier_all();
+    // shmem_barrier_all();
     // if ( cpr_pe_role == CPR_STORAGE_ROLE )
     //     shmem_cpr_checkpoint(1, a, array_size, me);
     // shmem_barrier_all();
@@ -1033,62 +1033,62 @@ int main ()
     // if (me ==0)
     //     printf("*****\n*****\nAfter Checkpointing\n*****\n*****\n");
     // // // TEST SUCCESSFUL:
-    for ( i=8; i<11; ++i )
-    {
-        if ( me == i )
-        {
-            printf("PE=%d table:\n", i);
-            for ( j=0; j<cpr_num_active_pes; ++j )
-            {
-                printf("for PE=%d\n", j);
-                for ( k=0; k<cpr_table_tail[j]; ++k )
-                {
-                    printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
-                        cpr_checkpoint_table[j][k][0]->pe_num,
-                        cpr_checkpoint_table[j][k][0]->id,
-                        cpr_checkpoint_table[j][k][0]->count,
-                        cpr_checkpoint_table[j][k][0]->is_symmetric);
-                    for ( l=0; l< cpr_checkpoint_table[j][k][0]->count; ++l )
-                        printf("%lu ", cpr_checkpoint_table[j][k][0]->data[l]);
-                    printf("\n----------------\n");
-                }
-                printf("============***============\n");
-            }
-            printf("\n\n\n");
-        }
-        shmem_barrier_all();
-    }
-    shmem_barrier_all ();
+    // for ( i=8; i<11; ++i )
+    // {
+    //     if ( me == i )
+    //     {
+    //         printf("PE=%d table:\n", i);
+    //         for ( j=0; j<cpr_num_active_pes; ++j )
+    //         {
+    //             printf("for PE=%d\n", j);
+    //             for ( k=0; k<cpr_table_tail[j]; ++k )
+    //             {
+    //                 printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
+    //                     cpr_checkpoint_table[j][k][0]->pe_num,
+    //                     cpr_checkpoint_table[j][k][0]->id,
+    //                     cpr_checkpoint_table[j][k][0]->count,
+    //                     cpr_checkpoint_table[j][k][0]->is_symmetric);
+    //                 for ( l=0; l< cpr_checkpoint_table[j][k][0]->count; ++l )
+    //                     printf("%lu ", cpr_checkpoint_table[j][k][0]->data[l]);
+    //                 printf("\n----------------\n");
+    //             }
+    //             printf("============***============\n");
+    //         }
+    //         printf("\n\n\n");
+    //     }
+    //     shmem_barrier_all();
+    // }
+    // shmem_barrier_all ();
     // // I need this part only for testing the whole checkpointing, to make sure nothing's left in queues
     // if ( cpr_pe_type == CPR_SPARE_PE )
     //     shmem_cpr_checkpoint(100, &me, me, me);
 
     // shmem_barrier_all ();
 
-    for ( l=8; l<11; ++l ){
-        if ( me == l )
-        {
-            cpr_check_carrier *carr;
+    // for ( l=8; l<11; ++l ){
+    //     if ( me == l )
+    //     {
+    //         cpr_check_carrier *carr;
             
-            printf("PE=%d rqh=%d rqt=%d, cqh=%d cqt=%d\n",
-                l, cpr_resrv_queue_head, cpr_resrv_queue_tail,
-                cpr_check_queue_head, cpr_check_queue_tail);
-            // for ( i=0; i < cpr_num_active_pes; ++i )
-            //     printf("for PE=%d, we have %d carriers\n", i, cpr_table_tail[i]);
-            printf("-------\n");
-            for ( i=0; i<cpr_resrv_queue_tail; ++i )
-                printf("rcarr[%d].pe_num=%d, id=%d, count=%d, sym=%d\n", 
-                    i, cpr_resrv_queue[i].pe_num, cpr_resrv_queue[i].id, 
-                    cpr_resrv_queue[i].count, cpr_resrv_queue[i].is_symmetric);
-            printf("=======\n");
-            for ( i=0; i<cpr_check_queue_tail; ++i )
-                printf("chcarr[%d].pe_num=%d, id=%d, count=%d, sym=%d\n", 
-                    i, cpr_check_queue[i].pe_num, cpr_check_queue[i].id, 
-                    cpr_check_queue[i].count, cpr_check_queue[i].is_symmetric);
-            printf("\n\n\n");
-        }
-        shmem_barrier_all();
-    }
+    //         printf("PE=%d rqh=%d rqt=%d, cqh=%d cqt=%d\n",
+    //             l, cpr_resrv_queue_head, cpr_resrv_queue_tail,
+    //             cpr_check_queue_head, cpr_check_queue_tail);
+    //         // for ( i=0; i < cpr_num_active_pes; ++i )
+    //         //     printf("for PE=%d, we have %d carriers\n", i, cpr_table_tail[i]);
+    //         printf("-------\n");
+    //         for ( i=0; i<cpr_resrv_queue_tail; ++i )
+    //             printf("rcarr[%d].pe_num=%d, id=%d, count=%d, sym=%d\n", 
+    //                 i, cpr_resrv_queue[i].pe_num, cpr_resrv_queue[i].id, 
+    //                 cpr_resrv_queue[i].count, cpr_resrv_queue[i].is_symmetric);
+    //         printf("=======\n");
+    //         for ( i=0; i<cpr_check_queue_tail; ++i )
+    //             printf("chcarr[%d].pe_num=%d, id=%d, count=%d, sym=%d\n", 
+    //                 i, cpr_check_queue[i].pe_num, cpr_check_queue[i].id, 
+    //                 cpr_check_queue[i].count, cpr_check_queue[i].is_symmetric);
+    //         printf("\n\n\n");
+    //     }
+    //     shmem_barrier_all();
+    // }
 
     // // shmem_barrier_all();
 
