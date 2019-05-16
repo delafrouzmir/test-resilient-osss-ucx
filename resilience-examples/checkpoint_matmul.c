@@ -905,7 +905,7 @@ int main ()
             
             shmem_cpr_checkpoint(1, a, array_size, shmem_cpr_pe_num(me));
             shmem_barrier_all();
-            printf("pe=%d done with %d chp id=1\n", me, i);
+            printf("pe=%d done with %d chp id=1\n", me, *iter);
 
             for ( i=8; i<11; ++i )
             {
