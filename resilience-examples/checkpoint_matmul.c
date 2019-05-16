@@ -659,7 +659,7 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                         // if ( me == 8 )
                         //     printf("me=%d 7th\n", me);
                         // head and tail might overflow the int size... add code to check
-                        *carr = cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];
+                        carr = &cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];
                         if ( me == 8 && carr->count == 1)
                         {
                             printf("check_Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n%lu\n",
@@ -681,8 +681,13 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                         }
                         cpr_check_queue_head ++;
                         
+                        if ( me == 8 )
+                            printf("******carr->count=%d, CPR_CARR_DATA_SIZE=%d\n", carr->count, CPR_CARR_DATA_SIZE);
+
                         if ( carr->count <= CPR_CARR_DATA_SIZE )
+                        {
                             last_data = count;
+                        }
                         else
                         {
                             if ( carr->count - carr->offset <= CPR_CARR_DATA_SIZE )
