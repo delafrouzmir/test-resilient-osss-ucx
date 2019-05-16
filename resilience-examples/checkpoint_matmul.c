@@ -690,6 +690,8 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                             else
                                 last_data = CPR_CARR_DATA_SIZE;
                         }
+                        if ( me == 8 )
+                            printf("***last_data=%d\n", last_data);
                         for ( i=0; i< last_data; ++i)
                         {
                             cpr_checkpoint_table[carr-> pe_num][carr-> id][(carr->offset)/CPR_CARR_DATA_SIZE] -> data[i] = carr-> data[i];
