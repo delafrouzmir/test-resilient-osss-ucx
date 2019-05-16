@@ -683,7 +683,13 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                                 last_data = CPR_CARR_DATA_SIZE;
                         }
                         for ( i=0; i< last_data; ++i)
+                        {
                             cpr_checkpoint_table[carr-> pe_num][carr-> id][(carr->offset)/CPR_CARR_DATA_SIZE].data[i] = carr-> data[i];
+                            if ( me == 8 && carr-> pe_num < 3 )
+                                printf("cpr_checkpoint_table[%d][%d][%d].data[%d] = %d\n",
+                                    carr-> pe_num, carr-> id, (carr->offset)/CPR_CARR_DATA_SIZE,
+                                    i, carr-> data[i]);
+                        }
                         // if ( me == 8 )
                         //     printf("me=%d 8th\n", me);
                         // I'm assuming id = index here
