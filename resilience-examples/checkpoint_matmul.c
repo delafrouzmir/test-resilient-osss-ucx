@@ -652,12 +652,26 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                         //     printf("me=%d 7th\n", me);
                         // head and tail might overflow the int size... add code to check
                         *carr = cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];
-                        if ( me == 8 )
+                        if ( me == 8 && carr->count == 1)
                         {
-                            printf("check_Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n",
+                            printf("check_Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n
+                                %lu\n",
                                 cpr_check_queue_head, carr->pe_num, carr->id,
                                 carr->is_symmetric, carr->count, carr->rand_num,
-                                carr->offset);
+                                carr->offset, carr->data[0]);
+
+                        }
+                        if ( me == 8 && carr->count == 10)
+                        {
+                            printf("check_Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n
+                                %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu\n",
+                                cpr_check_queue_head, carr->pe_num, carr->id,
+                                carr->is_symmetric, carr->count, carr->rand_num,
+                                carr->offset, carr->data[0], carr->data[1],
+                                carr->data[2], carr->data[3], carr->data[4], carr->data[5],
+                                carr->data[6], carr->data[7], carr->data[8], carr->data[9],
+                                carr->data[10]);
+
                         }
                         cpr_check_queue_head ++;
                         
@@ -1011,7 +1025,7 @@ int main ()
                         cpr_checkpoint_table[j][k][0].count,
                         cpr_checkpoint_table[j][k][0].is_symmetric);
                     for ( l=0; l< cpr_checkpoint_table[j][k][0].count; ++l )
-                        printf("%d ", cpr_checkpoint_table[j][k][0].data[l]);
+                        printf("%lu ", cpr_checkpoint_table[j][k][0].data[l]);
                     printf("\n----------------\n");
                 }
                 printf("============***============\n");
