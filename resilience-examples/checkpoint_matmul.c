@@ -417,7 +417,7 @@ int shmem_cpr_is_reserved (int id, int *mem, int pe_num)
     }
 }
 
-int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
+int shmem_cpr_reserve (int id, int64_t * mem, int count, int pe_num)
 {
     /* TO DO:
     1- create a hash table for id s and the index in cpr_shadow_mem or cpr_checkpoint_table
@@ -503,7 +503,7 @@ int shmem_cpr_reserve (int id, int * mem, int count, int pe_num)
                 while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
                 {
                     // almost making sure the carrier has arrived
-                    shmem_wait_until(cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num,
+                    shmem_wait_until(&cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num,
                         SHMEM_CMP_NE, rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN]);
                     rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN] = 
                         cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num;
@@ -627,7 +627,7 @@ int shmem_cpr_checkpoint ( int id, int64_t* mem, int count, int pe_num )
                     while (cpr_check_queue_head < cpr_check_queue_tail)
                     {
                         // almost making sure the carrier has arrived
-                        shmem_wait_until(cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num,
+                        shmem_wait_until(&cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num,
                             SHMEM_CMP_NE, check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN]);
                         check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN] = 
                             cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num;
