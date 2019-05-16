@@ -942,7 +942,7 @@ int main ()
     /**/
     shmem_barrier_all();
 
-    for ( (*iter)=0; (*iter)<10; ++(*iter) )
+    for ( (*iter)=0; (*iter)<40; ++(*iter) )
     {
         // if ( cpr_pe[me] == 9 || cpr_pe[me] == 10 )
         // {
