@@ -40,6 +40,9 @@ int main(int argc, char const *argv[]) {
     int64_t* C;
     clock_t start, end;
     
+    FILEPOINT *fp;
+    fp = fopen ("result_matmul.txt", "a");
+
     npes = shmem_n_pes();
     me = shmem_my_pe();
 
@@ -92,7 +95,7 @@ int main(int argc, char const *argv[]) {
 
         shmem_quiet();
 
-        print_matrix(C, N, N);
+        //print_matrix(C, N, N);
 
         free (C);
     }
@@ -101,7 +104,7 @@ int main(int argc, char const *argv[]) {
     end = clock();
 
     if ( me == 0 )
-        printf("%f\n", (double)(end - start) / CLOCKS_PER_SEC);
+        fprintf(fp, "%f\n", (double)(end - start) / CLOCKS_PER_SEC);
 
     shmem_free(As);
     shmem_free(Bs);
