@@ -981,8 +981,8 @@ int main ()
                                 cpr_checkpoint_table[j][k][0]->pe_num,
                                 cpr_checkpoint_table[j][k][0]->id,
                                 cpr_checkpoint_table[j][k][0]->count,
-                                cpr_checkpoint_table[j][k][0]->offset,
-                                cpr_checkpoint_table[j][k][0]->is_symmetric);
+                                cpr_checkpoint_table[j][k][0]->is_symmetric,
+                                cpr_checkpoint_table[j][k][0]->offset);
                             for ( l=0; l< CPR_CARR_DATA_SIZE; ++l )
                                 printf("%d ", cpr_checkpoint_table[j][k][0]->data[l]);
                             printf("\n----------------\n");
@@ -991,8 +991,8 @@ int main ()
                                 cpr_checkpoint_table[j][k][1]->pe_num,
                                 cpr_checkpoint_table[j][k][1]->id,
                                 cpr_checkpoint_table[j][k][1]->count,
-                                cpr_checkpoint_table[j][k][1]->offset,
-                                cpr_checkpoint_table[j][k][1]->is_symmetric);
+                                cpr_checkpoint_table[j][k][1]->is_symmetric,
+                                cpr_checkpoint_table[j][k][1]->offset);
                             for ( l=0; l< cpr_checkpoint_table[j][k][1]->count % CPR_CARR_DATA_SIZE; ++l )
                                 printf("%d ", cpr_checkpoint_table[j][k][1]->data[l]);
                             printf("\n----------------\n");
