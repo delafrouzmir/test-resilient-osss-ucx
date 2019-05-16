@@ -42,7 +42,7 @@
 typedef struct resrv_carrier
 {
     int id;                     // ID of memory part that is being reserved
-    uunsigned long *adr;                   // Address of memory part that is being reserved
+    unsigned long *adr;                   // Address of memory part that is being reserved
     int count;                  // number of data items that needs to be stored
     int pe_num;                 // the PE that asked for a reservation or checkpoint
     int is_symmetric;           // if this request is to checkpoint symmetric or private data
@@ -53,7 +53,7 @@ typedef struct check_carrier cpr_check_carrier;
 struct check_carrier
 {
     int id;                     // ID of memory part that is being checkpointed
-    uunsigned long *adr;                   // Address of memory part that is being checkpointed
+    unsigned long *adr;                   // Address of memory part that is being checkpointed
     // TO DO: maybe if change from count to size=count*sizeof(data),
     // it can be generalized to all 
     int count;                  // number of data items that needs to be stored
@@ -380,7 +380,7 @@ void shmem_cpr_copy_carrier ( cpr_rsvr_carrier *frst, cpr_check_carrier *scnd )
     scnd -> is_symmetric = frst -> is_symmetric;
 }
 
-int shmem_cpr_is_reserved (int id, uunsigned long *mem, int pe_num)
+int shmem_cpr_is_reserved (int id, unsigned long *mem, int pe_num)
 {
     switch(cpr_pe_type)
     {
@@ -826,12 +826,12 @@ int shmem_cpr_rollback ( int dead_pe, int me )
     return SUCCESS;
 }
 
-void mmul(const uunsigned long Is, const uunsigned long Ks, const uunsigned long Js,
-          const uunsigned long Adist, const unsigned long* A,
-          const uunsigned long Bdist, const unsigned long* B,
-          const uunsigned long Cdist, unsigned long* C) {
+void mmul(const unsigned long Is, const unsigned long Ks, const unsigned long Js,
+          const unsigned long Adist, const unsigned long* A,
+          const unsigned long Bdist, const unsigned long* B,
+          const unsigned long Cdist, unsigned long* C) {
 
-    uunsigned long i, j, k;
+    unsigned long i, j, k;
     unsigned long a_ik;
 
     for (i = 0; i < Is; i++) {
@@ -845,9 +845,9 @@ void mmul(const uunsigned long Is, const uunsigned long Ks, const uunsigned long
 }
 
 
-void print_matrix(const unsigned long* mat, const uunsigned long Is, const uunsigned long Js) {
-    for (uunsigned long i = 0; i < Is; i++) {
-        for (uunsigned long j = 0; j < Js; j++)
+void print_matrix(const unsigned long* mat, const unsigned long Is, const unsigned long Js) {
+    for (unsigned long i = 0; i < Is; i++) {
+        for (unsigned long j = 0; j < Js; j++)
             printf("%d ", mat[i * Js + j]);
         printf("\n");
     }
