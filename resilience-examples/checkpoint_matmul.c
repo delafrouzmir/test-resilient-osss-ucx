@@ -65,11 +65,11 @@ struct check_carrier
 };
 
 // Part 1: necessary for keeping checkpoints in shadow mem
-cpr_check_carrier **cpr_shadow_mem;    // a PE's own copy of its checkpoints, an array of pointers to carriers
+cpr_check_carrier ***cpr_shadow_mem;    // a PE's own copy of its checkpoints, an array of pointers to carriers
 int cpr_shadow_mem_size, cpr_shadow_mem_tail;
 
 // Part 2: necessary for keeping checkpoints in checkpoint table
-cpr_check_carrier ***cpr_checkpoint_table; // a spare PE or MSPE's copy of all active PE's checkpoints == an array of all their shadow mems
+cpr_check_carrier ****cpr_checkpoint_table; // a spare PE or MSPE's copy of all active PE's checkpoints == an array of all their shadow mems
 int *cpr_table_size, *cpr_table_tail;
 
 // Part 3: queues necessary for exchange of data when reserving or checkpointing
@@ -304,14 +304,14 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
 
     cpr_shadow_mem_tail = 0;
     cpr_shadow_mem_size = CPR_STARTING_TABLE_SIZE;
-    cpr_shadow_mem = (cpr_check_carrier **) malloc(cpr_shadow_mem_size * sizeof(cpr_check_carrier *) );
+    cpr_shadow_mem = (cpr_check_carrier ***) malloc(cpr_shadow_mem_size * sizeof(cpr_check_carrier **) );
     
     switch (cpr_pe_role)
     {
         case CPR_STORAGE_ROLE:
             // table_size doubles every time we ask for more space
             // table_tail shows the last place reserved
-            cpr_checkpoint_table = (cpr_check_carrier ***) malloc (cpr_num_active_pes * sizeof(cpr_check_carrier **));
+            cpr_checkpoint_table = (cpr_check_carrier ****) malloc (cpr_num_active_pes * sizeof(cpr_check_carrier ***));
             cpr_table_size = (int *) malloc(cpr_num_active_pes * sizeof(int *));
             cpr_table_tail = (int *) malloc(cpr_num_active_pes * sizeof(int *));
             rsrv_randomness = (int *) malloc(CPR_STARTING_QUEUE_LEN * sizeof(int));
@@ -321,7 +321,7 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
             {
                 cpr_table_size[i] = CPR_STARTING_TABLE_SIZE;
                 cpr_table_tail[i] = 0;
-                cpr_checkpoint_table[i] = (cpr_check_carrier **) malloc (cpr_table_size[i] * sizeof(cpr_check_carrier *));
+                cpr_checkpoint_table[i] = (cpr_check_carrier ***) malloc (cpr_table_size[i] * sizeof(cpr_check_carrier **));
             }
 
             break;
@@ -458,16 +458,20 @@ int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
                 {
 
                     cpr_shadow_mem_size *= 2;
-                    cpr_shadow_mem = (cpr_check_carrier **) realloc (cpr_shadow_mem,
-                            cpr_shadow_mem_size * sizeof(cpr_check_carrier *) );
+                    cpr_shadow_mem = (cpr_check_carrier ***) realloc (cpr_shadow_mem,
+                            cpr_shadow_mem_size * sizeof(cpr_check_carrier **) );
                 }
                 cpr_shadow_mem_tail ++;
 
                 // updating the shadow mem with the reservation request:
-                cpr_shadow_mem[cpr_shadow_mem_tail-1] = (cpr_check_carrier *) malloc ( space_needed* sizeof(cpr_check_carrier));
+                cpr_shadow_mem[cpr_shadow_mem_tail-1] = (cpr_check_carrier **) malloc ( space_needed* sizeof(cpr_check_carrier*));
                 
                 for ( i=0; i<space_needed; ++i )
-                    shmem_cpr_copy_carrier (carr, &cpr_shadow_mem[cpr_shadow_mem_tail-1][i]);
+                {
+                    cpr_shadow_mem[cpr_shadow_mem_tail-1][i] =
+                        (cpr_check_carrier *) malloc ( 1* sizeof(cpr_check_carrier));
+                    shmem_cpr_copy_carrier (carr, cpr_shadow_mem[cpr_shadow_mem_tail-1][i]);
+                }
 
                 // should reserve a place on all storage PEs
                 // and update the cpr_table_tail of all spare PEs
@@ -525,17 +529,21 @@ int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
                     {
                         cpr_table_size[ carr-> pe_num] *= 2;
                         cpr_checkpoint_table[carr-> pe_num] =
-                                (cpr_check_carrier **) realloc (cpr_checkpoint_table[carr-> pe_num], 
-                                    cpr_table_size[carr-> pe_num] * sizeof(cpr_check_carrier *));
+                                (cpr_check_carrier ***) realloc (cpr_checkpoint_table[carr-> pe_num], 
+                                    cpr_table_size[carr-> pe_num] * sizeof(cpr_check_carrier **));
                     }
 
                     // Preparing the meta data of this piece of checkpoint for later
                     // e.g: later if they want to checkpoint with id=5, I lookup for id=5 which
                                 // I have assigned here:                
                     cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]] = 
-                        (cpr_check_carrier *) malloc ( space_needed * sizeof(cpr_check_carrier));
+                        (cpr_check_carrier **) malloc ( space_needed * sizeof(cpr_check_carrier*));
                     for ( i=0; i<space_needed; ++i )
-                        shmem_cpr_copy_carrier (carr, &cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]][i]);
+                    {
+                        cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]][i] = 
+                            (cpr_check_carrier *) malloc ( 1 * sizeof(cpr_check_carrier));
+                        shmem_cpr_copy_carrier (carr, cpr_checkpoint_table[carr-> pe_num][cpr_table_tail[carr-> pe_num]][i]);
+                    }
                     
                     cpr_table_tail[ carr-> pe_num] ++;
                     // TODO: update the hash table. I'm assuming id = index here
@@ -583,7 +591,7 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                 space_needed = 1+ (count-1) / CPR_CARR_DATA_SIZE;
 
                 for ( i=0; i < count; ++i )
-                    cpr_shadow_mem[id][i/CPR_CARR_DATA_SIZE] . data[i % CPR_CARR_DATA_SIZE] = mem[i];
+                    cpr_shadow_mem[id][i/CPR_CARR_DATA_SIZE] -> data[i % CPR_CARR_DATA_SIZE] = mem[i];
 
                 carr->id = id;
                 carr->count = count;
@@ -684,9 +692,9 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                         }
                         for ( i=0; i< last_data; ++i)
                         {
-                            cpr_checkpoint_table[carr-> pe_num][carr-> id][(carr->offset)/CPR_CARR_DATA_SIZE].data[i] = carr-> data[i];
+                            cpr_checkpoint_table[carr-> pe_num][carr-> id][(carr->offset)/CPR_CARR_DATA_SIZE] -> data[i] = carr-> data[i];
                             if ( me == 8 && carr-> pe_num < 3 )
-                                printf("cpr_checkpoint_table[%d][%d][%d].data[%d] = %d\n",
+                                printf("cpr_checkpoint_table[%d][%d][%d]->data[%d] = %d\n",
                                     carr-> pe_num, carr-> id, (carr->offset)/CPR_CARR_DATA_SIZE,
                                     i, carr-> data[i]);
                         }
@@ -740,10 +748,10 @@ int shmem_cpr_rollback ( int dead_pe, int me )
             case CPR_ACTIVE_ROLE:
                 for ( i=0; i<cpr_shadow_mem_tail; ++i)
                 {
-                    reading_carr = 1+ (cpr_shadow_mem[i][0].count-1) / CPR_CARR_DATA_SIZE;
+                    reading_carr = 1+ (cpr_shadow_mem[i][0]->count-1) / CPR_CARR_DATA_SIZE;
                     for ( k=0; k < reading_carr; ++k )
                     {
-                        carr = &cpr_shadow_mem[i][k];
+                        carr = cpr_shadow_mem[i][k];
                         reading_data = ( k== reading_carr-1 ) ?
                             (carr->count)%CPR_CARR_DATA_SIZE 
                             : CPR_CARR_DATA_SIZE;
@@ -765,18 +773,20 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                     cpr_pe_type = CPR_RESURRECTED_PE;
                     cpr_pe_role = CPR_ACTIVE_ROLE;
 
-                    cpr_shadow_mem = (cpr_check_carrier **) malloc ( cpr_table_size[dead_pe] * sizeof(cpr_check_carrier *));
+                    cpr_shadow_mem = (cpr_check_carrier ***) malloc ( cpr_table_size[dead_pe] * sizeof(cpr_check_carrier **));
                     for ( i=0; i < cpr_table_tail[dead_pe]; ++i )
                     {
                         reading_carr = 1+
-                            (cpr_checkpoint_table[dead_pe][i][0].count-1) / CPR_CARR_DATA_SIZE;
+                            (cpr_checkpoint_table[dead_pe][i][0] -> count-1) / CPR_CARR_DATA_SIZE;
                         
-                        cpr_shadow_mem[i] = (cpr_check_carrier *) malloc ( reading_carr * sizeof(cpr_check_carrier));
+                        cpr_shadow_mem[i] = (cpr_check_carrier **) malloc ( reading_carr * sizeof(cpr_check_carrier*));
 
                         for ( j=0; j<reading_carr; ++j )
                         {
+                            cpr_shadow_mem[i][j] =
+                                (cpr_check_carrier *) malloc ( 1 * sizeof(cpr_check_carrier));
                             cpr_shadow_mem[i][j] = cpr_checkpoint_table[dead_pe][i][j];
-                            carr = &cpr_shadow_mem[i][j];
+                            carr = cpr_shadow_mem[i][j];
                             // check if the variable is in memory region of symmetrics
                             if ( carr -> is_symmetric )
                             {
@@ -1024,12 +1034,12 @@ int main ()
                 for ( k=0; k<cpr_table_tail[j]; ++k )
                 {
                     printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
-                        cpr_checkpoint_table[j][k][0].pe_num,
-                        cpr_checkpoint_table[j][k][0].id,
-                        cpr_checkpoint_table[j][k][0].count,
-                        cpr_checkpoint_table[j][k][0].is_symmetric);
-                    for ( l=0; l< cpr_checkpoint_table[j][k][0].count; ++l )
-                        printf("%lu ", cpr_checkpoint_table[j][k][0].data[l]);
+                        cpr_checkpoint_table[j][k][0]->pe_num,
+                        cpr_checkpoint_table[j][k][0]->id,
+                        cpr_checkpoint_table[j][k][0]->count,
+                        cpr_checkpoint_table[j][k][0]->is_symmetric);
+                    for ( l=0; l< cpr_checkpoint_table[j][k][0]->count; ++l )
+                        printf("%lu ", cpr_checkpoint_table[j][k][0]->data[l]);
                     printf("\n----------------\n");
                 }
                 printf("============***============\n");
