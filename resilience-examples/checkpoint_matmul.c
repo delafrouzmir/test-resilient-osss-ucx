@@ -874,6 +874,11 @@ int shmem_cpr_rollback ( int dead_pe, int me )
     return SUCCESS;
 }
 
+int shmem_cpr_finalize()
+{
+    //free everything
+}
+
 void mmul(const unsigned long Is, const unsigned long Ks, const unsigned long Js,
           const unsigned long Adist, const unsigned long* A,
           const unsigned long Bdist, const unsigned long* B,
@@ -937,8 +942,8 @@ int main ()
     first_rollback = 0;
     *iter = 0;
     
-    shmem_cpr_reserve(0, iter, 1, shmem_cpr_pe_num(me));
-    shmem_cpr_reserve(1, a, array_size, shmem_cpr_pe_num(me));
+    // shmem_cpr_reserve(0, iter, 1, shmem_cpr_pe_num(me));
+    shmem_cpr_reserve(0, a, array_size, shmem_cpr_pe_num(me));
     /**/
     shmem_barrier_all();
 
@@ -952,11 +957,11 @@ int main ()
         // }
         if ( (*iter) % 10 == 0)
         {
-            shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
-            shmem_barrier_all();
+            // shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
+            // shmem_barrier_all();
             // printf("pe=%d done with %lu chp id=0\n", me, *iter);
             
-            shmem_cpr_checkpoint(1, a, array_size, shmem_cpr_pe_num(me));
+            shmem_cpr_checkpoint(0, a, array_size, shmem_cpr_pe_num(me));
             shmem_barrier_all();
             // printf("pe=%d done with %lu chp id=1\n", me, *iter);
 
