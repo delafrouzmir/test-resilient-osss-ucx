@@ -60,7 +60,6 @@ struct check_carrier
     unsigned long data[CPR_CARR_DATA_SIZE];   // an array of data that will be stored
     int pe_num;                 // the PE that asked for a reservation or checkpoint
     int is_symmetric;           // if this request is to checkpoint symmetric or private data
-    cpr_check_carrier *next;    // the pointer to the next carrier if count>CPR_CARR_DATA_SIZE.
     int offset;
     int rand_num;               // rand_num to wait for arrival of new carriers in queues
 };
@@ -433,7 +432,7 @@ int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
         return FAILURE;
 
     cpr_rsvr_carrier *carr = (cpr_rsvr_carrier *) malloc ( sizeof (cpr_rsvr_carrier) ); 
-    int i, q_tail, space_needed, memory_mul_factor;
+    int i, q_tail, space_needed;
     // TO DO: could/should this npes change through the program?
     int npes = cpr_num_active_pes + cpr_num_spare_pes;
 
@@ -517,7 +516,7 @@ int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
 
                     if ( cpr_table_tail[carr-> pe_num] + 1 > cpr_table_size[ carr-> pe_num] )
                     {
-                        cpr_table_size[ carr-> pe_num] *= memory_mul_factor;
+                        cpr_table_size[ carr-> pe_num] *= 2;
                         cpr_checkpoint_table[carr-> pe_num] =
                                 (cpr_check_carrier **) realloc (cpr_checkpoint_table[carr-> pe_num], 
                                     cpr_table_size[carr-> pe_num] * sizeof(cpr_check_carrier *));
@@ -648,7 +647,7 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                         *carr = cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];
                         if ( me == 8 )
                         {
-                            printf("Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d\n offset=%d",
+                            printf("Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n",
                                 cpr_check_queue_head, carr->pe_num, carr->id,
                                 carr->is_symmetric, carr->count, carr->rand_num,
                                 carr->offset);
@@ -657,8 +656,8 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                         
                         for ( i=0; i< carr-> count; ++i)
                             cpr_checkpoint_table[carr-> pe_num][carr-> id][(carr->offset)/CPR_CARR_DATA_SIZE].data[i] = carr-> data[i];
-                        if ( me == 8 )
-                            printf("me=%d 8th\n", me);
+                        // if ( me == 8 )
+                        //     printf("me=%d 8th\n", me);
                         // I'm assuming id = index here
                     }
                 }
