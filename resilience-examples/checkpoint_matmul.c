@@ -246,7 +246,6 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
 
 int shmem_cpr_init (int me, int npes, int spes, int mode)
 {
-    int i;
     /*
     * Incorrect input
     */
