@@ -931,6 +931,7 @@ int main ()
                     printf("\n\n\n");
                 }
                 shmem_barrier_all();
+            }
         }
         for ( j=0; j<array_size; ++j)
             a[j] ++;
