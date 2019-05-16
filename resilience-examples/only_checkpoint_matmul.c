@@ -1003,8 +1003,8 @@ int main(int argc, char const *argv[]) {
     if ( me == 0 )
         fprintf(fp, "npes=%lu spes=%lu N=%lu time=%f\n",
             npes, spes, N, (double)(end - start) / CLOCKS_PER_SEC);
-    fclose();
-    
+    fclose(fp);
+
     shmem_free(As);
     shmem_free(Bs);
     shmem_free(Cs);
