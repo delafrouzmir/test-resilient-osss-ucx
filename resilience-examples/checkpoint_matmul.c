@@ -455,7 +455,7 @@ int shmem_cpr_reserve (int id, int64_t * mem, int count, int pe_num)
                 carr->is_symmetric = shmem_addr_accessible(mem, cpr_storage_pes[0]);
 
                 // calculating ceiling of num of carriers needed in chp table
-                space_needed = 1+ (double)(carr->count-1) / CPR_CARR_DATA_SIZE;
+                space_needed = 1+ (carr->count-1) / CPR_CARR_DATA_SIZE;
 
                 if ( cpr_shadow_mem_tail + 1 > cpr_shadow_mem_size )
                 {
@@ -515,7 +515,7 @@ int shmem_cpr_reserve (int id, int64_t * mem, int count, int pe_num)
                     cpr_resrv_queue_head ++;
                     
                     // calculating ceiling of num of carriers needed in chp table
-                    space_needed = 1+ (double)(carr->count-1) / CPR_CARR_DATA_SIZE;
+                    space_needed = 1+ (carr->count-1) / CPR_CARR_DATA_SIZE;
 
                     if ( cpr_table_tail[carr-> pe_num] + 1 > cpr_table_size[ carr-> pe_num] )
                     {
@@ -576,7 +576,7 @@ int shmem_cpr_checkpoint ( int id, int64_t* mem, int count, int pe_num )
             case CPR_ACTIVE_ROLE:
                 // TO DO: differential checkpointing? what if count is smaller than the count that was reserved?
 
-                space_needed = 1+ (double)(count-1) / CPR_CARR_DATA_SIZE;
+                space_needed = 1+ (count-1) / CPR_CARR_DATA_SIZE;
 
                 for ( i=0; i < count; ++i )
                     cpr_shadow_mem[id][i/CPR_CARR_DATA_SIZE] . data[i % CPR_CARR_DATA_SIZE] = mem[i];
@@ -585,14 +585,14 @@ int shmem_cpr_checkpoint ( int id, int64_t* mem, int count, int pe_num )
                 carr->count = count;
                 carr->pe_num = pe_num;
                 carr->adr = mem;
-                if ( me == 0 )
-                    printf("me=%d 1st\n", me);
+                // if ( me == 0 )
+                //     printf("me=%d 1st\n", me);
                 for ( i= 0; i < cpr_num_storage_pes; ++i)
                 {
                     if ( cpr_all_pe_type[cpr_storage_pes[i]] != CPR_DEAD_PE )
                     {
-                        if ( me == 0 )
-                            printf("me=%d 2nd\n", me);
+                        // if ( me == 0 )
+                        //     printf("me=%d 2nd\n", me);
                         for ( j=0; j < space_needed; ++j )
                         {
                             carr -> offset = j * CPR_CARR_DATA_SIZE;
@@ -601,8 +601,8 @@ int shmem_cpr_checkpoint ( int id, int64_t* mem, int count, int pe_num )
                             last_data = (j == space_needed-1) ? 
                                 count - (j*CPR_CARR_DATA_SIZE) : CPR_CARR_DATA_SIZE;
 
-                            if ( me == 0 )
-                                printf("me=%d 3rd\n", me);
+                            // if ( me == 0 )
+                            //     printf("me=%d 3rd\n", me);
 
                             for ( k=0; k < last_data; ++k )
                                 carr -> data[k] = mem[k + j*CPR_CARR_DATA_SIZE];
@@ -612,8 +612,8 @@ int shmem_cpr_checkpoint ( int id, int64_t* mem, int count, int pe_num )
 
                             shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), cpr_storage_pes[i]);
 
-                            if ( me == 0 )
-                                printf("me=%d 4th\n", me);
+                            // if ( me == 0 )
+                            //     printf("me=%d 4th\n", me);
                         }
 
                         if ( shmem_atomic_fetch ( &cpr_sig_check, cpr_storage_pes[i]) == 0 )
@@ -631,12 +631,12 @@ int shmem_cpr_checkpoint ( int id, int64_t* mem, int count, int pe_num )
                 {
                     if ( cpr_resrv_queue_head < cpr_resrv_queue_tail )
                         shmem_cpr_reserve(id, mem, count, pe_num);
-                    if ( me == 8 )
-                        printf("me=%d 5th\n", me);
+                    // if ( me == 8 )
+                    //     printf("me=%d 5th\n", me);
                     // waiting to receive the first checkpointing request in the queue:
                     shmem_wait_until ( &cpr_sig_check, SHMEM_CMP_GT, 0);
-                    if ( me == 8 )
-                        printf("me=%d 6th\n", me);
+                    // if ( me == 8 )
+                    //     printf("me=%d 6th\n", me);
                     while (cpr_check_queue_head < cpr_check_queue_tail)
                     {
                         // almost making sure the carrier has arrived
@@ -644,10 +644,17 @@ int shmem_cpr_checkpoint ( int id, int64_t* mem, int count, int pe_num )
                             SHMEM_CMP_NE, check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN]);
                         check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN] = 
                             cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num;
-                        if ( me == 8 )
-                            printf("me=%d 7th\n", me);
+                        // if ( me == 8 )
+                        //     printf("me=%d 7th\n", me);
                         // head and tail might overflow the int size... add code to check
                         *carr = cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];
+                        if ( me == 8 )
+                        {
+                            printf("Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d\n offset=%d",
+                                cpr_check_queue_head, carr->pe_num, carr->id,
+                                carr->is_symmetric, carr->count, carr->rand_num,
+                                carr->offset);
+                        }
                         cpr_check_queue_head ++;
                         
                         for ( i=0; i< carr-> count; ++i)
@@ -702,7 +709,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
             case CPR_ACTIVE_ROLE:
                 for ( i=0; i<cpr_shadow_mem_tail; ++i)
                 {
-                    reading_carr = 1+ (double)(cpr_shadow_mem[i][0].count-1) / CPR_CARR_DATA_SIZE;
+                    reading_carr = 1+ (cpr_shadow_mem[i][0].count-1) / CPR_CARR_DATA_SIZE;
                     for ( k=0; k < reading_carr; ++k )
                     {
                         carr = &cpr_shadow_mem[i][k];
@@ -731,7 +738,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                     for ( i=0; i < cpr_table_tail[dead_pe]; ++i )
                     {
                         reading_carr = 1+
-                            (double)(cpr_checkpoint_table[dead_pe][i][0].count-1) / CPR_CARR_DATA_SIZE;
+                            (cpr_checkpoint_table[dead_pe][i][0].count-1) / CPR_CARR_DATA_SIZE;
                         
                         cpr_shadow_mem[i] = (cpr_check_carrier *) malloc ( reading_carr * sizeof(cpr_check_carrier));
 
@@ -889,7 +896,7 @@ int main ()
     /**/
     shmem_barrier_all();
 
-    for ( (*iter)=0; (*iter)<40; ++(*iter) )
+    for ( (*iter)=0; (*iter)<10; ++(*iter) )
     {
         // if ( cpr_pe[me] == 9 || cpr_pe[me] == 10 )
         // {
@@ -905,33 +912,33 @@ int main ()
             
             shmem_cpr_checkpoint(1, a, array_size, shmem_cpr_pe_num(me));
             shmem_barrier_all();
-            printf("pe=%d done with %d chp id=1\n", me, *iter);
+            printf("pe=%d done with %lu chp id=1\n", me, *iter);
 
-            for ( i=8; i<11; ++i )
-            {
-                if ( me == i )
-                {
-                    printf("PE=%d table:\n", i);
-                    for ( j=0; j<cpr_num_active_pes; ++j )
-                    {
-                        printf("for PE=%d\n", j);
-                        for ( k=0; k<cpr_table_tail[j]; ++k )
-                        {
-                            printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
-                                cpr_checkpoint_table[j][k][0].pe_num,
-                                cpr_checkpoint_table[j][k][0].id,
-                                cpr_checkpoint_table[j][k][0].count,
-                                cpr_checkpoint_table[j][k][0].is_symmetric);
-                            for ( l=0; l< cpr_checkpoint_table[j][k][0].count; ++l )
-                                printf("%d ", cpr_checkpoint_table[j][k][0].data[l]);
-                            printf("\n----------------\n");
-                        }
-                        printf("============***============\n");
-                    }
-                    printf("\n\n\n");
-                }
-                shmem_barrier_all();
-            }
+            // for ( i=8; i<11; ++i )
+            // {
+            //     if ( me == i )
+            //     {
+            //         printf("PE=%d table:\n", i);
+            //         for ( j=0; j<cpr_num_active_pes; ++j )
+            //         {
+            //             printf("for PE=%d\n", j);
+            //             for ( k=0; k<cpr_table_tail[j]; ++k )
+            //             {
+            //                 printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
+            //                     cpr_checkpoint_table[j][k][0].pe_num,
+            //                     cpr_checkpoint_table[j][k][0].id,
+            //                     cpr_checkpoint_table[j][k][0].count,
+            //                     cpr_checkpoint_table[j][k][0].is_symmetric);
+            //                 for ( l=0; l< cpr_checkpoint_table[j][k][0].count; ++l )
+            //                     printf("%d ", cpr_checkpoint_table[j][k][0].data[l]);
+            //                 printf("\n----------------\n");
+            //             }
+            //             printf("============***============\n");
+            //         }
+            //         printf("\n\n\n");
+            //     }
+            //     shmem_barrier_all();
+            // }
         }
         for ( j=0; j<array_size; ++j)
             a[j] ++;
