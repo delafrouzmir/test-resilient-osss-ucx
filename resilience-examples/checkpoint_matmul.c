@@ -686,7 +686,7 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
 
                         if ( carr->count <= CPR_CARR_DATA_SIZE )
                         {
-                            last_data = count;
+                            last_data = carr->count;
                         }
                         else
                         {
