@@ -997,7 +997,7 @@ int main(int argc, char const *argv[]) {
     end = clock();
 
     if ( me == 0 )
-        printf("npes=%d spes=%d N=%d time=%f\n",
+        fprintf("npes=%d spes=%d N=%d time=%f\n",
             npes, spes, N, (double)(end - start) / CLOCKS_PER_SEC);
 
     shmem_free(As);
