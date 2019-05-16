@@ -962,11 +962,21 @@ int main(int argc, char const *argv[]) {
     start = clock();
 
     shmem_cpr_reserve(0, Cs, N * Ns, shmem_cpr_pe_num(me));
+    if ( cpr_pe_role == CPR_STORAGE_ROLE )
+        shmem_cpr_reserve(0, NULL, 0, shmem_cpr_pe_num(me));
+
+    shmem_barrier_all();
 
     for ( i=8; i<12; ++i ){
-        for ( j=0; j<cpr_num_active_pes; ++j )
-            printf("PE=%lu for pe=%lu table_tail=%d table_size=%d shadow_tail=%d shadow_size=%d\n",
-                i, j, cpr_table_tail[j], cpr_table_size[j], cpr_shadow_mem_tail, cpr_shadow_mem_size);
+        if ( me == i )
+            for ( j=0; j<cpr_num_active_pes; ++j )
+                printf("PE=%lu for pe=%lu table_tail=%d table_size=%d\n",
+                    i, j, cpr_table_tail[j], cpr_table_size[j]);
+    }
+    for ( i=0; i<8; ++i ){
+        if ( me == i )
+            printf("pe=%d shadow_tail%d shadow_size%d\n",
+                cpr_shadow_mem_tail, cpr_shadow_mem_size);
     }
 
     for (s = 0; s < cpr_num_active_pes; s++) {
