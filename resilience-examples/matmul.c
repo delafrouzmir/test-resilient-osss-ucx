@@ -40,7 +40,7 @@ int main(int argc, char const *argv[]) {
     int64_t* C;
     clock_t start, end;
     
-    FILEPOINT *fp;
+    FILE *fp;
     fp = fopen ("result_matmul.txt", "a");
 
     npes = shmem_n_pes();
