@@ -761,7 +761,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                             (carr->count)%CPR_CARR_DATA_SIZE 
                             : CPR_CARR_DATA_SIZE;
                         printf("PE=%d at rollback, iter=%d/read_carr=%d , read_data=%d, carr->off=%d\n", 
-                            pe_num, k, reading_carr, reading_data, carr->offset);
+                            me, k, reading_carr, reading_data, carr->offset);
                         for ( j=0; j < reading_data; ++j )
                             *((carr->adr)+(carr->offset)+j) = carr->data[j];
                     }
@@ -802,7 +802,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                                     : CPR_CARR_DATA_SIZE;
 
                                 printf("PE=%d at rollback, iter%d/read_carr=%d , read_data=%d, carr->off=%d\n", 
-                                    pe_num, j, reading_carr, reading_data, carr->offset);
+                                    me, j, reading_carr, reading_data, carr->offset);
 
                                 for ( k=0; k < reading_data; ++k )
                                     *(carr->adr + carr->offset +k) = carr->data[k];
