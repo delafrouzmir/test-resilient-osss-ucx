@@ -509,15 +509,14 @@ int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
                     // TO DO: head and tail might overflow the int size... add code to check
                     *carr = cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)];
 
-                    cpr_resrv_queue_head ++;
-
                     if ( me == 8 )
                     {
-                        printf("rsrv_Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n",
-                            cpr_check_queue_head, carr->pe_num, carr->id,
-                            carr->is_symmetric, carr->count, carr->rand_num,
-                            carr->offset);
+                        printf("rsrv_Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d\n",
+                            cpr_resrv_queue_head, carr->pe_num, carr->id,
+                            carr->is_symmetric, carr->count, carr->rand_num);
                     }
+
+                    cpr_resrv_queue_head ++;
                     
                     // calculating ceiling of num of carriers needed in chp table
                     space_needed = 1+ (carr->count-1) / CPR_CARR_DATA_SIZE;
