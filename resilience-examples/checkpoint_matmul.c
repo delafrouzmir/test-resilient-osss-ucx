@@ -871,18 +871,20 @@ int main ()
     *iter = 0;
     
     shmem_cpr_reserve(0, iter, 1, shmem_cpr_pe_num(me));
+    printf("me=%d done with 1 reserve\n", me);
     shmem_cpr_reserve(1, a, array_size, shmem_cpr_pe_num(me));
+    printf("me=%d done with 2 reserve\n", me);
     /**/
     shmem_barrier_all();
 
     for ( (*iter)=0; (*iter)<40; ++(*iter) )
     {
-        if ( cpr_pe[me] == 9 || cpr_pe[me] == 10 )
-        {
-            printf("*** me=%d iter=%d\n", me, *iter);
-            // for ( j=0; j<array_size; ++j )
-            //     printf("**%d ", a[j]);
-        }
+        // if ( cpr_pe[me] == 9 || cpr_pe[me] == 10 )
+        // {
+        //     printf("*** me=%d iter=%d\n", me, *iter);
+        //     // for ( j=0; j<array_size; ++j )
+        //     //     printf("**%d ", a[j]);
+        // }
         if ( (*iter) % 10 == 0)
         {
             shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
@@ -894,21 +896,21 @@ int main ()
         for ( j=0; j<array_size; ++j)
             a[j] ++;
         
-        if ( (*iter) == 25 && first_rollback == 0 ){
-            first_rollback = 1;
-            shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
-            if ( cpr_pe_role == CPR_STORAGE_ROLE )
-                *iter = 20;
-            shmem_barrier_all();
-            // printf("PE=%d done with rollback with iter=%d!\n", me, *iter);
-            // if ( me == 11)
-            // {
-            //     printf("AFTER ROLLBACK:\n");
-            //     for ( j=0; j<array_size; ++j )
-            //         printf("%d ", a[j]);
-            //     printf("\n");
-            // }
-        }
+        // if ( (*iter) == 25 && first_rollback == 0 ){
+        //     first_rollback = 1;
+        //     shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
+        //     if ( cpr_pe_role == CPR_STORAGE_ROLE )
+        //         *iter = 20;
+        //     shmem_barrier_all();
+        //     // printf("PE=%d done with rollback with iter=%d!\n", me, *iter);
+        //     // if ( me == 11)
+        //     // {
+        //     //     printf("AFTER ROLLBACK:\n");
+        //     //     for ( j=0; j<array_size; ++j )
+        //     //         printf("%d ", a[j]);
+        //     //     printf("\n");
+        //     // }
+        // }
     }
 
     if ( cpr_pe_role == CPR_STORAGE_ROLE )
