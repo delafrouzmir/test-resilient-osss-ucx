@@ -925,339 +925,252 @@ void print_matrix(const unsigned long* mat, const unsigned long Is, const unsign
 }
 
 
-int main(int argc, char const *argv[]) {
+// int main(int argc, char const *argv[]) {
     
-    shmem_init();
+//     shmem_init();
 
-    unsigned long npes, spes, me, i, j, k, s, block_num;
-    unsigned long *As, *Bs, *Cs, *Bs_nxt, *temp;
-    unsigned long* C;
+//     unsigned long npes, spes, me, i, j, k, s, block_num;
+//     unsigned long *As, *Bs, *Cs, *Bs_nxt, *temp;
+//     unsigned long* C;
+//     clock_t start, end;
+    
+//     FILE *fp;
+//     fp = fopen ("matmul_chp_no_rb.txt", "a");
+
+//     npes = shmem_n_pes();
+//     me = shmem_my_pe();
+//     spes = 4;
+
+//     shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
+
+//     // printf("me=%d role=%d type=%d\n", me, cpr_pe_role, cpr_pe_type);
+
+//     const unsigned long N = atoi(argv[argc-1]);           // Size of the matrices
+//     const unsigned long Ns = N / cpr_num_active_pes;   // Width of the stripes
+//     const unsigned long stripe_n_bytes = N * Ns * sizeof(unsigned long);
+
+//     // if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
+//     As = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of A
+//     Bs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Vertical stripes of B
+//     Cs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of C
+
+//     Bs_nxt = (unsigned long*) shmem_align(4096, stripe_n_bytes); // Buffer that stores stripes of B
+//     temp = (unsigned long*) shmem_malloc (sizeof(int));
+
+//     // Initialize the matrices
+//     for(i = 0; i < N * Ns; i++) {
+//         As[i] = (i + me) % 5 + 1;
+//         Bs[i] = (i + me) % 5 + 3;
+//         Cs[i] = 0;
+//     }
+//     // }
+//     // Make sure all the stripes are initialized
+//     shmem_barrier_all();
+
+//     start = clock();
+
+//     shmem_cpr_reserve(0, Cs, N * Ns, shmem_cpr_pe_num(me));
+//     if ( cpr_pe_role == CPR_STORAGE_ROLE )
+//         shmem_cpr_reserve(0, NULL, 0, shmem_cpr_pe_num(me));
+
+//     shmem_barrier_all();
+
+//     for ( i=8; i<12; ++i ){
+//         if ( me == i )
+//             for ( j=0; j<cpr_num_active_pes; ++j )
+//                 printf("PE=%lu for pe=%lu table_tail=%d table_size=%d\n",
+//                     i, j, cpr_table_tail[j], cpr_table_size[j]);
+//     }
+//     for ( i=0; i<8; ++i ){
+//         if ( me == i )
+//             printf("pe=%d shadow_tail%d shadow_size%d\n",
+//                 cpr_shadow_mem_tail, cpr_shadow_mem_size);
+//     }
+
+//     shmem_barrier_all();
+
+//     if ( me == 8 ){
+//         for ( i=0; i<cpr_resrv_queue_tail; ++i )
+//             printf("carr[%d].pe=%d id=%d rand=%d count=%d \n",
+//                 i , cpr_resrv_queue[i].pe_num, cpr_resrv_queue[i].id,
+//                 cpr_resrv_queue[i].rand_num, cpr_resrv_queue[i].count);
+//     }
+
+//     for (s = 0; s < cpr_num_active_pes; s++) {
+
+//         if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
+//             block_num = (me + s) % cpr_num_active_pes;
+
+//             shmem_getmem_nbi(Bs_nxt, Bs, stripe_n_bytes, (me + 1) % cpr_num_active_pes);
+
+//             mmul(Ns, N, Ns, N, As, Ns, Bs, N, Cs + block_num * Ns);
+
+//             temp = Bs;
+//             Bs = Bs_nxt;
+//             Bs_nxt = temp;
+//         }
+//         // shmem_cpr_checkpoint(0, Cs, N * Ns, shmem_cpr_pe_num(me));
+
+//         // printf("pe=%d , iter=%lu, %f\n", me, s, (clock()-start) / CLOCKS_PER_SEC);
+
+//         shmem_barrier_all();
+//     }
+
+//     // Collect and print the matrix product
+//     if (me == 0) {
+//         C = (unsigned long *) malloc (N * N * sizeof (unsigned long));
+
+//         for (i = 0; i < Ns * N; i++)
+//             C[i] = Cs[i];
+
+//         for (i = 1; i < npes; i++)
+//             shmem_getmem_nbi(C + i * Ns * N, Cs, Ns * N * sizeof(unsigned long), i);
+
+//         shmem_quiet();
+
+//         //print_matrix(C, N, N);
+
+//         free (C);
+//     }
+
+//     shmem_barrier_all();
+
+//     end = clock();
+
+//     if ( me == 0 )
+//         fprintf(fp, "npes=%lu spes=%lu N=%lu time=%f\n",
+//             npes, spes, N, (double)(end - start) / CLOCKS_PER_SEC);
+//     fclose(fp);
+
+//     shmem_free(As);
+//     shmem_free(Bs);
+//     shmem_free(Cs);
+
+//     shmem_finalize();
+
+//     return 0;
+// }
+
+int main ()
+{
+    int spes;
+    int success_init;
+    int i, j, k, l, array_size, first_rollback;
+    unsigned long* a, *iter;
     clock_t start, end;
-    
-    FILE *fp;
-    fp = fopen ("matmul_chp_no_rb.txt", "a");
 
-    npes = shmem_n_pes();
-    me = shmem_my_pe();
-    spes = 4;
+    shmem_init ();
+    me = shmem_my_pe ();
+    npes = shmem_n_pes ();
 
-    shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
-
-    // printf("me=%d role=%d type=%d\n", me, cpr_pe_role, cpr_pe_type);
-
-    const unsigned long N = atoi(argv[argc-1]);           // Size of the matrices
-    const unsigned long Ns = N / cpr_num_active_pes;   // Width of the stripes
-    const unsigned long stripe_n_bytes = N * Ns * sizeof(unsigned long);
-
-    // if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
-    As = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of A
-    Bs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Vertical stripes of B
-    Cs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of C
-
-    Bs_nxt = (unsigned long*) shmem_align(4096, stripe_n_bytes); // Buffer that stores stripes of B
-    temp = (unsigned long*) shmem_malloc (sizeof(int));
-
-    // Initialize the matrices
-    for(i = 0; i < N * Ns; i++) {
-        As[i] = (i + me) % 5 + 1;
-        Bs[i] = (i + me) % 5 + 3;
-        Cs[i] = 0;
-    }
-    // }
-    // Make sure all the stripes are initialized
-    shmem_barrier_all();
+    if ( npes >= 6 )
+        spes = 4;
+    else if ( npes == 5 )
+        spes = 2;
+    else if ( npes == 4 )
+        spes = 1;
+    else
+        spes = 0;
 
     start = clock();
+    success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
 
-    shmem_cpr_reserve(0, Cs, N * Ns, shmem_cpr_pe_num(me));
-    if ( cpr_pe_role == CPR_STORAGE_ROLE )
-        shmem_cpr_reserve(0, NULL, 0, shmem_cpr_pe_num(me));
+    iter = (unsigned long *) shmem_malloc(sizeof(unsigned long));
 
-    shmem_barrier_all();
+    array_size = 10;
+    a = (unsigned long *) shmem_malloc((array_size)*sizeof(unsigned long));
+    for ( i=0; i<array_size; ++i)
+        a[i] = me;
 
-    for ( i=8; i<12; ++i ){
-        if ( me == i )
-            for ( j=0; j<cpr_num_active_pes; ++j )
-                printf("PE=%lu for pe=%lu table_tail=%d table_size=%d\n",
-                    i, j, cpr_table_tail[j], cpr_table_size[j]);
-    }
-    for ( i=0; i<8; ++i ){
-        if ( me == i )
-            printf("pe=%d shadow_tail%d shadow_size%d\n",
-                cpr_shadow_mem_tail, cpr_shadow_mem_size);
-    }
+    // not sure if this is necessary here
+    shmem_barrier_all ();
 
-    shmem_barrier_all();
+    first_rollback = 0;
+    *iter = 0;
     
-    if ( me == 8 ){
-        for ( i=0; i<cpr_resrv_queue_tail; ++i )
-            printf("carr[%d].pe=%d id=%d rand=%d count=%d \n",
-                i , cpr_resrv_queue[i].pe_num, cpr_resrv_queue[i].id,
-                cpr_resrv_queue[i].rand_num, cpr_resrv_queue[i].count);
-    }
-
-    for (s = 0; s < cpr_num_active_pes; s++) {
-
-        if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
-            block_num = (me + s) % cpr_num_active_pes;
-
-            shmem_getmem_nbi(Bs_nxt, Bs, stripe_n_bytes, (me + 1) % cpr_num_active_pes);
-
-            mmul(Ns, N, Ns, N, As, Ns, Bs, N, Cs + block_num * Ns);
-
-            temp = Bs;
-            Bs = Bs_nxt;
-            Bs_nxt = temp;
-        }
-        // shmem_cpr_checkpoint(0, Cs, N * Ns, shmem_cpr_pe_num(me));
-
-        // printf("pe=%d , iter=%lu, %f\n", me, s, (clock()-start) / CLOCKS_PER_SEC);
-
-        shmem_barrier_all();
-    }
-
-    // Collect and print the matrix product
-    if (me == 0) {
-        C = (unsigned long *) malloc (N * N * sizeof (unsigned long));
-
-        for (i = 0; i < Ns * N; i++)
-            C[i] = Cs[i];
-
-        for (i = 1; i < npes; i++)
-            shmem_getmem_nbi(C + i * Ns * N, Cs, Ns * N * sizeof(unsigned long), i);
-
-        shmem_quiet();
-
-        //print_matrix(C, N, N);
-
-        free (C);
-    }
-
+    // shmem_cpr_reserve(0, iter, 1, shmem_cpr_pe_num(me));
+    shmem_cpr_reserve(0, a, array_size, shmem_cpr_pe_num(me));
+    /**/
     shmem_barrier_all();
 
-    end = clock();
+    for ( (*iter)=0; (*iter)<40; ++(*iter) )
+    {
+        if ( (*iter) % 10 == 0)
+        {
+            // shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
+            // shmem_barrier_all();
+            // printf("pe=%d done with %lu chp id=0\n", me, *iter);
+            
+            shmem_cpr_checkpoint(0, a, array_size, shmem_cpr_pe_num(me));
+            shmem_barrier_all();
+            // printf("pe=%d done with %lu chp id=1\n", me, *iter);
 
+            // for ( i=8; i<11; ++i )
+            // {
+                // if ( me == 8 )
+                // {
+                //     printf("PE=8 table at iter=%d:\n", *iter);
+                //     for ( j=0; j<cpr_num_active_pes; ++j )
+                //     {
+                //         printf("for PE=%d\n", j);
+                //         for ( k=0; k<cpr_table_tail[j]; ++k )
+                //         {
+                //             printf("pe=%d id=%d count=%d is_symmetric=%d offset=%d data=:\n",
+                //                 cpr_checkpoint_table[j][k][0]->pe_num,
+                //                 cpr_checkpoint_table[j][k][0]->id,
+                //                 cpr_checkpoint_table[j][k][0]->count,
+                //                 cpr_checkpoint_table[j][k][0]->is_symmetric,
+                //                 cpr_checkpoint_table[j][k][0]->offset);
+                //             for ( l=0; l< CPR_CARR_DATA_SIZE; ++l )
+                //                 printf("%d ", cpr_checkpoint_table[j][k][0]->data[l]);
+                //             printf("\n----------------\n");
+
+                //             printf("pe=%d id=%d count=%d is_symmetric=%d offset=%d data=:\n",
+                //                 cpr_checkpoint_table[j][k][1]->pe_num,
+                //                 cpr_checkpoint_table[j][k][1]->id,
+                //                 cpr_checkpoint_table[j][k][1]->count,
+                //                 cpr_checkpoint_table[j][k][1]->is_symmetric,
+                //                 cpr_checkpoint_table[j][k][1]->offset);
+                //             for ( l=0; l< cpr_checkpoint_table[j][k][1]->count % CPR_CARR_DATA_SIZE; ++l )
+                //                 printf("%d ", cpr_checkpoint_table[j][k][1]->data[l]);
+                //             printf("\n----------------\n");
+                //         }
+                //         printf("============***============\n");
+                //     }
+                //     printf("\n\n\n");
+                // }
+                // shmem_barrier_all();
+            // }
+        }
+        for ( j=0; j<array_size; ++j)
+            a[j] ++;
+        
+        if ( (*iter) == 25 && first_rollback == 0 ){
+            first_rollback = 1;
+            shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
+            // if ( cpr_pe_role == CPR_STORAGE_ROLE )
+            // *iter = 20;
+            shmem_barrier_all();
+            // printf("PE=%d done with rollback with iter=%d!\n", me, *iter);
+            // if ( me == 11)
+            // {
+            //     printf("AFTER ROLLBACK:\n");
+            //     for ( j=0; j<array_size; ++j )
+            //         printf("%d ", a[j]);
+            //     printf("\n");
+            // }
+        }
+    }
+
+    if ( cpr_pe_role == CPR_STORAGE_ROLE )
+        shmem_cpr_checkpoint(0, NULL, 0, shmem_cpr_pe_num(me));
+
+    shmem_barrier_all();
     if ( me == 0 )
-        fprintf(fp, "npes=%lu spes=%lu N=%lu time=%f\n",
-            npes, spes, N, (double)(end - start) / CLOCKS_PER_SEC);
-    fclose(fp);
+        printf("%f\n", clock()-start / CLOCKS_PER_SEC);
 
-    shmem_free(As);
-    shmem_free(Bs);
-    shmem_free(Cs);
 
     shmem_finalize();
 
     return 0;
 }
-
-// int main ()
-// {
-//     int spes;
-//     int success_init;
-//     int i, j, k, l, array_size, first_rollback;
-//     unsigned long* a, *iter;
-
-//     shmem_init ();
-//     me = shmem_my_pe ();
-//     npes = shmem_n_pes ();
-
-//     if ( npes >= 6 )
-//         spes = 4;
-//     else if ( npes == 5 )
-//         spes = 2;
-//     else if ( npes == 4 )
-//         spes = 1;
-//     else
-//         spes = 0;
-
-//     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
-
-//     iter = (unsigned long *) shmem_malloc(sizeof(unsigned long));
-
-//     array_size = 10;
-//     a = (unsigned long *) shmem_malloc((array_size)*sizeof(unsigned long));
-//     for ( i=0; i<array_size; ++i)
-//         a[i] = me;
-
-//     // not sure if this is necessary here
-//     shmem_barrier_all ();
-
-//     first_rollback = 0;
-//     *iter = 0;
-    
-//     // shmem_cpr_reserve(0, iter, 1, shmem_cpr_pe_num(me));
-//     shmem_cpr_reserve(0, a, array_size, shmem_cpr_pe_num(me));
-//     /**/
-//     shmem_barrier_all();
-
-//     for ( (*iter)=0; (*iter)<40; ++(*iter) )
-//     {
-//         // if ( cpr_pe[me] == 9 || cpr_pe[me] == 10 )
-//         // {
-//         //     printf("*** me=%d iter=%d\n", me, *iter);
-//         //     // for ( j=0; j<array_size; ++j )
-//         //     //     printf("**%d ", a[j]);
-//         // }
-//         if ( (*iter) % 10 == 0)
-//         {
-//             // shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
-//             // shmem_barrier_all();
-//             // printf("pe=%d done with %lu chp id=0\n", me, *iter);
-            
-//             shmem_cpr_checkpoint(0, a, array_size, shmem_cpr_pe_num(me));
-//             shmem_barrier_all();
-//             // printf("pe=%d done with %lu chp id=1\n", me, *iter);
-
-//             // for ( i=8; i<11; ++i )
-//             // {
-//                 if ( me == 8 )
-//                 {
-//                     printf("PE=8 table at iter=%d:\n", *iter);
-//                     for ( j=0; j<cpr_num_active_pes; ++j )
-//                     {
-//                         printf("for PE=%d\n", j);
-//                         for ( k=0; k<cpr_table_tail[j]; ++k )
-//                         {
-//                             printf("pe=%d id=%d count=%d is_symmetric=%d offset=%d data=:\n",
-//                                 cpr_checkpoint_table[j][k][0]->pe_num,
-//                                 cpr_checkpoint_table[j][k][0]->id,
-//                                 cpr_checkpoint_table[j][k][0]->count,
-//                                 cpr_checkpoint_table[j][k][0]->is_symmetric,
-//                                 cpr_checkpoint_table[j][k][0]->offset);
-//                             for ( l=0; l< cpr_checkpoint_table[j][k][0]->count; ++l )
-//                                 printf("%d ", cpr_checkpoint_table[j][k][0]->data[l]);
-//                             printf("\n----------------\n");
-
-//                             // printf("pe=%d id=%d count=%d is_symmetric=%d offset=%d data=:\n",
-//                             //     cpr_checkpoint_table[j][k][1]->pe_num,
-//                             //     cpr_checkpoint_table[j][k][1]->id,
-//                             //     cpr_checkpoint_table[j][k][1]->count,
-//                             //     cpr_checkpoint_table[j][k][1]->is_symmetric,
-//                             //     cpr_checkpoint_table[j][k][1]->offset);
-//                             // for ( l=0; l< cpr_checkpoint_table[j][k][1]->count % CPR_CARR_DATA_SIZE; ++l )
-//                             //     printf("%d ", cpr_checkpoint_table[j][k][1]->data[l]);
-//                             // printf("\n----------------\n");
-//                         }
-//                         printf("============***============\n");
-//                     }
-//                     printf("\n\n\n");
-//                 }
-//                 shmem_barrier_all();
-//             // }
-//         }
-//         for ( j=0; j<array_size; ++j)
-//             a[j] ++;
-        
-//         if ( (*iter) == 25 && first_rollback == 0 ){
-//             first_rollback = 1;
-//             // shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
-//             // if ( cpr_pe_role == CPR_STORAGE_ROLE )
-//             // *iter = 20;
-//             // shmem_barrier_all();
-//             // printf("PE=%d done with rollback with iter=%d!\n", me, *iter);
-//             // if ( me == 11)
-//             // {
-//             //     printf("AFTER ROLLBACK:\n");
-//             //     for ( j=0; j<array_size; ++j )
-//             //         printf("%d ", a[j]);
-//             //     printf("\n");
-//             // }
-//         }
-//     }
-
-//     if ( cpr_pe_role == CPR_STORAGE_ROLE )
-//         shmem_cpr_checkpoint(0, NULL, 0, shmem_cpr_pe_num(me));
-
-//     shmem_barrier_all();
-
-//     // if ( me == 0 )
-//     // {
-//     //     for ( i=0; i<npes; ++i )
-//     //         printf("pe[%d]=%d, role=%d, type=%d\n", i, cpr_pe[i], cpr_all_pe_role[i], cpr_all_pe_type[i]);
-//     //     printf("storages=%d\n", cpr_num_storage_pes);
-//     //     for ( i=0; i<cpr_num_storage_pes; ++i )
-//     //         printf("storag[%d]=%d \n", i, cpr_storage_pes[i]);
-//     // }
-
-//     // shmem_barrier_all();
-//     // if ( cpr_pe_role == CPR_STORAGE_ROLE )
-//     //     shmem_cpr_checkpoint(1, a, array_size, me);
-//     // shmem_barrier_all();
-
-//     // if (me ==0)
-//     //     printf("*****\n*****\nAfter Checkpointing\n*****\n*****\n");
-//     // // // TEST SUCCESSFUL:
-//     // for ( i=8; i<11; ++i )
-//     // {
-//     //     if ( me == i )
-//     //     {
-//     //         printf("PE=%d table:\n", i);
-//     //         for ( j=0; j<cpr_num_active_pes; ++j )
-//     //         {
-//     //             printf("for PE=%d\n", j);
-//     //             for ( k=0; k<cpr_table_tail[j]; ++k )
-//     //             {
-//     //                 printf("pe=%d id=%d count=%d is_symmetric=%d data=:\n",
-//     //                     cpr_checkpoint_table[j][k][0]->pe_num,
-//     //                     cpr_checkpoint_table[j][k][0]->id,
-//     //                     cpr_checkpoint_table[j][k][0]->count,
-//     //                     cpr_checkpoint_table[j][k][0]->is_symmetric);
-//     //                 for ( l=0; l< cpr_checkpoint_table[j][k][0]->count; ++l )
-//     //                     printf("%lu ", cpr_checkpoint_table[j][k][0]->data[l]);
-//     //                 printf("\n----------------\n");
-//     //             }
-//     //             printf("============***============\n");
-//     //         }
-//     //         printf("\n\n\n");
-//     //     }
-//     //     shmem_barrier_all();
-//     // }
-//     // shmem_barrier_all ();
-//     // // I need this part only for testing the whole checkpointing, to make sure nothing's left in queues
-//     // if ( cpr_pe_type == CPR_SPARE_PE )
-//     //     shmem_cpr_checkpoint(100, &me, me, me);
-
-//     // shmem_barrier_all ();
-
-//     // for ( l=8; l<11; ++l ){
-//     //     if ( me == l )
-//     //     {
-//     //         cpr_check_carrier *carr;
-            
-//     //         printf("PE=%d rqh=%d rqt=%d, cqh=%d cqt=%d\n",
-//     //             l, cpr_resrv_queue_head, cpr_resrv_queue_tail,
-//     //             cpr_check_queue_head, cpr_check_queue_tail);
-//     //         // for ( i=0; i < cpr_num_active_pes; ++i )
-//     //         //     printf("for PE=%d, we have %d carriers\n", i, cpr_table_tail[i]);
-//     //         printf("-------\n");
-//     //         for ( i=0; i<cpr_resrv_queue_tail; ++i )
-//     //             printf("rcarr[%d].pe_num=%d, id=%d, count=%d, sym=%d\n", 
-//     //                 i, cpr_resrv_queue[i].pe_num, cpr_resrv_queue[i].id, 
-//     //                 cpr_resrv_queue[i].count, cpr_resrv_queue[i].is_symmetric);
-//     //         printf("=======\n");
-//     //         for ( i=0; i<cpr_check_queue_tail; ++i )
-//     //             printf("chcarr[%d].pe_num=%d, id=%d, count=%d, sym=%d\n", 
-//     //                 i, cpr_check_queue[i].pe_num, cpr_check_queue[i].id, 
-//     //                 cpr_check_queue[i].count, cpr_check_queue[i].is_symmetric);
-//     //         printf("\n\n\n");
-//     //     }
-//     //     shmem_barrier_all();
-//     // }
-
-//     // // shmem_barrier_all();
-
-//     // // for ( j=0; j<npes; ++j )
-//     // //    if ( me == j )
-//     // //    {
-//     // //        printf("I am =%d, called %d reservs and %d checks,\t posted %d reservs and %d checks,\t and read %d reservs and %d checks\n", me, called_resrv, called_check, posted_resrv, posted_check, read_resrv, read_check);
-//     // //    }
-//     // /*
-//     // if ( me == 0)
-//     //     printf("\nFINALLY\n");
-//     // printf("PE %d: \t a[0]=%d\n", me, a[0]);
-//     // */
-//     shmem_finalize();
-
-//     return 0;
-// }
