@@ -615,8 +615,9 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                 {
                     if ( cpr_all_pe_type[cpr_storage_pes[i]] != CPR_DEAD_PE )
                     {
-                        // if ( me == 0 )
-                        //     printf("me=%d 2nd\n", me);
+                        if ( me == 0 )
+                            printf("me=%d at 1st\n", pe_num);
+                        
                         for ( j=0; j < space_needed; ++j )
                         {
                             carr -> offset = j * CPR_CARR_DATA_SIZE;
@@ -627,14 +628,17 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
 
                             for ( k=0; k < last_data; ++k )
                                 carr -> data[k] = mem[k + j*CPR_CARR_DATA_SIZE];
-
+                            if ( me == 0 )
+                                printf("me=%d at 2nd\n", pe_num);
                             // shmem_atomic_fetch_inc returns the amount before increment
                             q_tail = ( shmem_atomic_fetch_inc (&cpr_check_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
-
+                            if ( me == 0 )
+                                printf("me=%d at 3rd\n", pe_num);
                             shmem_putmem (&cpr_check_queue[q_tail], (void *) carr, 1 * sizeof(cpr_check_carrier), cpr_storage_pes[i]);
                             shmem_fence();
                             shmem_atomic_set( &check_randomness[q_tail], 1, cpr_storage_pes[i]);
-
+                            if ( me == 0 )
+                                printf("me=%d at 4th\n", pe_num);
                             if ( shmem_atomic_fetch ( &cpr_sig_rsvr, cpr_storage_pes[i]) == 0 )
                                 shmem_atomic_set( &cpr_sig_rsvr, 1, cpr_storage_pes[i]);
 
@@ -653,7 +657,7 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
             case CPR_STORAGE_ROLE:
 
                 if ( me == 8 )
-                        printf("me=%d 4th\n", me);
+                    printf("me=%d 4th\n", me);
                 // First, we need to check reservation queue is empty. if not, call reservation
                 if ( cpr_pe_type != CPR_DEAD_PE )
                 {
