@@ -1103,7 +1103,7 @@ int main(int argc, char const *argv[])
         shmem_barrier_all();
     }
 
-    for ( (*iter)=0; (*iter)<; ++(*iter) )
+    for ( (*iter)=0; (*iter)<20; ++(*iter) )
     {
         if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
             // block_num = (me + s) % cpr_num_active_pes;
