@@ -600,6 +600,9 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
 
                 space_needed = 1+ (count-1) / CPR_CARR_DATA_SIZE;
 
+                for ( i=0; i<space_needed; ++i )
+                    cpr_shadow_mem[id][i] -> offset = i * CPR_CARR_DATA_SIZE;
+
                 for ( i=0; i < count; ++i )
                     cpr_shadow_mem[id][i/CPR_CARR_DATA_SIZE] -> data[i % CPR_CARR_DATA_SIZE] = mem[i];
 
@@ -667,6 +670,7 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                         
                         cpr_checkpoint_table[carr-> pe_num][carr-> id][(carr->offset)/CPR_CARR_DATA_SIZE]
                             -> offset = carr-> offset;
+                            
                         if ( carr->count <= CPR_CARR_DATA_SIZE )
                             last_data = carr->count;
                         else
@@ -1009,26 +1013,6 @@ int main(int argc, char const *argv[])
                 shmem_cpr_checkpoint(0, NULL, 0, shmem_cpr_pe_num(me));
             }
             shmem_barrier_all();
-        }
-
-        if ( (*iter) == 15 )
-        {
-            for ( i=8; i<12; ++i )
-            {
-                if ( me == i )
-                {
-                    printf("PE=%d rsrv-q-head=%d rsrv-q-tail=%d:\n", i, cpr_resrv_queue_head, cpr_resrv_queue_tail);
-                    for ( j=0; j<cpr_num_active_pes; ++j )
-                    {
-                        printf("for PE=%d cpr_table_size[%d]=%d chp_table[%d][0][0]->count=%d chp_table[%d][0][0]->off=%d chp_table[%d][0][1]->off=%d chp_table[%d][0][2]->off=%d\n",
-                            j, j, cpr_table_tail[j], j, cpr_checkpoint_table[j][0][0]->count,
-                            j, cpr_checkpoint_table[j][0][0]->offset,
-                            j, cpr_checkpoint_table[j][0][1]->offset,
-                            j, cpr_checkpoint_table[j][0][2]->offset);
-                    }
-                }
-                shmem_barrier_all();
-            }
         }
        
         if ( (*iter) == 3*frequency+5 && first_rollback == 0 ){
