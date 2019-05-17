@@ -638,8 +638,8 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                             shmem_atomic_set( &check_randomness[q_tail], 1, cpr_storage_pes[i]);
                             if ( pe_num == 0 )
                                 printf("me=%d at 4th\n", pe_num);
-                            if ( shmem_atomic_fetch ( &cpr_sig_rsvr, cpr_storage_pes[i]) == 0 )
-                                shmem_atomic_set( &cpr_sig_rsvr, 1, cpr_storage_pes[i]);
+                            if ( shmem_atomic_fetch ( &cpr_sig_check, cpr_storage_pes[i]) == 0 )
+                                shmem_atomic_set( &cpr_sig_check, 1, cpr_storage_pes[i]);
 
                             if ( pe_num == 0 && cpr_storage_pes[i] == 8 )
                                 printf("me=%d put to 8 qtail=%d\n", pe_num, q_tail);
