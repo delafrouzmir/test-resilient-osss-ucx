@@ -596,6 +596,8 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
         switch (cpr_pe_role)
         {
             case CPR_ACTIVE_ROLE:
+                if ( me == 0 )
+                    printf("me=%d entered checkpointing\n", pe_num);
                 // TO DO: differential checkpointing? what if count is smaller than the count that was reserved?
 
                 space_needed = 1+ (count-1) / CPR_CARR_DATA_SIZE;
@@ -623,23 +625,25 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                             last_data = (j == space_needed-1) ? 
                                 count - (j*CPR_CARR_DATA_SIZE) : CPR_CARR_DATA_SIZE;
 
-                            // if ( me == 0 )
-                            //     printf("me=%d 3rd\n", me);
-
                             for ( k=0; k < last_data; ++k )
                                 carr -> data[k] = mem[k + j*CPR_CARR_DATA_SIZE];
 
                             // shmem_atomic_fetch_inc returns the amount before increment
                             q_tail = ( shmem_atomic_fetch_inc (&cpr_check_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
 
-                            shmem_putmem (&cpr_check_queue[q_tail], carr, 1 * sizeof(cpr_check_carrier), cpr_storage_pes[i]);
+                            shmem_putmem (&cpr_check_queue[q_tail], (void *) carr, 1 * sizeof(cpr_check_carrier), cpr_storage_pes[i]);
+                            shmem_fence();
+                            shmem_atomic_set( &check_randomness[q_tail], 1, cpr_storage_pes[i]);
 
-                            // if ( me == 0 )
-                                // printf("me=%d 4th\n", me);
+                            if ( shmem_atomic_fetch ( &cpr_sig_rsvr, cpr_storage_pes[i]) == 0 )
+                                shmem_atomic_set( &cpr_sig_rsvr, 1, cpr_storage_pes[i]);
+
+                            if ( me == 0 && j == 8 )
+                                printf("me=%d put to 8 qtail=%d\n", pe_num, qtail);
                         }
 
-                        if ( shmem_atomic_fetch ( &cpr_sig_check, cpr_storage_pes[i]) == 0 )
-                            shmem_atomic_set( &cpr_sig_check, 1, cpr_storage_pes[i]);
+                        // if ( shmem_atomic_fetch ( &cpr_sig_check, cpr_storage_pes[i]) == 0 )
+                        //     shmem_atomic_set( &cpr_sig_check, 1, cpr_storage_pes[i]);
                         
                     }
                 }
