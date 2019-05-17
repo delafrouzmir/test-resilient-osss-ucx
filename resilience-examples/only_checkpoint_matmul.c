@@ -979,6 +979,13 @@ int main(int argc, char const *argv[]) {
                 cpr_shadow_mem_tail, cpr_shadow_mem_size);
     }
 
+    if ( me == 8 ){
+        for ( i=0; i<cpr_resrv_queue_tail; ++i )
+            printf("carr[%d].pe=%d id=%d rand=%d offset=%d \n",
+                i , cpr_resrv_queue[i].pe_num, cpr_resrv_queue[i].id,
+                cpr_resrv_queue[i].rand_num, cpr_resrv_queue[i].offset);
+    }
+
     for (s = 0; s < cpr_num_active_pes; s++) {
 
         if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
@@ -994,7 +1001,7 @@ int main(int argc, char const *argv[]) {
         }
         shmem_cpr_checkpoint(0, Cs, N * Ns, shmem_cpr_pe_num(me));
 
-        printf("pe=%d , iter=%lu, %f\n", me, s, (clock()-start) / CLOCKS_PER_SEC);
+        // printf("pe=%d , iter=%lu, %f\n", me, s, (clock()-start) / CLOCKS_PER_SEC);
 
         shmem_barrier_all();
     }
