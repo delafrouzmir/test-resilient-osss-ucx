@@ -639,7 +639,7 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                                 shmem_atomic_set( &cpr_sig_rsvr, 1, cpr_storage_pes[i]);
 
                             if ( me == 0 && j == 8 )
-                                printf("me=%d put to 8 qtail=%d\n", pe_num, qtail);
+                                printf("me=%d put to 8 qtail=%d\n", pe_num, q_tail);
                         }
 
                         // if ( shmem_atomic_fetch ( &cpr_sig_check, cpr_storage_pes[i]) == 0 )
