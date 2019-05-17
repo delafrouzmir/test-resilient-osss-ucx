@@ -614,8 +614,6 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                 {
                     if ( cpr_all_pe_type[cpr_storage_pes[i]] != CPR_DEAD_PE )
                     {
-                        if ( pe_num == 0 )
-                            printf("me=%d at 1st\n", pe_num);
                         
                         for ( j=0; j < space_needed; ++j )
                         {
@@ -627,22 +625,16 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
 
                             for ( k=0; k < last_data; ++k )
                                 carr -> data[k] = mem[k + j*CPR_CARR_DATA_SIZE];
-                            if ( pe_num == 0 )
-                                printf("me=%d at 2nd\n", pe_num);
+                            
                             // shmem_atomic_fetch_inc returns the amount before increment
                             q_tail = ( shmem_atomic_fetch_inc (&cpr_check_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
-                            if ( pe_num == 0 )
-                                printf("me=%d at 3rd\n", pe_num);
+                            
                             shmem_putmem (&cpr_check_queue[q_tail], (void *) carr, 1 * sizeof(cpr_check_carrier), cpr_storage_pes[i]);
                             shmem_fence();
                             shmem_atomic_set( &check_randomness[q_tail], 1, cpr_storage_pes[i]);
-                            if ( pe_num == 0 )
-                                printf("me=%d at 4th\n", pe_num);
+                            
                             if ( shmem_atomic_fetch ( &cpr_sig_check, cpr_storage_pes[i]) == 0 )
                                 shmem_atomic_set( &cpr_sig_check, 1, cpr_storage_pes[i]);
-
-                            if ( pe_num == 0 && cpr_storage_pes[i] == 8 )
-                                printf("me=%d put to 8 qtail=%d\n", pe_num, q_tail);
                         }
 
                         // if ( shmem_atomic_fetch ( &cpr_sig_check, cpr_storage_pes[i]) == 0 )
@@ -654,23 +646,15 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                 break;
 
             case CPR_STORAGE_ROLE:
-
-                if ( pe_num == 8 )
-                    printf("me=%d 4th\n", pe_num);
                 // First, we need to check reservation queue is empty. if not, call reservation
                 if ( cpr_pe_type != CPR_DEAD_PE )
                 {
                     if ( cpr_resrv_queue_head < cpr_resrv_queue_tail )
-                    {
-                        printf("%d called reserve in check\n", pe_num);
                         shmem_cpr_reserve(id, mem, count, pe_num);
-                    }
-                    if ( pe_num == 8 )
-                        printf("me=%d 5th\n", pe_num);
+                    
                     // waiting to receive the first checkpointing request in the queue:
                     shmem_wait_until ( &cpr_sig_check, SHMEM_CMP_NE, 0);
-                    if ( pe_num == 8 )
-                        printf("me=%d 6th\n", pe_num);
+                    
                     while (cpr_check_queue_head < cpr_check_queue_tail)
                     {
                         // almost making sure the carrier has arrived
@@ -698,8 +682,7 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                         {
                             cpr_checkpoint_table[carr-> pe_num][carr-> id][(carr->offset)/CPR_CARR_DATA_SIZE] -> data[i] = carr-> data[i];
                         }
-                        if ( pe_num == 8 )
-                            printf("me=%d 7th\n", pe_num);
+                        
                         // I'm assuming id = index here
                     }
                 }
@@ -1115,7 +1098,7 @@ int main(int argc, char const *argv[])
         shmem_barrier_all();
     }
 
-    for ( (*iter)=0; (*iter)<20; ++(*iter) )
+    for ( (*iter)=0; (*iter)<40; ++(*iter) )
     {
         if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
             // block_num = (me + s) % cpr_num_active_pes;
