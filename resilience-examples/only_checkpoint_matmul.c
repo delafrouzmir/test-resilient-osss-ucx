@@ -595,8 +595,7 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
         switch (cpr_pe_role)
         {
             case CPR_ACTIVE_ROLE:
-                if ( me == 0 )
-                    printf("me=%d entered checkpointing\n", pe_num);
+                
                 // TO DO: differential checkpointing? what if count is smaller than the count that was reserved?
 
                 space_needed = 1+ (count-1) / CPR_CARR_DATA_SIZE;
@@ -1036,7 +1035,6 @@ int main(int argc, char const *argv[])
     npes = shmem_n_pes ();
     spes = 4;
     
-    // }
 
     iter = (int *) shmem_malloc(sizeof(int));
     shmem_barrier_all();
@@ -1053,6 +1051,9 @@ int main(int argc, char const *argv[])
     Bs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Vertical stripes of B
     Cs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of C
     
+    Bs_nxt = (unsigned long*) shmem_align(4096, stripe_n_bytes); // Buffer that stores stripes of B
+    temp = (unsigned long*) shmem_malloc (sizeof(int));
+
     // Initialize the matrices
     for(i = 0; i < N * Ns; i++) {
         As[i] = (i + me) % 5 + 1;
@@ -1101,15 +1102,15 @@ int main(int argc, char const *argv[])
     for ( (*iter)=0; (*iter)<40; ++(*iter) )
     {
         if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
-            // block_num = (me + s) % cpr_num_active_pes;
+            block_num = (me + s) % cpr_num_active_pes;
 
-            // shmem_getmem_nbi(Bs_nxt, Bs, stripe_n_bytes, (me + 1) % cpr_num_active_pes);
+            shmem_getmem_nbi(Bs_nxt, Bs, stripe_n_bytes, (me + 1) % cpr_num_active_pes);
 
             mmul(Ns, N, Ns, N, As, Ns, Bs, N, Cs);
 
-            // temp = Bs;
-            // Bs = Bs_nxt;
-            // Bs_nxt = temp;
+            temp = Bs;
+            Bs = Bs_nxt;
+            Bs_nxt = temp;
         }
         // shmem_cpr_checkpoint(0, Cs, N * Ns, shmem_cpr_pe_num(me));
 
@@ -1120,20 +1121,7 @@ int main(int argc, char const *argv[])
         {
             // shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
             // shmem_barrier_all();
-            // printf("pe=%d done with %lu chp id=0\n", me, *iter);
-            for ( i=8; i<12; ++i )
-            {
-                if ( me == i )
-                {
-                    printf("PE=%d check-q-head=%d check-q-tail=%d:\n", i, cpr_check_queue_head, cpr_check_queue_tail);
-                    // for ( j=0; j<cpr_num_active_pes; ++j )
-                    // {
-                    //     printf("for PE=%d cpr_table_size[%d]=%d chp_table[%d][0][0]->count=%d\n",
-                    //         j, j, cpr_table_tail[j], j, cpr_checkpoint_table[j][0][0]->count);
-                    // }
-                }
-                shmem_barrier_all();
-            }
+            
             shmem_cpr_checkpoint(0, Cs, N * Ns, shmem_cpr_pe_num(me));
 
             shmem_barrier_all();
