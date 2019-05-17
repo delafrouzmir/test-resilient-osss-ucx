@@ -1089,20 +1089,6 @@ int main(int argc, char const *argv[])
 
     shmem_barrier_all();
 
-    for ( i=8; i<12; ++i )
-    {
-        if ( me == i )
-        {
-            printf("PE=%d rsrv-q-head=%d rsrv-q-tail=%d:\n", i, cpr_resrv_queue_head, cpr_resrv_queue_tail);
-            for ( j=0; j<cpr_num_active_pes; ++j )
-            {
-                printf("for PE=%d cpr_table_size[%d]=%d chp_table[%d][0][0]->count=%d\n",
-                    j, j, cpr_table_tail[j], j, cpr_checkpoint_table[j][0][0]->count);
-            }
-        }
-        shmem_barrier_all();
-    }
-
     for ( (*iter)=0; (*iter)<num_iter; ++(*iter) )
     {
         if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
