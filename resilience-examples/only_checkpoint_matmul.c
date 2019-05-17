@@ -1026,7 +1026,7 @@ int main(int argc, char const *argv[])
     int *iter;
     clock_t start, end;
 
-    int npes, spes, me, s, block_num;
+    int npes, spes, me, s, block_num, num_iter;
     unsigned long *As, *Bs, *Cs, *Bs_nxt, *temp;
     unsigned long* C;
     
@@ -1042,7 +1042,8 @@ int main(int argc, char const *argv[])
     start = clock();
     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
 
-    const unsigned long N = atoi(argv[argc-1]);           // Size of the matrices
+    num_iter = atoi(argv[argc-1]);
+    const unsigned long N = atoi(argv[argc-2]);           // Size of the matrices
     const unsigned long Ns = N / cpr_num_active_pes;   // Width of the stripes
     const unsigned long stripe_n_bytes = N * Ns * sizeof(unsigned long);
 
@@ -1099,7 +1100,7 @@ int main(int argc, char const *argv[])
         shmem_barrier_all();
     }
 
-    for ( (*iter)=0; (*iter)<40; ++(*iter) )
+    for ( (*iter)=0; (*iter)<num_iter; ++(*iter) )
     {
         if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
             block_num = (me + s) % cpr_num_active_pes;
