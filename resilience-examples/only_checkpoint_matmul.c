@@ -508,13 +508,14 @@ int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
 
             if ( cpr_pe_type != CPR_DEAD_PE )
             {
-                // shmem_wait_until ( &cpr_sig_rsvr, SHMEM_CMP_NE, 0);
-                shmem_wait_until(&rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN],
-                    SHMEM_CMP_NE, 0);
-                rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN] = 0;
+                shmem_wait_until ( &cpr_sig_rsvr, SHMEM_CMP_NE, 0);
                 
                 while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
                 {
+                    // almost making sure the carrier has arrived
+                    shmem_wait_until(&rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN],
+                        SHMEM_CMP_NE, 0);
+                    rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN] = 0;
                     // rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN] = 
                     //     cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num;
                     
@@ -556,10 +557,6 @@ int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
                     
                     cpr_table_tail[ carr-> pe_num] ++;
                     // TODO: update the hash table. I'm assuming id = index here
-                    // almost making sure the carrier has arrived
-                    shmem_wait_until(&rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN],
-                        SHMEM_CMP_NE, 0);
-                    rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN] = 0;
                 }
                 cpr_sig_rsvr = 0;
             }
@@ -1111,7 +1108,10 @@ int main(int argc, char const *argv[])
     /**/
     shmem_cpr_reserve(0, Cs, N * Ns, shmem_cpr_pe_num(me));
     if ( cpr_pe_role == CPR_STORAGE_ROLE )
+    {
+        cpr_sig_rsvr = 1;
         shmem_cpr_reserve(0, NULL, 0, shmem_cpr_pe_num(me));
+    }
 
     shmem_barrier_all();
 
