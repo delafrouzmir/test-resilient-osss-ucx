@@ -648,19 +648,19 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
 
             case CPR_STORAGE_ROLE:
 
-                if ( me == 8 )
-                        printf("me=%d 4th\n", me);
+                // if ( me == 8 )
+                //         printf("me=%d 4th\n", me);
                 // First, we need to check reservation queue is empty. if not, call reservation
                 if ( cpr_pe_type != CPR_DEAD_PE )
                 {
                     if ( cpr_resrv_queue_head < cpr_resrv_queue_tail )
                         shmem_cpr_reserve(id, mem, count, pe_num);
-                    if ( me == 8 )
-                        printf("me=%d 5th\n", me);
+                    // if ( me == 8 )
+                    //     printf("me=%d 5th\n", me);
                     // waiting to receive the first checkpointing request in the queue:
                     shmem_wait_until ( &cpr_sig_check, SHMEM_CMP_GT, 0);
-                    if ( me == 8 )
-                        printf("me=%d 6th\n", me);
+                    // if ( me == 8 )
+                    //     printf("me=%d 6th\n", me);
                     while (cpr_check_queue_head < cpr_check_queue_tail)
                     {
                         // almost making sure the carrier has arrived
@@ -668,8 +668,8 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                             SHMEM_CMP_NE, check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN]);
                         check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN] = 
                             cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num;
-                        if ( me == 8 )
-                            printf("me=%d 7th\n", me);
+                        // if ( me == 8 )
+                        //     printf("me=%d 7th\n", me);
                         // head and tail might overflow the int size... add code to check
                         carr = &cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];
                         // if ( me == 8 && carr->count == 1)
