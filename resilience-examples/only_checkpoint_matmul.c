@@ -658,40 +658,20 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                     // if ( me == 8 )
                     //     printf("me=%d 5th\n", me);
                     // waiting to receive the first checkpointing request in the queue:
-                    shmem_wait_until ( &cpr_sig_check, SHMEM_CMP_GT, 0);
+                    shmem_wait_until ( &cpr_sig_check, SHMEM_CMP_NE, 0);
                     // if ( me == 8 )
                     //     printf("me=%d 6th\n", me);
                     while (cpr_check_queue_head < cpr_check_queue_tail)
                     {
                         // almost making sure the carrier has arrived
-                        shmem_wait_until(&cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num,
-                            SHMEM_CMP_NE, check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN]);
-                        check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN] = 
-                            cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num;
-                        // if ( me == 8 )
-                        //     printf("me=%d 7th\n", me);
-                        // head and tail might overflow the int size... add code to check
+                        shmem_wait_until(&check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN],
+                                                SHMEM_CMP_NE, 0);
+                        check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN] = 0;
+                        
                         carr = &cpr_check_queue[(cpr_check_queue_head % CPR_STARTING_QUEUE_LEN)];
-                        // if ( me == 8 && carr->count == 1)
-                        // {
-                        //     printf("check_Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n%lu\n",
-                        //         cpr_check_queue_head, carr->pe_num, carr->id,
-                        //         carr->is_symmetric, carr->count, carr->rand_num,
-                        //         carr->offset, carr->data[0]);
-
-                        // }
-                        // if ( me == 8 && carr->count == 10)
-                        // {
-                        //     printf("check_Carr[%d].pe=%d id=%d symm=%d count=%d rand=%d offset=%d\n",
-                        //         cpr_check_queue_head, carr->pe_num, carr->id,
-                        //         carr->is_symmetric, carr->count, carr->rand_num,
-                        //         carr->offset);
-                        // }
+                        
                         cpr_check_queue_head ++;
                         
-                        // if ( me == 8 )
-                        //     printf("******carr->count=%d, CPR_CARR_DATA_SIZE=%d\n", carr->count, CPR_CARR_DATA_SIZE);
-
                         cpr_checkpoint_table[carr-> pe_num][carr-> id][(carr->offset)/CPR_CARR_DATA_SIZE]
                             -> offset = carr-> offset;
                         if ( carr->count <= CPR_CARR_DATA_SIZE )
@@ -703,18 +683,11 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                             else
                                 last_data = CPR_CARR_DATA_SIZE;
                         }
-                        // if ( me == 8 )
-                        //     printf("***last_data=%d\n", last_data);
+                        
                         for ( i=0; i< last_data; ++i)
                         {
                             cpr_checkpoint_table[carr-> pe_num][carr-> id][(carr->offset)/CPR_CARR_DATA_SIZE] -> data[i] = carr-> data[i];
-                            // if ( me == 8 && carr-> pe_num < 3 )
-                            //     printf("cpr_checkpoint_table[%d][%d][%d]->data[%d] = %d\n",
-                            //         carr-> pe_num, carr-> id, (carr->offset)/CPR_CARR_DATA_SIZE,
-                            //         i, carr-> data[i]);
                         }
-                        // if ( me == 8 )
-                        //     printf("me=%d 8th\n", me);
                         // I'm assuming id = index here
                     }
                 }
@@ -1130,7 +1103,7 @@ int main(int argc, char const *argv[])
         shmem_barrier_all();
     }
 
-    for ( (*iter)=0; (*iter)<20; ++(*iter) )
+    for ( (*iter)=0; (*iter)<; ++(*iter) )
     {
         if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
             // block_num = (me + s) % cpr_num_active_pes;
@@ -1155,9 +1128,14 @@ int main(int argc, char const *argv[])
             // printf("pe=%d done with %lu chp id=0\n", me, *iter);
             
             shmem_cpr_checkpoint(0, Cs, N * Ns, shmem_cpr_pe_num(me));
-            shmem_barrier_all();
-            // printf("pe=%d done with %lu chp id=1\n", me, *iter);
 
+            shmem_barrier_all();
+            if ( cpr_pe_role == CPR_STORAGE_ROLE )
+            {
+                cpr_sig_check = 1;
+                shmem_cpr_checkpoint(0, NULL, 0, shmem_cpr_pe_num(me));
+            }
+            shmem_barrier_all();
         }
 
         // for ( j=0; j<array_size; ++j)
