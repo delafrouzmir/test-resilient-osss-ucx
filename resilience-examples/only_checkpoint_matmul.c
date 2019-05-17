@@ -897,32 +897,32 @@ int shmem_cpr_finalize()
     //free everything
 }
 
-void mmul(const double Is, const double Ks, const double Js,
-          const double Adist, const double* A,
-          const double Bdist, const double* B,
-          const double Cdist, double* C) {
+// void mmul(const double Is, const double Ks, const double Js,
+//           const double Adist, const double* A,
+//           const double Bdist, const double* B,
+//           const double Cdist, double* C) {
 
-    double i, j, k;
-    double a_ik;
+//     double i, j, k;
+//     double a_ik;
 
-    for (i = 0; i < Is; i++) {
-        for (k = 0; k < Ks; k++) {
-            a_ik = A[i * Adist + k];
-            for (j = 0; j < Js; j++) {
-                C[i * Cdist + j] += (a_ik * B[k * Bdist + j]);
-            }
-        }
-    }
-}
+//     for (i = 0; i < Is; i++) {
+//         for (k = 0; k < Ks; k++) {
+//             a_ik = A[i * Adist + k];
+//             for (j = 0; j < Js; j++) {
+//                 C[i * Cdist + j] += (a_ik * B[k * Bdist + j]);
+//             }
+//         }
+//     }
+// }
 
 
-void print_matrix(const double* mat, const double Is, const double Js) {
-    for (double i = 0; i < Is; i++) {
-        for (double j = 0; j < Js; j++)
-            printf("%d ", mat[i * Js + j]);
-        printf("\n");
-    }
-}
+// void print_matrix(const double* mat, const double Is, const double Js) {
+//     for (double i = 0; i < Is; i++) {
+//         for (double j = 0; j < Js; j++)
+//             printf("%d ", mat[i * Js + j]);
+//         printf("\n");
+//     }
+// }
 
 
 // int main(int argc, char const *argv[]) {
