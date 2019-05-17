@@ -1109,7 +1109,7 @@ int main(int argc, char const *argv[])
         }
 
         for ( j=0; j<array_size; ++j)
-            a[j] = asin(a[j]);
+            a[j] = sin(a[j]);
         
         // if ( (*iter) == 25 && first_rollback == 0 ){
         //     first_rollback = 1;
