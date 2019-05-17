@@ -269,6 +269,14 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
     cpr_all_pe_type = (int *) malloc (npes * sizeof(int));
     cpr_all_pe_role = (int *) malloc (npes * sizeof(int));
     cpr_storage_pes = (int *) malloc (spes * sizeof (int));
+    rsrv_randomness = (int *) shmem_malloc(CPR_STARTING_QUEUE_LEN * sizeof(int));
+    check_randomness = (int *) shmem_malloc(CPR_STARTING_QUEUE_LEN * sizeof(int));
+
+    for (i=0; i<CPR_STARTING_QUEUE_LEN; ++i)
+    {
+        rsrv_randomness[i] = 0;
+        check_randomness[i] = 0;
+    }
 
     // add an if for different checkpointing mode here
     switch (mode)
@@ -314,8 +322,6 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
             cpr_checkpoint_table = (cpr_check_carrier ****) malloc (cpr_num_active_pes * sizeof(cpr_check_carrier ***));
             cpr_table_size = (int *) malloc(cpr_num_active_pes * sizeof(int *));
             cpr_table_tail = (int *) malloc(cpr_num_active_pes * sizeof(int *));
-            rsrv_randomness = (int *) malloc(CPR_STARTING_QUEUE_LEN * sizeof(int));
-            check_randomness = (int *) malloc(CPR_STARTING_QUEUE_LEN * sizeof(int));
 
             for (i=0; i<cpr_num_active_pes; ++i)
             {
@@ -483,7 +489,9 @@ int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
                         q_tail = ( shmem_atomic_fetch_inc ( &cpr_resrv_queue_tail, cpr_storage_pes[i])) % CPR_STARTING_QUEUE_LEN;
                         
                         shmem_putmem (&cpr_resrv_queue[q_tail], (void *) carr, 1 * sizeof(cpr_rsvr_carrier), cpr_storage_pes[i]);
-                        
+                        shmem_fence();
+                        shmem_atomic_set( &rsrv_randomness[q_tail], 1, cpr_storage_pes[i]);
+
                         if ( shmem_atomic_fetch ( &cpr_sig_rsvr, cpr_storage_pes[i]) == 0 )
                             shmem_atomic_set( &cpr_sig_rsvr, 1, cpr_storage_pes[i]);
                     }
@@ -506,10 +514,11 @@ int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
                 while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
                 {
                     // almost making sure the carrier has arrived
-                    shmem_wait_until(&cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num,
-                        SHMEM_CMP_NE, rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN]);
-                    rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN] = 
-                        cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num;
+                    shmem_wait_until(&rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN],
+                        SHMEM_CMP_NE, 0);
+                    rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN] = 0;
+                    // rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN] = 
+                    //     cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num;
                     
                     // TO DO: head and tail might overflow the int size... add code to check
                     *carr = cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)];
