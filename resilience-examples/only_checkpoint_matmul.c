@@ -1051,7 +1051,7 @@ void print_matrix(const unsigned long* mat, const unsigned long Is, const unsign
 //     return 0;
 // }
 
-int main ()
+int main(int argc, char const *argv[])
 {
     int spes;
     int success_init;
