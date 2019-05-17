@@ -42,7 +42,7 @@
 typedef struct resrv_carrier
 {
     int id;                     // ID of memory part that is being reserved
-    unsigned long *adr;                   // Address of memory part that is being reserved
+    double *adr;                   // Address of memory part that is being reserved
     int count;                  // number of data items that needs to be stored
     int pe_num;                 // the PE that asked for a reservation or checkpoint
     int is_symmetric;           // if this request is to checkpoint symmetric or private data
@@ -53,11 +53,11 @@ typedef struct check_carrier cpr_check_carrier;
 struct check_carrier
 {
     int id;                     // ID of memory part that is being checkpointed
-    unsigned long *adr;                   // Address of memory part that is being checkpointed
+    double *adr;                   // Address of memory part that is being checkpointed
     // TO DO: maybe if change from count to size=count*sizeof(data),
     // it can be generalized to all 
     int count;                  // number of data items that needs to be stored
-    unsigned long data[CPR_CARR_DATA_SIZE];   // an array of data that will be stored
+    double data[CPR_CARR_DATA_SIZE];   // an array of data that will be stored
     int pe_num;                 // the PE that asked for a reservation or checkpoint
     int is_symmetric;           // if this request is to checkpoint symmetric or private data
     int offset;
@@ -384,7 +384,7 @@ void shmem_cpr_copy_carrier ( cpr_rsvr_carrier *frst, cpr_check_carrier *scnd )
     scnd -> is_symmetric = frst -> is_symmetric;
 }
 
-int shmem_cpr_is_reserved (int id, unsigned long *mem, int pe_num)
+int shmem_cpr_is_reserved (int id, double *mem, int pe_num)
 {
     switch(cpr_pe_type)
     {
@@ -420,7 +420,7 @@ int shmem_cpr_is_reserved (int id, unsigned long *mem, int pe_num)
     }
 }
 
-int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
+int shmem_cpr_reserve (int id, double * mem, int count, int pe_num)
 {
     /* TO DO:
     1- create a hash table for id s and the index in cpr_shadow_mem or cpr_checkpoint_table
@@ -570,7 +570,7 @@ int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
 }
 
 // for now, assuming we are checkpointing ints
-int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
+int shmem_cpr_checkpoint ( int id, double* mem, int count, int pe_num )
 {
     /* TO DO:
     1- lookup id in hashtable to get the index
@@ -897,13 +897,13 @@ int shmem_cpr_finalize()
     //free everything
 }
 
-void mmul(const unsigned long Is, const unsigned long Ks, const unsigned long Js,
-          const unsigned long Adist, const unsigned long* A,
-          const unsigned long Bdist, const unsigned long* B,
-          const unsigned long Cdist, unsigned long* C) {
+void mmul(const double Is, const double Ks, const double Js,
+          const double Adist, const double* A,
+          const double Bdist, const double* B,
+          const double Cdist, double* C) {
 
-    unsigned long i, j, k;
-    unsigned long a_ik;
+    double i, j, k;
+    double a_ik;
 
     for (i = 0; i < Is; i++) {
         for (k = 0; k < Ks; k++) {
@@ -916,9 +916,9 @@ void mmul(const unsigned long Is, const unsigned long Ks, const unsigned long Js
 }
 
 
-void print_matrix(const unsigned long* mat, const unsigned long Is, const unsigned long Js) {
-    for (unsigned long i = 0; i < Is; i++) {
-        for (unsigned long j = 0; j < Js; j++)
+void print_matrix(const double* mat, const double Is, const double Js) {
+    for (double i = 0; i < Is; i++) {
+        for (double j = 0; j < Js; j++)
             printf("%d ", mat[i * Js + j]);
         printf("\n");
     }
@@ -929,9 +929,9 @@ void print_matrix(const unsigned long* mat, const unsigned long Is, const unsign
     
 //     shmem_init();
 
-//     unsigned long npes, spes, me, i, j, k, s, block_num;
-//     unsigned long *As, *Bs, *Cs, *Bs_nxt, *temp;
-//     unsigned long* C;
+//     double npes, spes, me, i, j, k, s, block_num;
+//     double *As, *Bs, *Cs, *Bs_nxt, *temp;
+//     double* C;
 //     clock_t start, end;
     
 //     FILE *fp;
@@ -945,17 +945,17 @@ void print_matrix(const unsigned long* mat, const unsigned long Is, const unsign
 
 //     // printf("me=%d role=%d type=%d\n", me, cpr_pe_role, cpr_pe_type);
 
-//     const unsigned long N = atoi(argv[argc-1]);           // Size of the matrices
-//     const unsigned long Ns = N / cpr_num_active_pes;   // Width of the stripes
-//     const unsigned long stripe_n_bytes = N * Ns * sizeof(unsigned long);
+//     const double N = atoi(argv[argc-1]);           // Size of the matrices
+//     const double Ns = N / cpr_num_active_pes;   // Width of the stripes
+//     const double stripe_n_bytes = N * Ns * sizeof(double);
 
 //     // if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
-//     As = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of A
-//     Bs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Vertical stripes of B
-//     Cs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of C
+//     As = (double*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of A
+//     Bs = (double*) shmem_align(4096, stripe_n_bytes);     // Vertical stripes of B
+//     Cs = (double*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of C
 
-//     Bs_nxt = (unsigned long*) shmem_align(4096, stripe_n_bytes); // Buffer that stores stripes of B
-//     temp = (unsigned long*) shmem_malloc (sizeof(int));
+//     Bs_nxt = (double*) shmem_align(4096, stripe_n_bytes); // Buffer that stores stripes of B
+//     temp = (double*) shmem_malloc (sizeof(int));
 
 //     // Initialize the matrices
 //     for(i = 0; i < N * Ns; i++) {
@@ -1018,13 +1018,13 @@ void print_matrix(const unsigned long* mat, const unsigned long Is, const unsign
 
 //     // Collect and print the matrix product
 //     if (me == 0) {
-//         C = (unsigned long *) malloc (N * N * sizeof (unsigned long));
+//         C = (double *) malloc (N * N * sizeof (double));
 
 //         for (i = 0; i < Ns * N; i++)
 //             C[i] = Cs[i];
 
 //         for (i = 1; i < npes; i++)
-//             shmem_getmem_nbi(C + i * Ns * N, Cs, Ns * N * sizeof(unsigned long), i);
+//             shmem_getmem_nbi(C + i * Ns * N, Cs, Ns * N * sizeof(double), i);
 
 //         shmem_quiet();
 
@@ -1056,7 +1056,8 @@ int main(int argc, char const *argv[])
     int spes;
     int success_init;
     int i, j, k, l, array_size, first_rollback;
-    unsigned long* a, *iter;
+    double* a;
+    int *iter;
     clock_t start, end;
 
     shmem_init ();
@@ -1075,10 +1076,10 @@ int main(int argc, char const *argv[])
     start = clock();
     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
 
-    iter = (unsigned long *) shmem_malloc(sizeof(unsigned long));
+    iter = (double *) shmem_malloc(sizeof(double));
 
     array_size = atoi(argv[argc-1]);
-    a = (unsigned long *) shmem_malloc((array_size)*sizeof(unsigned long));
+    a = (double *) shmem_malloc((array_size)*sizeof(double));
     for ( i=0; i<array_size; ++i)
         a[i] = me;
 
@@ -1106,8 +1107,9 @@ int main(int argc, char const *argv[])
             // printf("pe=%d done with %lu chp id=1\n", me, *iter);
 
         }
+
         for ( j=0; j<array_size; ++j)
-            a[j] ++;
+            a[j] = asin(a[j]);
         
         // if ( (*iter) == 25 && first_rollback == 0 ){
         //     first_rollback = 1;
