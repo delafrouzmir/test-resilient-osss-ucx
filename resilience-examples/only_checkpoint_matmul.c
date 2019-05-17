@@ -1107,6 +1107,7 @@ int main(int argc, char const *argv[])
     // shmem_cpr_reserve(0, a, array_size, shmem_cpr_pe_num(me));
     /**/
     shmem_cpr_reserve(0, Cs, N * Ns, shmem_cpr_pe_num(me));
+    shmem_barrier_all();
     if ( cpr_pe_role == CPR_STORAGE_ROLE )
     {
         cpr_sig_rsvr = 1;
