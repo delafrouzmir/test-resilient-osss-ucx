@@ -1077,7 +1077,7 @@ int main ()
 
     iter = (unsigned long *) shmem_malloc(sizeof(unsigned long));
 
-    array_size = 10;
+    array_size = atoi(argv[argc-1]);
     a = (unsigned long *) shmem_malloc((array_size)*sizeof(unsigned long));
     for ( i=0; i<array_size; ++i)
         a[i] = me;
@@ -1105,42 +1105,6 @@ int main ()
             shmem_barrier_all();
             // printf("pe=%d done with %lu chp id=1\n", me, *iter);
 
-            // for ( i=8; i<11; ++i )
-            // {
-                // if ( me == 8 )
-                // {
-                //     printf("PE=8 table at iter=%d:\n", *iter);
-                //     for ( j=0; j<cpr_num_active_pes; ++j )
-                //     {
-                //         printf("for PE=%d\n", j);
-                //         for ( k=0; k<cpr_table_tail[j]; ++k )
-                //         {
-                //             printf("pe=%d id=%d count=%d is_symmetric=%d offset=%d data=:\n",
-                //                 cpr_checkpoint_table[j][k][0]->pe_num,
-                //                 cpr_checkpoint_table[j][k][0]->id,
-                //                 cpr_checkpoint_table[j][k][0]->count,
-                //                 cpr_checkpoint_table[j][k][0]->is_symmetric,
-                //                 cpr_checkpoint_table[j][k][0]->offset);
-                //             for ( l=0; l< CPR_CARR_DATA_SIZE; ++l )
-                //                 printf("%d ", cpr_checkpoint_table[j][k][0]->data[l]);
-                //             printf("\n----------------\n");
-
-                //             printf("pe=%d id=%d count=%d is_symmetric=%d offset=%d data=:\n",
-                //                 cpr_checkpoint_table[j][k][1]->pe_num,
-                //                 cpr_checkpoint_table[j][k][1]->id,
-                //                 cpr_checkpoint_table[j][k][1]->count,
-                //                 cpr_checkpoint_table[j][k][1]->is_symmetric,
-                //                 cpr_checkpoint_table[j][k][1]->offset);
-                //             for ( l=0; l< cpr_checkpoint_table[j][k][1]->count % CPR_CARR_DATA_SIZE; ++l )
-                //                 printf("%d ", cpr_checkpoint_table[j][k][1]->data[l]);
-                //             printf("\n----------------\n");
-                //         }
-                //         printf("============***============\n");
-                //     }
-                //     printf("\n\n\n");
-                // }
-                // shmem_barrier_all();
-            // }
         }
         for ( j=0; j<array_size; ++j)
             a[j] ++;
