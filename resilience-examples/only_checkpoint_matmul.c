@@ -1116,7 +1116,7 @@ int main(int argc, char const *argv[])
     {
         if ( me == i )
         {
-            printf("PE=%d :\n");
+            printf("PE=%d :\n", i);
             for ( j=0; j<cpr_num_active_pes; ++j )
             {
                 printf("for PE=%d cpr_table_size[%d]=%d chp_table[%d][0][0]->count=%d\n",
@@ -1126,39 +1126,55 @@ int main(int argc, char const *argv[])
         shmem_barrier_all();
     }
 
-    // for ( (*iter)=0; (*iter)<1000; ++(*iter) )
-    // {
-    //     if ( (*iter) % 10 == 0)
-    //     {
-    //         // shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
-    //         // shmem_barrier_all();
-    //         // printf("pe=%d done with %lu chp id=0\n", me, *iter);
+    for ( (*iter)=0; (*iter)<20; ++(*iter) )
+    {
+        if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
+            // block_num = (me + s) % cpr_num_active_pes;
+
+            // shmem_getmem_nbi(Bs_nxt, Bs, stripe_n_bytes, (me + 1) % cpr_num_active_pes);
+
+            mmul(Ns, N, Ns, N, As, Ns, Bs, N, Cs);
+
+            // temp = Bs;
+            // Bs = Bs_nxt;
+            // Bs_nxt = temp;
+        }
+        // shmem_cpr_checkpoint(0, Cs, N * Ns, shmem_cpr_pe_num(me));
+
+        // printf("pe=%d , iter=%lu, %f\n", me, s, (clock()-start) / CLOCKS_PER_SEC);
+
+        shmem_barrier_all();
+        if ( (*iter) % 10 == 0)
+        {
+            // shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
+            // shmem_barrier_all();
+            // printf("pe=%d done with %lu chp id=0\n", me, *iter);
             
-    //         shmem_cpr_checkpoint(0, a, array_size, shmem_cpr_pe_num(me));
-    //         shmem_barrier_all();
-    //         // printf("pe=%d done with %lu chp id=1\n", me, *iter);
+            shmem_cpr_checkpoint(0, Cs, N * Ns, shmem_cpr_pe_num(me));
+            shmem_barrier_all();
+            // printf("pe=%d done with %lu chp id=1\n", me, *iter);
 
-    //     }
+        }
 
-    //     for ( j=0; j<array_size; ++j)
-    //         a[j] = log(a[j]*2);
+        // for ( j=0; j<array_size; ++j)
+        //     a[j] = log(a[j]*2);
         
-    //     // if ( (*iter) == 25 && first_rollback == 0 ){
-    //     //     first_rollback = 1;
-    //     //     shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
-    //     //     // if ( cpr_pe_role == CPR_STORAGE_ROLE )
-    //     //     // *iter = 20;
-    //     //     shmem_barrier_all();
-    //     //     // printf("PE=%d done with rollback with iter=%d!\n", me, *iter);
-    //     //     // if ( me == 11)
-    //     //     // {
-    //     //     //     printf("AFTER ROLLBACK:\n");
-    //     //     //     for ( j=0; j<array_size; ++j )
-    //     //     //         printf("%d ", a[j]);
-    //     //     //     printf("\n");
-    //     //     // }
-    //     // }
-    // }
+        // if ( (*iter) == 25 && first_rollback == 0 ){
+        //     first_rollback = 1;
+        //     shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
+        //     // if ( cpr_pe_role == CPR_STORAGE_ROLE )
+        //     // *iter = 20;
+        //     shmem_barrier_all();
+        //     // printf("PE=%d done with rollback with iter=%d!\n", me, *iter);
+        //     // if ( me == 11)
+        //     // {
+        //     //     printf("AFTER ROLLBACK:\n");
+        //     //     for ( j=0; j<array_size; ++j )
+        //     //         printf("%d ", a[j]);
+        //     //     printf("\n");
+        //     // }
+        // }
+    }
 
     // if ( cpr_pe_role == CPR_STORAGE_ROLE )
     //     shmem_cpr_checkpoint(0, NULL, 0, shmem_cpr_pe_num(me));
