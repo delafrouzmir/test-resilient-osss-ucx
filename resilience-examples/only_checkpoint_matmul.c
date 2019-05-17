@@ -261,7 +261,7 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
 
     // Setting up numbers of active and spare PEs
     // and arrays containing info on types and roles of PEs
-    int i;
+    int i, j;
     cpr_num_spare_pes = spes;
     cpr_num_active_pes = npes - spes;
     cpr_pe = (int *) malloc (npes * sizeof(int));
@@ -308,7 +308,6 @@ int shmem_cpr_init (int me, int npes, int spes, int mode)
     //     ** if in MANY_COPY mode: wrong type, error
     //     ** if in TWO-COPY mode: have a checkpoint_table which is a copy of all
     //         *** the ORIGINAL or RESURRECTED PEs' shadow_mem's
-    int i, j;
 
     cpr_shadow_mem_tail = 0;
     cpr_shadow_mem_size = CPR_STARTING_TABLE_SIZE;
