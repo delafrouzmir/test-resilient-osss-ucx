@@ -670,7 +670,7 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                         
                         cpr_checkpoint_table[carr-> pe_num][carr-> id][(carr->offset)/CPR_CARR_DATA_SIZE]
                             -> offset = carr-> offset;
-                            
+
                         if ( carr->count <= CPR_CARR_DATA_SIZE )
                             last_data = carr->count;
                         else
@@ -922,7 +922,7 @@ int main(int argc, char const *argv[])
     start = clock();
     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
 
-    frequency = 10;
+    frequency = 100;
     num_iter = atoi(argv[argc-1]);
     const unsigned long N = atoi(argv[argc-2]);           // Size of the matrices
     const unsigned long Ns = N / cpr_num_active_pes;   // Width of the stripes
@@ -987,9 +987,7 @@ int main(int argc, char const *argv[])
     for ( (*iter)=0; (*iter)<num_iter; ++(*iter) )
     {
         if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
-            block_num = (me + s) % cpr_num_active_pes;
-
-            shmem_getmem_nbi(Bs_nxt, Bs, stripe_n_bytes, (me + 1) % cpr_num_active_pes);
+            shmem_getmem_nbi(Bs_nxt, Bs, stripe_n_bytes, (shmem_cpr_pe_num(me) + 1) % cpr_num_active_pes);
 
             mmul(Ns, N, Ns, N, As, Ns, Bs, N, Cs);
 
