@@ -1120,9 +1120,6 @@ int main(int argc, char const *argv[])
         shmem_barrier_all();
         if ( (*iter) % 10 == 0)
         {
-            // shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
-            // shmem_barrier_all();
-            
             shmem_cpr_checkpoint(0, Cs, N * Ns, shmem_cpr_pe_num(me));
 
             shmem_barrier_all();
@@ -1132,20 +1129,6 @@ int main(int argc, char const *argv[])
                 shmem_cpr_checkpoint(0, NULL, 0, shmem_cpr_pe_num(me));
             }
             shmem_barrier_all();
-
-            for ( i=8; i<12; ++i )
-            {
-                if ( me == i )
-                {
-                    printf("PE=%d check-q-head=%d check-q-tail=%d:\n", i, cpr_check_queue_head, cpr_check_queue_tail);
-                    // for ( j=0; j<cpr_num_active_pes; ++j )
-                    // {
-                    //     printf("for PE=%d cpr_table_size[%d]=%d chp_table[%d][0][0]->count=%d\n",
-                    //         j, j, cpr_table_tail[j], j, cpr_checkpoint_table[j][0][0]->count);
-                    // }
-                }
-                shmem_barrier_all();
-            }
         }
 
         // for ( j=0; j<array_size; ++j)
