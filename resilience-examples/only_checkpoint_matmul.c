@@ -508,7 +508,10 @@ int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
 
             if ( cpr_pe_type != CPR_DEAD_PE )
             {
-                shmem_wait_until ( &cpr_sig_rsvr, SHMEM_CMP_NE, 0);
+                // shmem_wait_until ( &cpr_sig_rsvr, SHMEM_CMP_NE, 0);
+                shmem_wait_until(&rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN],
+                    SHMEM_CMP_NE, 0);
+                rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN] = 0;
                 
                 while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
                 {
