@@ -914,7 +914,7 @@ int main(int argc, char const *argv[])
     spes = 4;
     
     FILE *fp;
-    fp = fopen ("rollback_matmul.txt", "a");
+    fp = fopen ("rollback_matmul_res.txt", "a");
 
     iter = (int *) shmem_malloc(sizeof(int));
     shmem_barrier_all();
@@ -1035,7 +1035,7 @@ int main(int argc, char const *argv[])
 
     shmem_barrier_all();
     if ( me == 0 )
-        printf("no rollback: npes=%d, spes=%d, array_size=%d, iter=%d, freq=%d\ntime=%f\n",
+        fprintf(fp, "1 rollback: npes=%d, spes=%d, array_size=%d, iter=%d, freq=%d\ntime=%f\n",
             npes, spes, N, num_iter, frequency, (double) (clock()-start) / CLOCKS_PER_SEC);
 
     shmem_finalize();
