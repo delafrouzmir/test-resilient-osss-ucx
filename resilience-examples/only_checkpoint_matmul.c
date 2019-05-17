@@ -1035,6 +1035,8 @@ int main(int argc, char const *argv[])
     npes = shmem_n_pes ();
     spes = 4;
     
+    FILE *fp;
+    fp = fopen ("matmul_chp_no_rb.txt", "a");
 
     iter = (int *) shmem_malloc(sizeof(int));
     shmem_barrier_all();
@@ -1156,7 +1158,8 @@ int main(int argc, char const *argv[])
 
     shmem_barrier_all();
     if ( me == 0 )
-        printf("%f\n", (double) (clock()-start) / CLOCKS_PER_SEC);
+        fprintf(fp, "no rollback: npes=%d, spes=%d, array_size=%d, iter=%d, time=%f\n",
+            npes, spes, N, num_iter, (double) (clock()-start) / CLOCKS_PER_SEC);
 
     shmem_finalize();
 
