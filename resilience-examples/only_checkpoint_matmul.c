@@ -1076,7 +1076,7 @@ int main(int argc, char const *argv[])
     start = clock();
     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
 
-    iter = (double *) shmem_malloc(sizeof(double));
+    iter = (int *) shmem_malloc(sizeof(int));
 
     array_size = atoi(argv[argc-1]);
     a = (double *) shmem_malloc((array_size)*sizeof(double));
