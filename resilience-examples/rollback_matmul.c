@@ -974,7 +974,7 @@ int main(int argc, char const *argv[])
                     j, j, cpr_table_tail[j], j, cpr_checkpoint_table[j][0][0]->count,
                     j, cpr_checkpoint_table[j][0][0]->offset,
                     j, cpr_checkpoint_table[j][0][1]->offset,
-                    j, cpr_checkpoint_table[j][0][2]->offset,);
+                    j, cpr_checkpoint_table[j][0][2]->offset);
             }
         }
         shmem_barrier_all();
