@@ -981,9 +981,9 @@ int main(int argc, char const *argv[]) {
 
     if ( me == 8 ){
         for ( i=0; i<cpr_resrv_queue_tail; ++i )
-            printf("carr[%d].pe=%d id=%d rand=%d offset=%d \n",
+            printf("carr[%d].pe=%d id=%d rand=%d count=%d \n",
                 i , cpr_resrv_queue[i].pe_num, cpr_resrv_queue[i].id,
-                cpr_resrv_queue[i].rand_num, cpr_resrv_queue[i].offset);
+                cpr_resrv_queue[i].rand_num, cpr_resrv_queue[i].count);
     }
 
     for (s = 0; s < cpr_num_active_pes; s++) {
