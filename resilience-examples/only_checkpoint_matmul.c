@@ -1123,7 +1123,7 @@ int main ()
                                 cpr_checkpoint_table[j][k][0]->count,
                                 cpr_checkpoint_table[j][k][0]->is_symmetric,
                                 cpr_checkpoint_table[j][k][0]->offset);
-                            for ( l=0; l< CPR_CARR_DATA_SIZE; ++l )
+                            for ( l=0; l< cpr_checkpoint_table[j][k][0]->count; ++l )
                                 printf("%d ", cpr_checkpoint_table[j][k][0]->data[l]);
                             printf("\n----------------\n");
 
