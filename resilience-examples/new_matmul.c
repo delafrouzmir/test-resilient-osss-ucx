@@ -87,9 +87,7 @@ int main(int argc, char const *argv[])
 
     for ( (*iter)=0; (*iter)<num_iter; ++(*iter) )
     {
-        block_num = (me + s) % cpr_num_active_pes;
-
-        shmem_getmem_nbi(Bs_nxt, Bs, stripe_n_bytes, (me + 1) % cpr_num_active_pes);
+        shmem_getmem_nbi(Bs_nxt, Bs, stripe_n_bytes, (me + 1) % npes);
 
         mmul(Ns, N, Ns, N, As, Ns, Bs, N, Cs);
 
