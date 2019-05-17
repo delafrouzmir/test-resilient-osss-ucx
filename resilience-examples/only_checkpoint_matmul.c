@@ -515,10 +515,6 @@ int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
                 
                 while (cpr_resrv_queue_head < cpr_resrv_queue_tail)
                 {
-                    // almost making sure the carrier has arrived
-                    shmem_wait_until(&rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN],
-                        SHMEM_CMP_NE, 0);
-                    rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN] = 0;
                     // rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN] = 
                     //     cpr_resrv_queue[(cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN)].rand_num;
                     
@@ -560,6 +556,10 @@ int shmem_cpr_reserve (int id, unsigned long * mem, int count, int pe_num)
                     
                     cpr_table_tail[ carr-> pe_num] ++;
                     // TODO: update the hash table. I'm assuming id = index here
+                    // almost making sure the carrier has arrived
+                    shmem_wait_until(&rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN],
+                        SHMEM_CMP_NE, 0);
+                    rsrv_randomness[cpr_resrv_queue_head % CPR_STARTING_QUEUE_LEN] = 0;
                 }
                 cpr_sig_rsvr = 0;
             }
