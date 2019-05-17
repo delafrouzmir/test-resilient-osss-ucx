@@ -59,7 +59,7 @@ int main(int argc, char const *argv[])
 
     num_iter = atoi(argv[argc-1]);
     const unsigned long N = atoi(argv[argc-2]);           // Size of the matrices
-    const unsigned long Ns = N / cpr_num_active_pes;   // Width of the stripes
+    const unsigned long Ns = N / npes;   // Width of the stripes
     const unsigned long stripe_n_bytes = N * Ns * sizeof(unsigned long);
 
     // if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
@@ -87,17 +87,15 @@ int main(int argc, char const *argv[])
 
     for ( (*iter)=0; (*iter)<num_iter; ++(*iter) )
     {
-        if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
-            block_num = (me + s) % cpr_num_active_pes;
+        block_num = (me + s) % cpr_num_active_pes;
 
-            shmem_getmem_nbi(Bs_nxt, Bs, stripe_n_bytes, (me + 1) % cpr_num_active_pes);
+        shmem_getmem_nbi(Bs_nxt, Bs, stripe_n_bytes, (me + 1) % cpr_num_active_pes);
 
-            mmul(Ns, N, Ns, N, As, Ns, Bs, N, Cs);
+        mmul(Ns, N, Ns, N, As, Ns, Bs, N, Cs);
 
-            temp = Bs;
-            Bs = Bs_nxt;
-            Bs_nxt = temp;
-        }
+        temp = Bs;
+        Bs = Bs_nxt;
+        Bs_nxt = temp;
     }
 
     shmem_barrier_all();
