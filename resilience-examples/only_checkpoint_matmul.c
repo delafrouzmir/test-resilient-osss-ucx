@@ -1116,7 +1116,7 @@ int main(int argc, char const *argv[])
     {
         if ( me == i )
         {
-            printf("PE=%d :\n", i);
+            printf("PE=%d rsrv-q-head=%d rsrv-q-tail=%d:\n", i, cpr_resrv_queue_head, cpr_resrv_queue_tail);
             for ( j=0; j<cpr_num_active_pes; ++j )
             {
                 printf("for PE=%d cpr_table_size[%d]=%d chp_table[%d][0][0]->count=%d\n",
