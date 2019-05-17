@@ -652,19 +652,22 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
 
             case CPR_STORAGE_ROLE:
 
-                // if ( me == 8 )
-                //         printf("me=%d 4th\n", me);
+                if ( me == 8 )
+                        printf("me=%d 4th\n", me);
                 // First, we need to check reservation queue is empty. if not, call reservation
                 if ( cpr_pe_type != CPR_DEAD_PE )
                 {
                     if ( cpr_resrv_queue_head < cpr_resrv_queue_tail )
+                    {
+                        printf("%d called reserve in check\n", pe_num);
                         shmem_cpr_reserve(id, mem, count, pe_num);
-                    // if ( me == 8 )
-                    //     printf("me=%d 5th\n", me);
+                    }
+                    if ( me == 8 )
+                        printf("me=%d 5th\n", me);
                     // waiting to receive the first checkpointing request in the queue:
                     shmem_wait_until ( &cpr_sig_check, SHMEM_CMP_NE, 0);
-                    // if ( me == 8 )
-                    //     printf("me=%d 6th\n", me);
+                    if ( me == 8 )
+                        printf("me=%d 6th\n", me);
                     while (cpr_check_queue_head < cpr_check_queue_tail)
                     {
                         // almost making sure the carrier has arrived
@@ -692,6 +695,8 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
                         {
                             cpr_checkpoint_table[carr-> pe_num][carr-> id][(carr->offset)/CPR_CARR_DATA_SIZE] -> data[i] = carr-> data[i];
                         }
+                        if ( me == 8 )
+                            printf("me=%d 7th\n", me);
                         // I'm assuming id = index here
                     }
                 }
