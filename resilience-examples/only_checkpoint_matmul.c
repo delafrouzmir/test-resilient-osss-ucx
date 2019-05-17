@@ -925,25 +925,153 @@ void print_matrix(const unsigned long* mat, const unsigned long Is, const unsign
 }
 
 
-int main(int argc, char const *argv[]) {
+// int main(int argc, char const *argv[]) {
     
-    shmem_init();
+//     shmem_init();
 
-    unsigned long npes, spes, me, i, j, k, s, block_num;
-    unsigned long *As, *Bs, *Cs, *Bs_nxt, *temp;
-    unsigned long* C;
+//     unsigned long npes, spes, me, i, j, k, s, block_num;
+//     unsigned long *As, *Bs, *Cs, *Bs_nxt, *temp;
+//     unsigned long* C;
+//     clock_t start, end;
+    
+//     FILE *fp;
+//     fp = fopen ("matmul_chp_no_rb.txt", "a");
+
+//     npes = shmem_n_pes();
+//     me = shmem_my_pe();
+//     spes = 4;
+
+//     shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
+
+//     // printf("me=%d role=%d type=%d\n", me, cpr_pe_role, cpr_pe_type);
+
+//     const unsigned long N = atoi(argv[argc-1]);           // Size of the matrices
+//     const unsigned long Ns = N / cpr_num_active_pes;   // Width of the stripes
+//     const unsigned long stripe_n_bytes = N * Ns * sizeof(unsigned long);
+
+//     // if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
+//     As = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of A
+//     Bs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Vertical stripes of B
+//     Cs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of C
+
+//     Bs_nxt = (unsigned long*) shmem_align(4096, stripe_n_bytes); // Buffer that stores stripes of B
+//     temp = (unsigned long*) shmem_malloc (sizeof(int));
+
+//     // Initialize the matrices
+//     for(i = 0; i < N * Ns; i++) {
+//         As[i] = (i + me) % 5 + 1;
+//         Bs[i] = (i + me) % 5 + 3;
+//         Cs[i] = 0;
+//     }
+//     // }
+//     // Make sure all the stripes are initialized
+//     shmem_barrier_all();
+
+//     start = clock();
+
+//     shmem_cpr_reserve(0, Cs, N * Ns, shmem_cpr_pe_num(me));
+//     if ( cpr_pe_role == CPR_STORAGE_ROLE )
+//         shmem_cpr_reserve(0, NULL, 0, shmem_cpr_pe_num(me));
+
+//     shmem_barrier_all();
+
+//     for ( i=8; i<12; ++i ){
+//         if ( me == i )
+//             for ( j=0; j<cpr_num_active_pes; ++j )
+//                 printf("PE=%lu for pe=%lu table_tail=%d table_size=%d\n",
+//                     i, j, cpr_table_tail[j], cpr_table_size[j]);
+//     }
+//     for ( i=0; i<8; ++i ){
+//         if ( me == i )
+//             printf("pe=%d shadow_tail%d shadow_size%d\n",
+//                 cpr_shadow_mem_tail, cpr_shadow_mem_size);
+//     }
+
+//     shmem_barrier_all();
+
+//     if ( me == 8 ){
+//         for ( i=0; i<cpr_resrv_queue_tail; ++i )
+//             printf("carr[%d].pe=%d id=%d rand=%d count=%d \n",
+//                 i , cpr_resrv_queue[i].pe_num, cpr_resrv_queue[i].id,
+//                 cpr_resrv_queue[i].rand_num, cpr_resrv_queue[i].count);
+//     }
+
+//     for (s = 0; s < cpr_num_active_pes; s++) {
+
+//         if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
+//             block_num = (me + s) % cpr_num_active_pes;
+
+//             // shmem_getmem_nbi(Bs_nxt, Bs, stripe_n_bytes, (me + 1) % cpr_num_active_pes);
+
+//             mmul(Ns, N, Ns, N, As, Ns, Bs, N, Cs + block_num * Ns);
+
+//             // temp = Bs;
+//             // Bs = Bs_nxt;
+//             // Bs_nxt = temp;
+//         }
+//         // shmem_cpr_checkpoint(0, Cs, N * Ns, shmem_cpr_pe_num(me));
+
+//         // printf("pe=%d , iter=%lu, %f\n", me, s, (clock()-start) / CLOCKS_PER_SEC);
+
+//         shmem_barrier_all();
+//     }
+
+//     // Collect and print the matrix product
+//     if (me == 0) {
+//         C = (unsigned long *) malloc (N * N * sizeof (unsigned long));
+
+//         for (i = 0; i < Ns * N; i++)
+//             C[i] = Cs[i];
+
+//         for (i = 1; i < npes; i++)
+//             shmem_getmem_nbi(C + i * Ns * N, Cs, Ns * N * sizeof(unsigned long), i);
+
+//         shmem_quiet();
+
+//         //print_matrix(C, N, N);
+
+//         free (C);
+//     }
+
+//     shmem_barrier_all();
+
+//     end = clock();
+
+//     if ( me == 0 )
+//         fprintf(fp, "npes=%lu spes=%lu N=%lu time=%f\n",
+//             npes, spes, N, (unsigned long)(end - start) / CLOCKS_PER_SEC);
+//     fclose(fp);
+
+//     shmem_free(As);
+//     shmem_free(Bs);
+//     shmem_free(Cs);
+
+//     shmem_finalize();
+
+//     return 0;
+// }
+
+int main(int argc, char const *argv[])
+{
+    int spes;
+    int success_init;
+    int i, j, k, l, array_size, first_rollback;
+    unsigned long* a;
+    int *iter;
     clock_t start, end;
-    
-    FILE *fp;
-    fp = fopen ("matmul_chp_no_rb.txt", "a");
 
-    npes = shmem_n_pes();
-    me = shmem_my_pe();
+    shmem_init ();
+    me = shmem_my_pe ();
+    npes = shmem_n_pes ();
     spes = 4;
+    
+    // }
 
-    shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
+    iter = (int *) shmem_malloc(sizeof(int));
+    shmem_barrier_all();
 
-    // printf("me=%d role=%d type=%d\n", me, cpr_pe_role, cpr_pe_type);
+    start = clock();
+    success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
 
     const unsigned long N = atoi(argv[argc-1]);           // Size of the matrices
     const unsigned long Ns = N / cpr_num_active_pes;   // Width of the stripes
@@ -953,189 +1081,90 @@ int main(int argc, char const *argv[]) {
     As = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of A
     Bs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Vertical stripes of B
     Cs = (unsigned long*) shmem_align(4096, stripe_n_bytes);     // Horizontal stripes of C
-
-    Bs_nxt = (unsigned long*) shmem_align(4096, stripe_n_bytes); // Buffer that stores stripes of B
-    temp = (unsigned long*) shmem_malloc (sizeof(int));
-
+    
     // Initialize the matrices
     for(i = 0; i < N * Ns; i++) {
         As[i] = (i + me) % 5 + 1;
         Bs[i] = (i + me) % 5 + 3;
         Cs[i] = 0;
     }
-    // }
-    // Make sure all the stripes are initialized
-    shmem_barrier_all();
 
-    start = clock();
+    // array_size = atoi(argv[argc-1]);
+    // a = (unsigned long *) shmem_malloc((array_size)*sizeof(unsigned long));
+    // for ( i=0; i<array_size; ++i)
+    //     a[i] = me;
 
+    // not sure if this is necessary here
+    shmem_barrier_all ();
+
+    first_rollback = 0;
+    *iter = 0;
+    
+    // shmem_cpr_reserve(0, iter, 1, shmem_cpr_pe_num(me));
+    // shmem_cpr_reserve(0, a, array_size, shmem_cpr_pe_num(me));
+    /**/
     shmem_cpr_reserve(0, Cs, N * Ns, shmem_cpr_pe_num(me));
     if ( cpr_pe_role == CPR_STORAGE_ROLE )
         shmem_cpr_reserve(0, NULL, 0, shmem_cpr_pe_num(me));
 
     shmem_barrier_all();
 
-    for ( i=8; i<12; ++i ){
+    for ( i=8; i<12; ++i )
+    {
         if ( me == i )
+        {
+            printf("PE=%d :\n");
             for ( j=0; j<cpr_num_active_pes; ++j )
-                printf("PE=%lu for pe=%lu table_tail=%d table_size=%d\n",
-                    i, j, cpr_table_tail[j], cpr_table_size[j]);
-    }
-    for ( i=0; i<8; ++i ){
-        if ( me == i )
-            printf("pe=%d shadow_tail%d shadow_size%d\n",
-                cpr_shadow_mem_tail, cpr_shadow_mem_size);
-    }
-
-    shmem_barrier_all();
-
-    if ( me == 8 ){
-        for ( i=0; i<cpr_resrv_queue_tail; ++i )
-            printf("carr[%d].pe=%d id=%d rand=%d count=%d \n",
-                i , cpr_resrv_queue[i].pe_num, cpr_resrv_queue[i].id,
-                cpr_resrv_queue[i].rand_num, cpr_resrv_queue[i].count);
-    }
-
-    for (s = 0; s < cpr_num_active_pes; s++) {
-
-        if ( cpr_pe_role == CPR_ACTIVE_ROLE ){
-            block_num = (me + s) % cpr_num_active_pes;
-
-            // shmem_getmem_nbi(Bs_nxt, Bs, stripe_n_bytes, (me + 1) % cpr_num_active_pes);
-
-            mmul(Ns, N, Ns, N, As, Ns, Bs, N, Cs + block_num * Ns);
-
-            // temp = Bs;
-            // Bs = Bs_nxt;
-            // Bs_nxt = temp;
+            {
+                printf("for PE=%d cpr_table_size[%d]=%d chp_table[%d][0][0]->count=%d\n",
+                    j, j, cpr_table_tail[j], j, cpr_checkpoint_table[j][0][0]->count);
+            }
         }
-        // shmem_cpr_checkpoint(0, Cs, N * Ns, shmem_cpr_pe_num(me));
-
-        // printf("pe=%d , iter=%lu, %f\n", me, s, (clock()-start) / CLOCKS_PER_SEC);
-
         shmem_barrier_all();
     }
 
-    // Collect and print the matrix product
-    if (me == 0) {
-        C = (unsigned long *) malloc (N * N * sizeof (unsigned long));
+    // for ( (*iter)=0; (*iter)<1000; ++(*iter) )
+    // {
+    //     if ( (*iter) % 10 == 0)
+    //     {
+    //         // shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
+    //         // shmem_barrier_all();
+    //         // printf("pe=%d done with %lu chp id=0\n", me, *iter);
+            
+    //         shmem_cpr_checkpoint(0, a, array_size, shmem_cpr_pe_num(me));
+    //         shmem_barrier_all();
+    //         // printf("pe=%d done with %lu chp id=1\n", me, *iter);
 
-        for (i = 0; i < Ns * N; i++)
-            C[i] = Cs[i];
+    //     }
 
-        for (i = 1; i < npes; i++)
-            shmem_getmem_nbi(C + i * Ns * N, Cs, Ns * N * sizeof(unsigned long), i);
+    //     for ( j=0; j<array_size; ++j)
+    //         a[j] = log(a[j]*2);
+        
+    //     // if ( (*iter) == 25 && first_rollback == 0 ){
+    //     //     first_rollback = 1;
+    //     //     shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
+    //     //     // if ( cpr_pe_role == CPR_STORAGE_ROLE )
+    //     //     // *iter = 20;
+    //     //     shmem_barrier_all();
+    //     //     // printf("PE=%d done with rollback with iter=%d!\n", me, *iter);
+    //     //     // if ( me == 11)
+    //     //     // {
+    //     //     //     printf("AFTER ROLLBACK:\n");
+    //     //     //     for ( j=0; j<array_size; ++j )
+    //     //     //         printf("%d ", a[j]);
+    //     //     //     printf("\n");
+    //     //     // }
+    //     // }
+    // }
 
-        shmem_quiet();
-
-        //print_matrix(C, N, N);
-
-        free (C);
-    }
+    // if ( cpr_pe_role == CPR_STORAGE_ROLE )
+    //     shmem_cpr_checkpoint(0, NULL, 0, shmem_cpr_pe_num(me));
 
     shmem_barrier_all();
-
-    end = clock();
-
     if ( me == 0 )
-        fprintf(fp, "npes=%lu spes=%lu N=%lu time=%f\n",
-            npes, spes, N, (unsigned long)(end - start) / CLOCKS_PER_SEC);
-    fclose(fp);
-
-    shmem_free(As);
-    shmem_free(Bs);
-    shmem_free(Cs);
+        printf("%f\n", clock()-start / CLOCKS_PER_SEC);
 
     shmem_finalize();
 
     return 0;
 }
-
-// int main(int argc, char const *argv[])
-// {
-//     int spes;
-//     int success_init;
-//     int i, j, k, l, array_size, first_rollback;
-//     unsigned long* a;
-//     int *iter;
-//     clock_t start, end;
-
-//     shmem_init ();
-//     me = shmem_my_pe ();
-//     npes = shmem_n_pes ();
-
-//     if ( npes >= 6 )
-//         spes = 4;
-//     else if ( npes == 5 )
-//         spes = 2;
-//     else if ( npes == 4 )
-//         spes = 1;
-//     else
-//         spes = 0;
-
-//     start = clock();
-//     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
-
-//     iter = (int *) shmem_malloc(sizeof(int));
-
-//     array_size = atoi(argv[argc-1]);
-//     a = (unsigned long *) shmem_malloc((array_size)*sizeof(unsigned long));
-//     for ( i=0; i<array_size; ++i)
-//         a[i] = me;
-
-//     // not sure if this is necessary here
-//     shmem_barrier_all ();
-
-//     first_rollback = 0;
-//     *iter = 0;
-    
-//     // shmem_cpr_reserve(0, iter, 1, shmem_cpr_pe_num(me));
-//     shmem_cpr_reserve(0, a, array_size, shmem_cpr_pe_num(me));
-//     /**/
-//     shmem_barrier_all();
-
-//     for ( (*iter)=0; (*iter)<1000; ++(*iter) )
-//     {
-//         if ( (*iter) % 10 == 0)
-//         {
-//             // shmem_cpr_checkpoint(0, iter, 1, shmem_cpr_pe_num(me));
-//             // shmem_barrier_all();
-//             // printf("pe=%d done with %lu chp id=0\n", me, *iter);
-            
-//             shmem_cpr_checkpoint(0, a, array_size, shmem_cpr_pe_num(me));
-//             shmem_barrier_all();
-//             // printf("pe=%d done with %lu chp id=1\n", me, *iter);
-
-//         }
-
-//         for ( j=0; j<array_size; ++j)
-//             a[j] = log(a[j]*2);
-        
-//         // if ( (*iter) == 25 && first_rollback == 0 ){
-//         //     first_rollback = 1;
-//         //     shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
-//         //     // if ( cpr_pe_role == CPR_STORAGE_ROLE )
-//         //     // *iter = 20;
-//         //     shmem_barrier_all();
-//         //     // printf("PE=%d done with rollback with iter=%d!\n", me, *iter);
-//         //     // if ( me == 11)
-//         //     // {
-//         //     //     printf("AFTER ROLLBACK:\n");
-//         //     //     for ( j=0; j<array_size; ++j )
-//         //     //         printf("%d ", a[j]);
-//         //     //     printf("\n");
-//         //     // }
-//         // }
-//     }
-
-//     if ( cpr_pe_role == CPR_STORAGE_ROLE )
-//         shmem_cpr_checkpoint(0, NULL, 0, shmem_cpr_pe_num(me));
-
-//     shmem_barrier_all();
-//     if ( me == 0 )
-//         printf("%f\n", clock()-start / CLOCKS_PER_SEC);
-
-//     shmem_finalize();
-
-//     return 0;
-// }
