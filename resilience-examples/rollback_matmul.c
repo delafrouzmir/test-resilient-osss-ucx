@@ -1010,6 +1010,26 @@ int main(int argc, char const *argv[])
             }
             shmem_barrier_all();
         }
+
+        if ( (*iter) == 15 )
+        {
+            for ( i=8; i<12; ++i )
+            {
+                if ( me == i )
+                {
+                    printf("PE=%d rsrv-q-head=%d rsrv-q-tail=%d:\n", i, cpr_resrv_queue_head, cpr_resrv_queue_tail);
+                    for ( j=0; j<cpr_num_active_pes; ++j )
+                    {
+                        printf("for PE=%d cpr_table_size[%d]=%d chp_table[%d][0][0]->count=%d chp_table[%d][0][0]->off=%d chp_table[%d][0][1]->off=%d chp_table[%d][0][2]->off=%d\n",
+                            j, j, cpr_table_tail[j], j, cpr_checkpoint_table[j][0][0]->count,
+                            j, cpr_checkpoint_table[j][0][0]->offset,
+                            j, cpr_checkpoint_table[j][0][1]->offset,
+                            j, cpr_checkpoint_table[j][0][2]->offset);
+                    }
+                }
+                shmem_barrier_all();
+            }
+        }
        
         if ( (*iter) == 3*frequency+5 && first_rollback == 0 ){
             first_rollback = 1;
