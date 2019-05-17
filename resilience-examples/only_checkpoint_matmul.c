@@ -1173,7 +1173,7 @@ int main(int argc, char const *argv[])
 
     shmem_barrier_all();
     if ( me == 0 )
-        printf("%f\n", clock()-start / CLOCKS_PER_SEC);
+        printf("%f\n", (double) (clock()-start) / CLOCKS_PER_SEC);
 
     shmem_finalize();
 
