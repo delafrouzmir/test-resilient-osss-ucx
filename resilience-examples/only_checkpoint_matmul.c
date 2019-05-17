@@ -1053,13 +1053,16 @@ void print_matrix(const unsigned long* mat, const unsigned long Is, const unsign
 
 int main(int argc, char const *argv[])
 {
-    int spes;
     int success_init;
     int i, j, k, l, array_size, first_rollback;
-    unsigned long* a;
+    //unsigned long* a;
     int *iter;
     clock_t start, end;
 
+    int npes, spes, me, s, block_num;
+    unsigned long *As, *Bs, *Cs, *Bs_nxt, *temp;
+    unsigned long* C;
+    
     shmem_init ();
     me = shmem_my_pe ();
     npes = shmem_n_pes ();
