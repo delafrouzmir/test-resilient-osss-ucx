@@ -1159,7 +1159,7 @@ int main(int argc, char const *argv[])
 
     shmem_barrier_all();
     if ( me == 0 )
-        fprintf(fp, "1 rollback: npes=%d, spes=%d, array_size=%d, iter=%d, freq=%d\ntime=%f\n",
+        printf("1 rollback: npes=%d, spes=%d, array_size=%d, iter=%d, freq=%d\ntime=%f\n",
             npes, spes, N, num_iter, frequency, (double) (clock()-start) / CLOCKS_PER_SEC);
 
     shmem_finalize();
