@@ -1139,7 +1139,7 @@ int main(int argc, char const *argv[])
        
         if ( (*iter) == 3*frequency+5 && first_rollback == 0 ){
             first_rollback = 1;
-            shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
+            // shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
             // if ( cpr_pe_role == CPR_STORAGE_ROLE )
             *iter = 3*frequency;
             shmem_barrier_all();
