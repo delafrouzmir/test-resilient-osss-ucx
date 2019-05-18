@@ -1,0 +1,37 @@
+#!/bin/sh
+# For license: see LICENSE file at top-level
+
+compiler="${OSH_CC-gcc -std=gnu99}"
+
+prefix=/gpfs/home/dmirfenderes/install-location/res-osss-ucx
+exec_prefix=${prefix}
+shmem_dir=/gpfs/home/dmirfenderes/install-location/res-osss-ucx
+shmem_include=${prefix}/include
+shmem_lib=${exec_prefix}/lib
+
+pmixlib_stanza="-L/gpfs/home/dmirfenderes/install-location/pmix1.2.3/lib -Wl,-rpath,/gpfs/home/dmirfenderes/install-location/pmix1.2.3/lib -lpmix"
+
+shmemlib_ldflags="-L$shmem_lib -Wl,-rpath -Wl,$shmem_lib"
+shmemlib_libs="-lshmem -lshmemc-ucx -lshmemu -lm"
+shmemlib_stanza="$shmemlib_ldflags $shmemlib_libs $pmixlib_stanza"
+
+comms_stanza="-L/gpfs/home/dmirfenderes/install-location/ucx/lib -Wl,-rpath,/gpfs/home/dmirfenderes/install-location/ucx/lib -lucp -luct -lucs"
+
+shmemlib_stanza="$shmemlib_stanza $comms_stanza"
+
+# check to see if linking required: if not, throw away link args
+for c in $@
+do
+    case $c in
+        -[cES])
+            shmemlib_stanza=""
+            ;;
+        *)
+            ;;
+    esac
+done
+    
+$compiler \
+    -I$shmem_include -pthread \
+    $@ \
+    $shmemlib_stanza 

@@ -754,15 +754,15 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                 for ( i=0; i<cpr_shadow_mem_tail; ++i)
                 {
                     reading_carr = 1+ (cpr_shadow_mem[i][0]->count-1) / CPR_CARR_DATA_SIZE;
-                    printf("PE=%d at rollback!!\n", me);
+                    // printf("PE=%d at rollback!!\n", me);
                     for ( k=0; k < reading_carr; ++k )
                     {
                         carr = cpr_shadow_mem[i][k];
                         reading_data = ( k== reading_carr-1 ) ?
                             (carr->count)%CPR_CARR_DATA_SIZE 
                             : CPR_CARR_DATA_SIZE;
-                        printf("PE=%d at rollback, iter=%d/read_carr=%d , read_data=%d, carr->off=%d\n", 
-                            me, k, reading_carr, reading_data, carr->offset);
+                        // printf("PE=%d at rollback, iter=%d/read_carr=%d , read_data=%d, carr->off=%d\n", 
+                        //     me, k, reading_carr, reading_data, carr->offset);
                         for ( j=0; j < reading_data; ++j )
                             *((carr->adr)+(carr->offset)+j) = carr->data[j];
                     }
@@ -774,12 +774,12 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                 // First, if there is any checkpoint remaining in the queue, should be checkpointed
                 if ( cpr_check_queue_head < cpr_check_queue_tail )
                     shmem_cpr_checkpoint(0, NULL, 0, me);
-                printf("PE=%d at rollback!!\n", me);
+                // printf("PE=%d at rollback!!\n", me);
                 // The last spare replaces the dead PE
                 if ( me == chosen_pe )
                 {
 
-                    printf("PE=%d is chosen!!\n", me);
+                    // printf("PE=%d is chosen!!\n", me);
                     cpr_pe_type = CPR_RESURRECTED_PE;
                     cpr_pe_role = CPR_ACTIVE_ROLE;
 
@@ -804,8 +804,8 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                                     (carr -> count) % CPR_CARR_DATA_SIZE
                                     : CPR_CARR_DATA_SIZE;
 
-                                printf("PE=%d at rollback, iter%d/read_carr=%d , read_data=%d, carr->off=%d\n", 
-                                    me, j, reading_carr, reading_data, carr->offset);
+                                // printf("PE=%d at rollback, iter%d/read_carr=%d , read_data=%d, carr->off=%d\n", 
+                                //     me, j, reading_carr, reading_data, carr->offset);
 
                                 for ( k=0; k < reading_data; ++k )
                                     *(carr->adr + carr->offset +k) = carr->data[k];
@@ -921,6 +921,7 @@ int main ()
     int success_init;
     int i, j, k, l, array_size, first_rollback;
     unsigned long* a, *iter;
+    clock_t start, end;
 
     shmem_init ();
     me = shmem_my_pe ();
@@ -935,6 +936,7 @@ int main ()
     else
         spes = 0;
 
+    start = clock();
     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
 
     iter = (unsigned long *) shmem_malloc(sizeof(unsigned long));
@@ -975,39 +977,39 @@ int main ()
 
             // for ( i=8; i<11; ++i )
             // {
-                if ( me == 8 )
-                {
-                    printf("PE=8 table at iter=%d:\n", *iter);
-                    for ( j=0; j<cpr_num_active_pes; ++j )
-                    {
-                        printf("for PE=%d\n", j);
-                        for ( k=0; k<cpr_table_tail[j]; ++k )
-                        {
-                            printf("pe=%d id=%d count=%d is_symmetric=%d offset=%d data=:\n",
-                                cpr_checkpoint_table[j][k][0]->pe_num,
-                                cpr_checkpoint_table[j][k][0]->id,
-                                cpr_checkpoint_table[j][k][0]->count,
-                                cpr_checkpoint_table[j][k][0]->is_symmetric,
-                                cpr_checkpoint_table[j][k][0]->offset);
-                            for ( l=0; l< CPR_CARR_DATA_SIZE; ++l )
-                                printf("%d ", cpr_checkpoint_table[j][k][0]->data[l]);
-                            printf("\n----------------\n");
+                // if ( me == 8 )
+                // {
+                //     printf("PE=8 table at iter=%d:\n", *iter);
+                //     for ( j=0; j<cpr_num_active_pes; ++j )
+                //     {
+                //         printf("for PE=%d\n", j);
+                //         for ( k=0; k<cpr_table_tail[j]; ++k )
+                //         {
+                //             printf("pe=%d id=%d count=%d is_symmetric=%d offset=%d data=:\n",
+                //                 cpr_checkpoint_table[j][k][0]->pe_num,
+                //                 cpr_checkpoint_table[j][k][0]->id,
+                //                 cpr_checkpoint_table[j][k][0]->count,
+                //                 cpr_checkpoint_table[j][k][0]->is_symmetric,
+                //                 cpr_checkpoint_table[j][k][0]->offset);
+                //             for ( l=0; l< CPR_CARR_DATA_SIZE; ++l )
+                //                 printf("%d ", cpr_checkpoint_table[j][k][0]->data[l]);
+                //             printf("\n----------------\n");
 
-                            printf("pe=%d id=%d count=%d is_symmetric=%d offset=%d data=:\n",
-                                cpr_checkpoint_table[j][k][1]->pe_num,
-                                cpr_checkpoint_table[j][k][1]->id,
-                                cpr_checkpoint_table[j][k][1]->count,
-                                cpr_checkpoint_table[j][k][1]->is_symmetric,
-                                cpr_checkpoint_table[j][k][1]->offset);
-                            for ( l=0; l< cpr_checkpoint_table[j][k][1]->count % CPR_CARR_DATA_SIZE; ++l )
-                                printf("%d ", cpr_checkpoint_table[j][k][1]->data[l]);
-                            printf("\n----------------\n");
-                        }
-                        printf("============***============\n");
-                    }
-                    printf("\n\n\n");
-                }
-                shmem_barrier_all();
+                //             printf("pe=%d id=%d count=%d is_symmetric=%d offset=%d data=:\n",
+                //                 cpr_checkpoint_table[j][k][1]->pe_num,
+                //                 cpr_checkpoint_table[j][k][1]->id,
+                //                 cpr_checkpoint_table[j][k][1]->count,
+                //                 cpr_checkpoint_table[j][k][1]->is_symmetric,
+                //                 cpr_checkpoint_table[j][k][1]->offset);
+                //             for ( l=0; l< cpr_checkpoint_table[j][k][1]->count % CPR_CARR_DATA_SIZE; ++l )
+                //                 printf("%d ", cpr_checkpoint_table[j][k][1]->data[l]);
+                //             printf("\n----------------\n");
+                //         }
+                //         printf("============***============\n");
+                //     }
+                //     printf("\n\n\n");
+                // }
+                // shmem_barrier_all();
             // }
         }
         for ( j=0; j<array_size; ++j)
@@ -1034,6 +1036,8 @@ int main ()
         shmem_cpr_checkpoint(0, NULL, 0, shmem_cpr_pe_num(me));
 
     shmem_barrier_all();
+    if ( me == 0 )
+        printf("%f\n", clock()-start / CLOCKS_PER_SEC);
 
     // if ( me == 0 )
     // {
