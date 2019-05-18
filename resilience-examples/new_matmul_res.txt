@@ -23,3 +23,28 @@ no chp: npes=8, array_size=64, iter=100000
 time=1.730000
 no chp: npes=8, array_size=64, iter=200000
 time=3.470000
+------------------------------------------
+no chp: npes=8, array_size=64, iter=50000
+time=1.100000
+no chp: npes=8, array_size=64, iter=100000
+time=2.070000
+no chp: npes=8, array_size=64, iter=200000
+time=3.670000
+no chp: npes=8, array_size=64, iter=50000
+time=1.050000
+no chp: npes=8, array_size=64, iter=100000
+time=1.960000
+no chp: npes=8, array_size=64, iter=200000
+time=3.650000
+no chp: npes=8, array_size=64, iter=50000
+time=1.120000
+no chp: npes=8, array_size=64, iter=100000
+time=2.040000
+no chp: npes=8, array_size=64, iter=200000
+time=3.640000
+no chp: npes=8, array_size=64, iter=50000
+time=1.070000
+no chp: npes=8, array_size=64, iter=100000
+time=2.090000
+no chp: npes=8, array_size=64, iter=200000
+time=3.630000
