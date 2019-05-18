@@ -703,13 +703,17 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
 
 int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
 {
-    int i, j, k, l, space_needed;
+    int i, j, k, l, space_needed, last_data, q_tail;
     cpr_check_carrier *carr;
     cpr_sig_table_info = 0;
 
     if ( pe_num == candid )
     {
-        for ( i=0; i< )
+        for ( i=0; i<CPR_STARTING_QUEUE_LEN; ++i )
+        {
+            rsrv_randomness[i] = 0;
+            check_randomness[i] = 0;
+        }
         // setting that to one, will let "storage" know to send data
         shmem_atomic_set (&cpr_sig_table_info, 1, storage );
 
@@ -794,7 +798,7 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
 
             for ( j=0; j<cpr_table_tail[i]; ++j )
             {
-                space_needed = 1 + (checkpoint_table[i][j][0]->count -1)/CPR_CARR_DATA_SIZE;
+                space_needed = 1 + (cpr_checkpoint_table[i][j][0]->count -1)/CPR_CARR_DATA_SIZE;
                 shmem_wait_until ( &cpr_sig_table_info, SHMEM_CMP_EQ, 1 );
                 shmem_put(&cpr_table_info_carr, &space_needed, 1, candid);
                 shmem_fence();
@@ -804,7 +808,7 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
                 {
                     q_tail = ( shmem_atomic_fetch_inc (&cpr_check_queue_tail, candid)) % CPR_STARTING_QUEUE_LEN;
                     
-                    shmem_putmem (&cpr_check_queue[q_tail], (void *) checkpoint_table[i][j][k], 1 * sizeof(cpr_check_carrier), candid);
+                    shmem_putmem (&cpr_check_queue[q_tail], (void *) cpr_checkpoint_table[i][j][k], 1 * sizeof(cpr_check_carrier), candid);
                     shmem_fence();
                     shmem_atomic_set( &check_randomness[q_tail], 1, candid);
                 }
@@ -818,7 +822,7 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
     return SUCCESS;
 }
 
-int shmem_cpr_rollback ( int dead_pe, int me )
+int shmem_cpr_rollback ( int dead_pe, int pe_num )
 {
     /* TO DO:
     lookup id in hashtable to get the index
@@ -836,7 +840,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
     *  e.g. replacing every dead PE with a spare from the same node
     */
 
-    if ( me != dead_pe && cpr_all_pe_role[dead_pe] == CPR_ACTIVE_ROLE)
+    if ( pe_num != dead_pe && cpr_all_pe_role[dead_pe] == CPR_ACTIVE_ROLE)
     {
         chosen_pe = cpr_storage_pes[cpr_num_storage_pes-1];
 
@@ -847,7 +851,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                 for ( i=0; i<cpr_shadow_mem_tail; ++i)
                 {
                     reading_carr = 1+ (cpr_shadow_mem[i][0]->count-1) / CPR_CARR_DATA_SIZE;
-                    printf("PE=%d at rollback!!\n", me);
+                    printf("PE=%d at rollback!!\n", pe_num);
                     for ( k=0; k < reading_carr; ++k )
                     {
                         carr = cpr_shadow_mem[i][k];
@@ -855,7 +859,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                             (carr->count)%CPR_CARR_DATA_SIZE 
                             : CPR_CARR_DATA_SIZE;
                         printf("PE=%d at rollback, iter=%d/read_carr=%d , read_data=%d, carr->off=%d\n", 
-                            me, k, reading_carr, reading_data, carr->offset);
+                            pe_num, k, reading_carr, reading_data, carr->offset);
                         for ( j=0; j < reading_data; ++j )
                             *((carr->adr)+(carr->offset)+j) = carr->data[j];
                     }
@@ -866,13 +870,13 @@ int shmem_cpr_rollback ( int dead_pe, int me )
             case CPR_STORAGE_ROLE:
                 // First, if there is any checkpoint remaining in the queue, should be checkpointed
                 if ( cpr_check_queue_head < cpr_check_queue_tail )
-                    shmem_cpr_checkpoint(0, NULL, 0, me);
-                printf("PE=%d at rollback!!\n", me);
+                    shmem_cpr_checkpoint(0, NULL, 0, pe_num);
+                printf("PE=%d at rollback!!\n", pe_num);
                 // The last spare replaces the dead PE
-                if ( me == chosen_pe )
+                if ( pe_num == chosen_pe )
                 {
 
-                    printf("PE=%d is chosen!!\n", me);
+                    printf("PE=%d is chosen!!\n", pe_num);
                     cpr_pe_type = CPR_RESURRECTED_PE;
                     cpr_pe_role = CPR_ACTIVE_ROLE;
 
@@ -898,7 +902,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                                     : CPR_CARR_DATA_SIZE;
 
                                 printf("PE=%d at rollback, iter%d/read_carr=%d , read_data=%d, carr->off=%d\n", 
-                                    me, j, reading_carr, reading_data, carr->offset);
+                                    pe_num, j, reading_carr, reading_data, carr->offset);
 
                                 for ( k=0; k < reading_data; ++k )
                                     *(carr->adr + carr->offset +k) = carr->data[k];
@@ -928,7 +932,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                             break;
                         }
 
-                    if ( candid_storage != -1 &&(me == candid_storage || me == cpr_storage_pes[0]) )
+                    if ( candid_storage != -1 &&(pe_num == candid_storage || pe_num == cpr_storage_pes[0]) )
                         copy_table_success = shmem_cpr_copy_check_table ( candid_storage, cpr_storage_pes[0], pe_num );
                 }
                 break;
@@ -950,11 +954,11 @@ int shmem_cpr_rollback ( int dead_pe, int me )
 
         if ( cpr_checkpointing_mode == CPR_MANY_COPY_CHECKPOINT )
             cpr_num_storage_pes --;
-        else if ( cpr_checkpointing_mode == TWO_MANY_COPY_CHECKPOINT && copy_table_success )
+        else if ( cpr_checkpointing_mode == CPR_TWO_COPY_CHECKPOINT && copy_table_success )
             cpr_storage_pes[cpr_num_storage_pes-1] = candid_storage;
     }
 
-    if ( me != dead_pe && cpr_all_pe_role[dead_pe] == CPR_STORAGE_ROLE){
+    if ( pe_num != dead_pe && cpr_all_pe_role[dead_pe] == CPR_STORAGE_ROLE){
 
         cpr_pe[dead_pe] = -1;
         cpr_all_pe_type[dead_pe] = CPR_DEAD_PE;
@@ -969,7 +973,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                     break;
                 }
 
-            if ( candid_storage != -1 &&(me == candid_storage || me == cpr_storage_pes[0]) )
+            if ( candid_storage != -1 &&(pe_num == candid_storage || pe_num == cpr_storage_pes[0]) )
                 copy_table_success = shmem_cpr_copy_check_table ( candid_storage, cpr_storage_pes[0], pe_num );
 
             if ( copy_table_success )
@@ -977,7 +981,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
         }
         else if ( cpr_checkpointing_mode == CPR_MANY_COPY_CHECKPOINT )
             cpr_num_storage_pes --;
-        
+
     }
 
     return SUCCESS;
