@@ -1044,7 +1044,7 @@ int main(int argc, char const *argv[])
     shmem_barrier_all();
 
     start = clock();
-    success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
+    success_init = shmem_cpr_init(me, npes, spes, CPR_TWO_COPY_CHECKPOINT);
 
     frequency = 100;
     num_iter = atoi(argv[argc-1]);
