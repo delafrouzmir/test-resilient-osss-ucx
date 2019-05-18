@@ -1,0 +1,195 @@
+
+1 rollback: npes=12, spes=4, array_size=64, iter=50000, freq=100
+time=1.380000
+1 rollback: npes=12, spes=4, array_size=64, iter=100000, freq=100
+time=2.760000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=100
+time=5.230000
+1 rollback: npes=12, spes=4, array_size=64, iter=50000, freq=100
+time=1.450000
+1 rollback: npes=12, spes=4, array_size=64, iter=100000, freq=100
+time=2.650000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=100
+time=5.150000
+1 rollback: npes=12, spes=4, array_size=64, iter=50000, freq=100
+time=1.420000
+1 rollback: npes=12, spes=4, array_size=64, iter=100000, freq=100
+time=2.640000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=100
+time=5.130000
+1 rollback: npes=12, spes=4, array_size=64, iter=50000, freq=100
+time=1.550000
+1 rollback: npes=12, spes=4, array_size=64, iter=100000, freq=100
+time=2.620000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=100
+time=5.160000
+1 rollback: npes=12, spes=4, array_size=64, iter=50000, freq=200
+time=1.310000
+1 rollback: npes=12, spes=4, array_size=64, iter=100000, freq=200
+time=2.570000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=200
+time=4.810000
+1 rollback: npes=12, spes=4, array_size=64, iter=50000, freq=200
+time=1.340000
+1 rollback: npes=12, spes=4, array_size=64, iter=100000, freq=200
+time=2.520000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=200
+time=4.950000
+1 rollback: npes=12, spes=4, array_size=64, iter=50000, freq=200
+time=1.300000
+1 rollback: npes=12, spes=4, array_size=64, iter=100000, freq=200
+time=2.500000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=200
+time=4.810000
+1 rollback: npes=12, spes=4, array_size=64, iter=50000, freq=200
+time=1.360000
+1 rollback: npes=12, spes=4, array_size=64, iter=100000, freq=200
+time=2.520000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=200
+time=4.830000
+1 rollback: npes=12, spes=4, array_size=64, iter=50000, freq=400
+time=1.260000
+1 rollback: npes=12, spes=4, array_size=64, iter=100000, freq=400
+time=2.390000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=400
+time=4.670000
+1 rollback: npes=12, spes=4, array_size=64, iter=50000, freq=400
+time=1.370000
+1 rollback: npes=12, spes=4, array_size=64, iter=100000, freq=400
+time=2.380000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=400
+time=5.010000
+1 rollback: npes=12, spes=4, array_size=64, iter=50000, freq=400
+time=1.270000
+1 rollback: npes=12, spes=4, array_size=64, iter=100000, freq=400
+time=2.460000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=400
+time=4.980000
+1 rollback: npes=12, spes=4, array_size=64, iter=50000, freq=400
+time=1.280000
+1 rollback: npes=12, spes=4, array_size=64, iter=100000, freq=400
+time=2.400000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=400
+time=4.710000
+1 rollback: npes=12, spes=4, array_size=64, iter=50000, freq=1000
+time=1.240000
+1 rollback: npes=12, spes=4, array_size=64, iter=100000, freq=1000
+time=2.370000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=1000
+time=4.660000
+1 rollback: npes=12, spes=4, array_size=64, iter=50000, freq=1000
+time=1.310000
+1 rollback: npes=12, spes=4, array_size=64, iter=100000, freq=1000
+time=2.520000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=1000
+time=4.560000
+1 rollback: npes=12, spes=4, array_size=64, iter=50000, freq=1000
+time=1.240000
+1 rollback: npes=12, spes=4, array_size=64, iter=100000, freq=1000
+time=2.360000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=1000
+time=4.590000
+1 rollback: npes=12, spes=4, array_size=64, iter=50000, freq=1000
+time=1.310000
+1 rollback: npes=12, spes=4, array_size=64, iter=100000, freq=1000
+time=2.360000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=1000
+time=4.720000
+------------------------------------------------------------------
+
+1 rollback: npes=8, spes=4, array_size=64, iter=50000, freq=100
+time=3.380000
+1 rollback: npes=8, spes=4, array_size=64, iter=100000, freq=100
+time=6.620000
+1 rollback: npes=8, spes=4, array_size=64, iter=200000, freq=100
+time=12.940000
+1 rollback: npes=8, spes=4, array_size=64, iter=50000, freq=100
+time=3.420000
+1 rollback: npes=8, spes=4, array_size=64, iter=100000, freq=100
+time=6.600000
+1 rollback: npes=8, spes=4, array_size=64, iter=200000, freq=100
+time=12.880000
+1 rollback: npes=8, spes=4, array_size=64, iter=50000, freq=100
+time=3.370000
+1 rollback: npes=8, spes=4, array_size=64, iter=100000, freq=100
+time=6.490000
+1 rollback: npes=8, spes=4, array_size=64, iter=200000, freq=100
+time=12.900000
+1 rollback: npes=8, spes=4, array_size=64, iter=50000, freq=100
+time=3.600000
+1 rollback: npes=8, spes=4, array_size=64, iter=100000, freq=100
+time=6.540000
+1 rollback: npes=8, spes=4, array_size=64, iter=200000, freq=100
+time=12.900000
+1 rollback: npes=8, spes=4, array_size=64, iter=50000, freq=200
+time=3.220000
+1 rollback: npes=8, spes=4, array_size=64, iter=100000, freq=200
+time=6.270000
+1 rollback: npes=8, spes=4, array_size=64, iter=200000, freq=200
+time=12.380000
+1 rollback: npes=8, spes=4, array_size=64, iter=50000, freq=200
+time=3.300000
+1 rollback: npes=8, spes=4, array_size=64, iter=100000, freq=200
+time=6.620000
+1 rollback: npes=8, spes=4, array_size=64, iter=200000, freq=200
+time=12.480000
+1 rollback: npes=8, spes=4, array_size=64, iter=50000, freq=200
+time=3.290000
+1 rollback: npes=8, spes=4, array_size=64, iter=100000, freq=200
+time=6.310000
+1 rollback: npes=8, spes=4, array_size=64, iter=200000, freq=200
+time=12.300000
+1 rollback: npes=8, spes=4, array_size=64, iter=50000, freq=200
+time=3.250000
+1 rollback: npes=8, spes=4, array_size=64, iter=100000, freq=200
+time=6.240000
+1 rollback: npes=8, spes=4, array_size=64, iter=200000, freq=200
+time=12.540000
+1 rollback: npes=8, spes=4, array_size=64, iter=50000, freq=400
+time=3.190000
+1 rollback: npes=8, spes=4, array_size=64, iter=100000, freq=400
+time=6.130000
+1 rollback: npes=8, spes=4, array_size=64, iter=200000, freq=400
+time=12.280000
+1 rollback: npes=8, spes=4, array_size=64, iter=50000, freq=400
+time=3.170000
+1 rollback: npes=8, spes=4, array_size=64, iter=100000, freq=400
+time=6.210000
+1 rollback: npes=8, spes=4, array_size=64, iter=200000, freq=400
+time=12.370000
+1 rollback: npes=8, spes=4, array_size=64, iter=50000, freq=400
+time=3.250000
+1 rollback: npes=8, spes=4, array_size=64, iter=100000, freq=400
+time=6.120000
+1 rollback: npes=8, spes=4, array_size=64, iter=200000, freq=400
+time=12.170000
+1 rollback: npes=8, spes=4, array_size=64, iter=50000, freq=400
+time=3.250000
+1 rollback: npes=8, spes=4, array_size=64, iter=100000, freq=400
+time=6.300000
+1 rollback: npes=8, spes=4, array_size=64, iter=200000, freq=400
+time=12.210000
+1 rollback: npes=8, spes=4, array_size=64, iter=50000, freq=1000
+time=3.150000
+1 rollback: npes=8, spes=4, array_size=64, iter=100000, freq=1000
+time=6.270000
+1 rollback: npes=8, spes=4, array_size=64, iter=200000, freq=1000
+time=12.090000
+1 rollback: npes=8, spes=4, array_size=64, iter=50000, freq=1000
+time=3.150000
+1 rollback: npes=8, spes=4, array_size=64, iter=100000, freq=1000
+time=6.220000
+1 rollback: npes=8, spes=4, array_size=64, iter=200000, freq=1000
+time=12.190000
+1 rollback: npes=8, spes=4, array_size=64, iter=50000, freq=1000
+time=3.120000
+1 rollback: npes=8, spes=4, array_size=64, iter=100000, freq=1000
+time=6.190000
+1 rollback: npes=8, spes=4, array_size=64, iter=200000, freq=1000
+time=11.960000
+1 rollback: npes=8, spes=4, array_size=64, iter=50000, freq=1000
+time=3.280000
+1 rollback: npes=8, spes=4, array_size=64, iter=100000, freq=1000
+time=6.160000
+1 rollback: npes=8, spes=4, array_size=64, iter=200000, freq=1000
+time=12.040000

@@ -1044,7 +1044,7 @@ int main(int argc, char const *argv[])
     start = clock();
     success_init = shmem_cpr_init(me, npes, spes, CPR_MANY_COPY_CHECKPOINT);
 
-    frequency = 10;
+    frequency = 1000;
     num_iter = atoi(argv[argc-1]);
     const unsigned long N = atoi(argv[argc-2]);           // Size of the matrices
     const unsigned long Ns = N / cpr_num_active_pes;   // Width of the stripes

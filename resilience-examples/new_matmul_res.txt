@@ -1,0 +1,25 @@
+
+no chp: npes=8, array_size=64, iter=50000
+time=0.930000
+no chp: npes=8, array_size=64, iter=100000
+time=1.840000
+no chp: npes=8, array_size=64, iter=200000
+time=3.220000
+no chp: npes=8, array_size=64, iter=50000
+time=1.020000
+no chp: npes=8, array_size=64, iter=100000
+time=1.900000
+no chp: npes=8, array_size=64, iter=200000
+time=3.280000
+no chp: npes=8, array_size=64, iter=50000
+time=1.030000
+no chp: npes=8, array_size=64, iter=100000
+time=1.660000
+no chp: npes=8, array_size=64, iter=200000
+time=3.230000
+no chp: npes=8, array_size=64, iter=50000
+time=1.060000
+no chp: npes=8, array_size=64, iter=100000
+time=1.730000
+no chp: npes=8, array_size=64, iter=200000
+time=3.470000

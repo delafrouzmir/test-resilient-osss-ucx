@@ -1,0 +1,298 @@
+0 original putting to 8 with qhead=0, qtail=0, with id=0, count=1
+5 original putting to 8 with qhead=0, qtail=1, with id=0, count=1
+10 spare is entering chp with head=0 tail=0
+11 spare is entering chp with head=0 tail=0
+3 original putting to 8 with qhead=0, qtail=2, with id=0, count=1
+5 original putting to 9 with qhead=0, qtail=0, with id=0, count=1
+5 original putting to 10 with qhead=0, qtail=0, with id=0, count=1
+5 original putting to 11 with qhead=0, qtail=0, with id=0, count=1
+5 original putting to 8 with qhead=0, qtail=3, with id=1, count=15
+5 original putting to 9 with qhead=0, qtail=1, with id=1, count=15
+5 original putting to 10 with qhead=0, qtail=1, with id=1, count=15
+5 original putting to 11 with qhead=0, qtail=1, with id=1, count=15
+5 original putting to 8 with qhead=0, qtail=4, with id=0, count=1
+5 original putting to 9 with qhead=0, qtail=2, with id=0, count=1
+5 original putting to 10 with qhead=0, qtail=2, with id=0, count=1
+5 original putting to 11 with qhead=0, qtail=2, with id=0, count=1
+5 original putting to 8 with qhead=0, qtail=5, with id=1, count=15
+5 original putting to 9 with qhead=0, qtail=3, with id=1, count=15
+5 original putting to 10 with qhead=0, qtail=3, with id=1, count=15
+5 original putting to 11 with qhead=0, qtail=3, with id=1, count=15
+5 original putting to 8 with qhead=0, qtail=6, with id=0, count=1
+5 original putting to 9 with qhead=0, qtail=4, with id=0, count=1
+5 original putting to 10 with qhead=0, qtail=4, with id=0, count=1
+5 original putting to 11 with qhead=0, qtail=4, with id=0, count=1
+5 original putting to 8 with qhead=0, qtail=7, with id=1, count=15
+5 original putting to 9 with qhead=0, qtail=5, with id=1, count=15
+5 original putting to 10 with qhead=0, qtail=5, with id=1, count=15
+5 original putting to 11 with qhead=0, qtail=5, with id=1, count=15
+5 original putting to 8 with qhead=0, qtail=8, with id=0, count=1
+5 original putting to 9 with qhead=0, qtail=6, with id=0, count=1
+5 original putting to 10 with qhead=0, qtail=6, with id=0, count=1
+5 original putting to 11 with qhead=0, qtail=6, with id=0, count=1
+5 original putting to 8 with qhead=0, qtail=9, with id=1, count=15
+5 original putting to 9 with qhead=0, qtail=7, with id=1, count=15
+5 original putting to 10 with qhead=0, qtail=7, with id=1, count=15
+5 original putting to 11 with qhead=0, qtail=7, with id=1, count=15
+10 spare is entering chp with head=8 tail=8
+9 spare is entering chp with head=0 tail=8
+9 spare is entering chp with head=8 tail=8
+8 spare is entering chp with head=0 tail=10
+8 spare is entering chp with head=10 tail=10
+4 original putting to 8 with qhead=10, qtail=10, with id=0, count=1
+4 original putting to 9 with qhead=8, qtail=8, with id=0, count=1
+4 original putting to 10 with qhead=8, qtail=8, with id=0, count=1
+4 original putting to 11 with qhead=0, qtail=8, with id=0, count=1
+4 original putting to 8 with qhead=11, qtail=11, with id=1, count=14
+4 original putting to 9 with qhead=8, qtail=9, with id=1, count=14
+4 original putting to 10 with qhead=8, qtail=9, with id=1, count=14
+4 original putting to 11 with qhead=0, qtail=9, with id=1, count=14
+4 original putting to 8 with qhead=11, qtail=12, with id=0, count=1
+4 original putting to 9 with qhead=10, qtail=10, with id=0, count=1
+4 original putting to 10 with qhead=10, qtail=10, with id=0, count=1
+4 original putting to 11 with qhead=0, qtail=10, with id=0, count=1
+8 spare is entering chp with head=11 tail=11
+4 original putting to 8 with qhead=13, qtail=13, with id=1, count=14
+4 original putting to 9 with qhead=10, qtail=11, with id=1, count=14
+4 original putting to 10 with qhead=10, qtail=11, with id=1, count=14
+4 original putting to 11 with qhead=0, qtail=11, with id=1, count=14
+4 original putting to 8 with qhead=15, qtail=14, with id=0, count=1
+4 original putting to 9 with qhead=12, qtail=12, with id=0, count=1
+4 original putting to 10 with qhead=12, qtail=12, with id=0, count=1
+4 original putting to 11 with qhead=0, qtail=12, with id=0, count=1
+4 original putting to 8 with qhead=15, qtail=15, with id=1, count=14
+4 original putting to 9 with qhead=12, qtail=13, with id=1, count=14
+4 original putting to 10 with qhead=12, qtail=13, with id=1, count=14
+4 original putting to 11 with qhead=0, qtail=13, with id=1, count=14
+4 original putting to 8 with qhead=15, qtail=16, with id=0, count=1
+4 original putting to 9 with qhead=14, qtail=14, with id=0, count=1
+4 original putting to 10 with qhead=14, qtail=14, with id=0, count=1
+4 original putting to 11 with qhead=0, qtail=14, with id=0, count=1
+4 original putting to 8 with qhead=17, qtail=17, with id=1, count=14
+4 original putting to 9 with qhead=14, qtail=15, with id=1, count=14
+4 original putting to 10 with qhead=14, qtail=15, with id=1, count=14
+4 original putting to 11 with qhead=0, qtail=15, with id=1, count=14
+10 spare is entering chp with head=10 tail=10
+9 spare is entering chp with head=10 tail=10
+8 spare is entering chp with head=13 tail=13
+10 spare is entering chp with head=12 tail=12
+8 spare is entering chp with head=15 tail=15
+9 spare is entering chp with head=12 tail=12
+10 spare is entering chp with head=14 tail=14
+9 spare is entering chp with head=14 tail=14
+8 spare is entering chp with head=17 tail=17
+10 spare is entering chp with head=16 tail=16
+8 spare is entering chp with head=18 tail=18
+9 spare is entering chp with head=16 tail=16
+11 spare is entering chp with head=16 tail=16
+6 original putting to 8 with qhead=18, qtail=18, with id=0, count=1
+6 original putting to 9 with qhead=16, qtail=16, with id=0, count=1
+6 original putting to 10 with qhead=16, qtail=16, with id=0, count=1
+8 spare is entering chp with head=19 tail=19
+9 spare is entering chp with head=17 tail=17
+6 original putting to 11 with qhead=16, qtail=16, with id=0, count=1
+6 original putting to 8 with qhead=19, qtail=19, with id=1, count=16
+11 spare is entering chp with head=17 tail=17
+6 original putting to 9 with qhead=17, qtail=17, with id=1, count=16
+6 original putting to 10 with qhead=16, qtail=17, with id=1, count=16
+6 original putting to 11 with qhead=17, qtail=17, with id=1, count=16
+6 original putting to 8 with qhead=19, qtail=20, with id=0, count=1
+10 spare is entering chp with head=18 tail=18
+9 spare is entering chp with head=18 tail=18
+PE 8 is finished checkpointing before barrier
+6 original putting to 9 with qhead=18, qtail=18, with id=0, count=1
+6 original putting to 10 with qhead=18, qtail=18, with id=0, count=1
+6 original putting to 11 with qhead=17, qtail=18, with id=0, count=1
+11 spare is entering chp with head=19 tail=19
+6 original putting to 8 with qhead=21, qtail=21, with id=1, count=16
+6 original putting to 9 with qhead=18, qtail=19, with id=1, count=16
+6 original putting to 10 with qhead=18, qtail=19, with id=1, count=16
+6 original putting to 11 with qhead=19, qtail=19, with id=1, count=16
+6 original putting to 8 with qhead=21, qtail=22, with id=0, count=1
+11 spare is entering chp with head=20 tail=20
+6 original putting to 9 with qhead=18, qtail=20, with id=0, count=1
+6 original putting to 10 with qhead=18, qtail=20, with id=0, count=1
+6 original putting to 11 with qhead=20, qtail=20, with id=0, count=1
+6 original putting to 8 with qhead=21, qtail=23, with id=1, count=16
+6 original putting to 9 with qhead=18, qtail=21, with id=1, count=16
+6 original putting to 10 with qhead=18, qtail=21, with id=1, count=16
+6 original putting to 11 with qhead=20, qtail=21, with id=1, count=16
+6 original putting to 8 with qhead=21, qtail=24, with id=0, count=1
+6 original putting to 9 with qhead=18, qtail=22, with id=0, count=1
+11 spare is entering chp with head=22 tail=22
+6 original putting to 10 with qhead=18, qtail=22, with id=0, count=1
+6 original putting to 11 with qhead=22, qtail=22, with id=0, count=1
+6 original putting to 8 with qhead=21, qtail=25, with id=1, count=16
+6 original putting to 9 with qhead=18, qtail=23, with id=1, count=16
+6 original putting to 10 with qhead=18, qtail=23, with id=1, count=16
+6 original putting to 11 with qhead=22, qtail=23, with id=1, count=16
+7 original putting to 8 with qhead=21, qtail=26, with id=0, count=1
+7 original putting to 9 with qhead=18, qtail=24, with id=0, count=1
+7 original putting to 10 with qhead=18, qtail=24, with id=0, count=1
+7 original putting to 11 with qhead=22, qtail=24, with id=0, count=1
+7 original putting to 8 with qhead=21, qtail=27, with id=1, count=17
+7 original putting to 9 with qhead=18, qtail=25, with id=1, count=17
+7 original putting to 10 with qhead=18, qtail=25, with id=1, count=17
+7 original putting to 11 with qhead=22, qtail=25, with id=1, count=17
+7 original putting to 8 with qhead=21, qtail=28, with id=0, count=1
+7 original putting to 9 with qhead=18, qtail=26, with id=0, count=1
+7 original putting to 10 with qhead=18, qtail=26, with id=0, count=1
+7 original putting to 11 with qhead=22, qtail=26, with id=0, count=1
+7 original putting to 8 with qhead=21, qtail=29, with id=1, count=17
+7 original putting to 9 with qhead=18, qtail=27, with id=1, count=17
+7 original putting to 10 with qhead=18, qtail=27, with id=1, count=17
+7 original putting to 11 with qhead=22, qtail=27, with id=1, count=17
+7 original putting to 8 with qhead=21, qtail=30, with id=0, count=1
+7 original putting to 9 with qhead=18, qtail=28, with id=0, count=1
+7 original putting to 10 with qhead=18, qtail=28, with id=0, count=1
+7 original putting to 11 with qhead=22, qtail=28, with id=0, count=1
+7 original putting to 8 with qhead=21, qtail=31, with id=1, count=17
+7 original putting to 9 with qhead=18, qtail=29, with id=1, count=17
+7 original putting to 10 with qhead=18, qtail=29, with id=1, count=17
+7 original putting to 11 with qhead=22, qtail=29, with id=1, count=17
+7 original putting to 8 with qhead=21, qtail=32, with id=0, count=1
+7 original putting to 9 with qhead=18, qtail=30, with id=0, count=1
+7 original putting to 10 with qhead=18, qtail=30, with id=0, count=1
+7 original putting to 11 with qhead=22, qtail=30, with id=0, count=1
+7 original putting to 8 with qhead=21, qtail=33, with id=1, count=17
+7 original putting to 9 with qhead=18, qtail=31, with id=1, count=17
+7 original putting to 10 with qhead=18, qtail=31, with id=1, count=17
+7 original putting to 11 with qhead=22, qtail=31, with id=1, count=17
+10 spare is entering chp with head=32 tail=32
+PE 9 is finished checkpointing before barrier
+1 original putting to 8 with qhead=21, qtail=34, with id=0, count=1
+1 original putting to 9 with qhead=32, qtail=32, with id=0, count=1
+1 original putting to 10 with qhead=32, qtail=32, with id=0, count=1
+1 original putting to 11 with qhead=22, qtail=32, with id=0, count=1
+1 original putting to 8 with qhead=21, qtail=35, with id=1, count=11
+1 original putting to 9 with qhead=32, qtail=33, with id=1, count=11
+1 original putting to 10 with qhead=32, qtail=33, with id=1, count=11
+1 original putting to 11 with qhead=22, qtail=33, with id=1, count=11
+1 original putting to 8 with qhead=21, qtail=36, with id=0, count=1
+1 original putting to 9 with qhead=32, qtail=34, with id=0, count=1
+1 original putting to 10 with qhead=32, qtail=34, with id=0, count=1
+1 original putting to 11 with qhead=22, qtail=34, with id=0, count=1
+1 original putting to 8 with qhead=21, qtail=37, with id=1, count=11
+1 original putting to 9 with qhead=32, qtail=35, with id=1, count=11
+1 original putting to 10 with qhead=32, qtail=35, with id=1, count=11
+1 original putting to 11 with qhead=22, qtail=35, with id=1, count=11
+1 original putting to 8 with qhead=21, qtail=38, with id=0, count=1
+1 original putting to 9 with qhead=32, qtail=36, with id=0, count=1
+1 original putting to 10 with qhead=32, qtail=36, with id=0, count=1
+1 original putting to 11 with qhead=22, qtail=36, with id=0, count=1
+1 original putting to 8 with qhead=21, qtail=39, with id=1, count=11
+1 original putting to 9 with qhead=32, qtail=37, with id=1, count=11
+1 original putting to 10 with qhead=32, qtail=37, with id=1, count=11
+1 original putting to 11 with qhead=22, qtail=37, with id=1, count=11
+1 original putting to 8 with qhead=21, qtail=40, with id=0, count=1
+1 original putting to 9 with qhead=32, qtail=38, with id=0, count=1
+1 original putting to 10 with qhead=32, qtail=38, with id=0, count=1
+1 original putting to 11 with qhead=22, qtail=38, with id=0, count=1
+1 original putting to 8 with qhead=21, qtail=41, with id=1, count=11
+1 original putting to 9 with qhead=32, qtail=39, with id=1, count=11
+1 original putting to 10 with qhead=32, qtail=39, with id=1, count=11
+1 original putting to 11 with qhead=22, qtail=39, with id=1, count=11
+11 spare is entering chp with head=40 tail=40
+PE 10 is finished checkpointing before barrier
+3 original putting to 9 with qhead=32, qtail=40, with id=0, count=1
+3 original putting to 10 with qhead=40, qtail=40, with id=0, count=1
+3 original putting to 11 with qhead=40, qtail=40, with id=0, count=1
+3 original putting to 8 with qhead=21, qtail=42, with id=1, count=13
+3 original putting to 9 with qhead=32, qtail=41, with id=1, count=13
+11 spare is entering chp with head=41 tail=41
+3 original putting to 10 with qhead=40, qtail=41, with id=1, count=13
+3 original putting to 11 with qhead=41, qtail=41, with id=1, count=13
+3 original putting to 8 with qhead=21, qtail=43, with id=0, count=1
+3 original putting to 9 with qhead=32, qtail=42, with id=0, count=1
+PE 11 is finished checkpointing before barrier
+3 original putting to 10 with qhead=40, qtail=42, with id=0, count=1
+3 original putting to 11 with qhead=42, qtail=42, with id=0, count=1
+3 original putting to 8 with qhead=21, qtail=44, with id=1, count=13
+3 original putting to 9 with qhead=32, qtail=43, with id=1, count=13
+3 original putting to 10 with qhead=40, qtail=43, with id=1, count=13
+3 original putting to 11 with qhead=42, qtail=43, with id=1, count=13
+3 original putting to 8 with qhead=21, qtail=45, with id=0, count=1
+3 original putting to 9 with qhead=32, qtail=44, with id=0, count=1
+3 original putting to 10 with qhead=40, qtail=44, with id=0, count=1
+3 original putting to 11 with qhead=42, qtail=44, with id=0, count=1
+3 original putting to 8 with qhead=21, qtail=46, with id=1, count=13
+3 original putting to 9 with qhead=32, qtail=45, with id=1, count=13
+3 original putting to 10 with qhead=40, qtail=45, with id=1, count=13
+3 original putting to 11 with qhead=42, qtail=45, with id=1, count=13
+3 original putting to 8 with qhead=21, qtail=47, with id=0, count=1
+3 original putting to 9 with qhead=32, qtail=46, with id=0, count=1
+3 original putting to 10 with qhead=40, qtail=46, with id=0, count=1
+3 original putting to 11 with qhead=42, qtail=46, with id=0, count=1
+3 original putting to 8 with qhead=21, qtail=48, with id=1, count=13
+3 original putting to 9 with qhead=32, qtail=47, with id=1, count=13
+3 original putting to 10 with qhead=40, qtail=47, with id=1, count=13
+3 original putting to 11 with qhead=42, qtail=47, with id=1, count=13
+0 original putting to 9 with qhead=32, qtail=48, with id=0, count=1
+0 original putting to 10 with qhead=40, qtail=48, with id=0, count=1
+0 original putting to 11 with qhead=42, qtail=48, with id=0, count=1
+0 original putting to 8 with qhead=21, qtail=49, with id=1, count=10
+0 original putting to 9 with qhead=32, qtail=49, with id=1, count=10
+0 original putting to 10 with qhead=40, qtail=49, with id=1, count=10
+0 original putting to 11 with qhead=42, qtail=49, with id=1, count=10
+0 original putting to 8 with qhead=21, qtail=50, with id=0, count=1
+0 original putting to 9 with qhead=32, qtail=50, with id=0, count=1
+0 original putting to 10 with qhead=40, qtail=50, with id=0, count=1
+0 original putting to 11 with qhead=42, qtail=50, with id=0, count=1
+0 original putting to 8 with qhead=21, qtail=51, with id=1, count=10
+0 original putting to 9 with qhead=32, qtail=51, with id=1, count=10
+0 original putting to 10 with qhead=40, qtail=51, with id=1, count=10
+0 original putting to 11 with qhead=42, qtail=51, with id=1, count=10
+0 original putting to 8 with qhead=21, qtail=52, with id=0, count=1
+0 original putting to 9 with qhead=32, qtail=52, with id=0, count=1
+0 original putting to 10 with qhead=40, qtail=52, with id=0, count=1
+0 original putting to 11 with qhead=42, qtail=52, with id=0, count=1
+0 original putting to 8 with qhead=21, qtail=53, with id=1, count=10
+0 original putting to 9 with qhead=32, qtail=53, with id=1, count=10
+0 original putting to 10 with qhead=40, qtail=53, with id=1, count=10
+0 original putting to 11 with qhead=42, qtail=53, with id=1, count=10
+0 original putting to 8 with qhead=21, qtail=54, with id=0, count=1
+0 original putting to 9 with qhead=32, qtail=54, with id=0, count=1
+0 original putting to 10 with qhead=40, qtail=54, with id=0, count=1
+0 original putting to 11 with qhead=42, qtail=54, with id=0, count=1
+0 original putting to 8 with qhead=21, qtail=55, with id=1, count=10
+0 original putting to 9 with qhead=32, qtail=55, with id=1, count=10
+0 original putting to 10 with qhead=40, qtail=55, with id=1, count=10
+0 original putting to 11 with qhead=42, qtail=55, with id=1, count=10
+2 original putting to 8 with qhead=21, qtail=56, with id=0, count=1
+2 original putting to 9 with qhead=32, qtail=56, with id=0, count=1
+2 original putting to 10 with qhead=40, qtail=56, with id=0, count=1
+2 original putting to 11 with qhead=42, qtail=56, with id=0, count=1
+2 original putting to 8 with qhead=21, qtail=57, with id=1, count=12
+2 original putting to 9 with qhead=32, qtail=57, with id=1, count=12
+2 original putting to 10 with qhead=40, qtail=57, with id=1, count=12
+2 original putting to 11 with qhead=42, qtail=57, with id=1, count=12
+2 original putting to 8 with qhead=21, qtail=58, with id=0, count=1
+2 original putting to 9 with qhead=32, qtail=58, with id=0, count=1
+2 original putting to 10 with qhead=40, qtail=58, with id=0, count=1
+2 original putting to 11 with qhead=42, qtail=58, with id=0, count=1
+2 original putting to 8 with qhead=21, qtail=59, with id=1, count=12
+2 original putting to 9 with qhead=32, qtail=59, with id=1, count=12
+2 original putting to 10 with qhead=40, qtail=59, with id=1, count=12
+2 original putting to 11 with qhead=42, qtail=59, with id=1, count=12
+2 original putting to 8 with qhead=21, qtail=60, with id=0, count=1
+2 original putting to 9 with qhead=32, qtail=60, with id=0, count=1
+2 original putting to 10 with qhead=40, qtail=60, with id=0, count=1
+2 original putting to 11 with qhead=42, qtail=60, with id=0, count=1
+2 original putting to 8 with qhead=21, qtail=61, with id=1, count=12
+2 original putting to 9 with qhead=32, qtail=61, with id=1, count=12
+2 original putting to 10 with qhead=40, qtail=61, with id=1, count=12
+2 original putting to 11 with qhead=42, qtail=61, with id=1, count=12
+2 original putting to 8 with qhead=21, qtail=62, with id=0, count=1
+2 original putting to 9 with qhead=32, qtail=62, with id=0, count=1
+2 original putting to 10 with qhead=40, qtail=62, with id=0, count=1
+2 original putting to 11 with qhead=42, qtail=62, with id=0, count=1
+2 original putting to 8 with qhead=21, qtail=63, with id=1, count=12
+2 original putting to 9 with qhead=32, qtail=63, with id=1, count=12
+2 original putting to 10 with qhead=40, qtail=63, with id=1, count=12
+2 original putting to 11 with qhead=42, qtail=63, with id=1, count=12
+PE 8 is finished checkpointing
+active PEs=8
+***
+PE 9 is finished checkpointing
+PE 10 is finished checkpointing
+PE 11 is finished checkpointing
