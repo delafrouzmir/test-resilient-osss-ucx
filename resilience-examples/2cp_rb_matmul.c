@@ -930,22 +930,6 @@ int shmem_cpr_rollback ( int dead_pe, int pe_num )
                 // 1- check for number of spares left
                 // 2- reduce the number of storage/spare PEs if necessary
                 // 3- add the new storage PE to the array of storage PEs
-                if ( cpr_checkpointing_mode == CPR_TWO_COPY_CHECKPOINT )
-                {
-                    candid_storage = -1;
-                    for ( i = cpr_num_active_pes; i < npes; ++i )
-                        if ( cpr_all_pe_type[i] == CPR_SPARE_PE && cpr_all_pe_role[i] == CPR_DORMANT_ROLE )
-                        {
-                            candid_storage = i;
-                            break;
-                        }
-
-                    printf("from rollback, candid=%d storage=%d\n", candid_storage, cpr_storage_pes[0]);
-                    
-                    if ( candid_storage != -1 &&(pe_num == candid_storage || pe_num == cpr_storage_pes[0]) )
-                        copy_table_success = shmem_cpr_copy_check_table ( candid_storage, cpr_storage_pes[0], pe_num );
-                }
-                break;
 
             default:
             // nothing here for now
@@ -961,6 +945,23 @@ int shmem_cpr_rollback ( int dead_pe, int pe_num )
         cpr_replaced[dead_pe] = chosen_pe;
 
         cpr_all_pe_type[dead_pe] = CPR_DEAD_PE;
+
+        if ( cpr_checkpointing_mode == CPR_TWO_COPY_CHECKPOINT )
+        {
+            candid_storage = -1;
+            for ( i = 0; i < npes; ++i )
+                if ( cpr_all_pe_type[i] == CPR_SPARE_PE && cpr_all_pe_role[i] == CPR_DORMANT_ROLE )
+                {
+                    candid_storage = i;
+                    break;
+                }
+
+            printf("from rollback, candid=%d storage=%d\n", candid_storage, cpr_storage_pes[0]);
+
+            if ( candid_storage != -1 && (pe_num == candid_storage || pe_num == cpr_storage_pes[0]) )
+                copy_table_success = shmem_cpr_copy_check_table ( candid_storage, cpr_storage_pes[0], pe_num );
+        }
+        break;
 
         if ( cpr_checkpointing_mode == CPR_MANY_COPY_CHECKPOINT )
             cpr_num_storage_pes --;
