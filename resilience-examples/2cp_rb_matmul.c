@@ -96,7 +96,10 @@ int cpr_checkpointing_mode, cpr_sig, cpr_start;
 */
 int *cpr_pe, *cpr_all_pe_type, *cpr_all_pe_role, *cpr_replaced;
 
-// Part 6: delarrations for the application and testing
+// Part 6: necessary for copy_cpr_table in 2-copy mode
+int cpr_table_info_carr, cpr_sig_table_info;
+
+// Part 7: delarrations for the application and testing
 int me, npes;
 int called_check, called_resrv, posted_check, posted_resrv, read_check, read_resrv;
 
@@ -705,8 +708,8 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
 {
     int i, j, k, l, space_needed, last_data, q_tail;
     cpr_check_carrier *carr;
-    int cpr_sig_table_info = 0;
-    int cpr_table_info_carr = 0;
+    cpr_sig_table_info = 0;
+    cpr_table_info_carr = 0;
 
     if ( pe_num == candid )
     {
