@@ -706,6 +706,8 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
 
 int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
 {
+    printf("candid=%d storage=%d me=%d\n", candid, storage, pe_num);
+
     int i, j, k, l, space_needed, last_data, q_tail;
     cpr_check_carrier *carr;
     cpr_sig_table_info = 0;
