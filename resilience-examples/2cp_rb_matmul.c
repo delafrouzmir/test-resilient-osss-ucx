@@ -70,16 +70,16 @@ int cpr_shadow_mem_size, cpr_shadow_mem_tail;
 
 // Part 2: necessary for keeping checkpoints in checkpoint table
 cpr_check_carrier ****cpr_checkpoint_table; // a spare PE or MSPE's copy of all active PE's checkpoints == an array of all their shadow mems
-int *cpr_table_size, *cpr_table_tail, cpr_table_info_carr, cpr_sig_table_info;
+int *cpr_table_size, *cpr_table_tail;
 
 // Part 3: queues necessary for exchange of data when reserving or checkpointing
 cpr_check_carrier cpr_check_queue[CPR_STARTING_QUEUE_LEN];
 int cpr_check_queue_head, cpr_check_queue_tail, cpr_sig_check;
-int *check_randomness;
+int* check_randomness;
 
 cpr_rsvr_carrier cpr_resrv_queue[CPR_STARTING_QUEUE_LEN];
 int cpr_resrv_queue_head, cpr_resrv_queue_tail, cpr_sig_rsvr;
-int *rsrv_randomness;
+int* rsrv_randomness;
 
 // Part 4: keeping the number of different pe types
 //int cpr_first_mspe, cpr_second_mspe, cpr_first_spare;
@@ -973,14 +973,14 @@ int shmem_cpr_rollback ( int dead_pe, int pe_num )
                     break;
                 }
 
-            if ( candid_storage != -1 &&(pe_num == candid_storage || pe_num == cpr_storage_pes[0]) )
+            if ( candid_storage != -1 && (pe_num == candid_storage || pe_num == cpr_storage_pes[0]) )
                 copy_table_success = shmem_cpr_copy_check_table ( candid_storage, cpr_storage_pes[0], pe_num );
 
             if ( copy_table_success )
                 cpr_storage_pes[cpr_num_storage_pes-1] = candid_storage;
         }
         else if ( cpr_checkpointing_mode == CPR_MANY_COPY_CHECKPOINT )
-            cpr_num_storage_pes --;
+            cpr_num_storage_pes --;     // TO DO: make sure to delete the right storage from the array of storage pes
 
     }
 
