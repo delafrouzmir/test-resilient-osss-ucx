@@ -705,7 +705,8 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
 {
     int i, j, k, l, space_needed, last_data, q_tail;
     cpr_check_carrier *carr;
-    cpr_sig_table_info = 0;
+    int cpr_sig_table_info = 0;
+    int cpr_table_info_carr = 0;
 
     if ( pe_num == candid )
     {
