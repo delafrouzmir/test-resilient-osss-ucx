@@ -767,12 +767,12 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
                     
                     cpr_check_queue_head ++;
 
-                    cpr_checkpoint_table[i][j][k] -> id = carr -> id;
-                    cpr_checkpoint_table[i][j][k] -> adr = carr -> adr;
-                    cpr_checkpoint_table[i][j][k] -> count = carr -> count;
-                    cpr_checkpoint_table[i][j][k] -> pe_num = carr -> pe_num;
-                    cpr_checkpoint_table[i][j][k] -> is_symmetric = carr -> is_symmetric;
-                    cpr_checkpoint_table[i][j][k] -> offset = carr -> offset;
+                    cpr_checkpoint_table[carr -> pe_num][carr -> id][(carr -> offset)/CPR_CARR_DATA_SIZE] -> id = carr -> id;
+                    cpr_checkpoint_table[carr -> pe_num][carr -> id][(carr -> offset)/CPR_CARR_DATA_SIZE] -> adr = carr -> adr;
+                    cpr_checkpoint_table[carr -> pe_num][carr -> id][(carr -> offset)/CPR_CARR_DATA_SIZE] -> count = carr -> count;
+                    cpr_checkpoint_table[carr -> pe_num][carr -> id][(carr -> offset)/CPR_CARR_DATA_SIZE] -> pe_num = carr -> pe_num;
+                    cpr_checkpoint_table[carr -> pe_num][carr -> id][(carr -> offset)/CPR_CARR_DATA_SIZE] -> is_symmetric = carr -> is_symmetric;
+                    cpr_checkpoint_table[carr -> pe_num][carr -> id][(carr -> offset)/CPR_CARR_DATA_SIZE] -> offset = carr -> offset;
                     
                     if ( carr->count <= CPR_CARR_DATA_SIZE )
                         last_data = carr->count;
