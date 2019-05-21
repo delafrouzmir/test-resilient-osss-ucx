@@ -1125,15 +1125,15 @@ int main(int argc, char const *argv[])
         shmem_barrier_all();
         if ( (*iter) % frequency == 0)
         {
-            // shmem_cpr_checkpoint(0, Cs, N * Ns, shmem_cpr_pe_num(me));
+            shmem_cpr_checkpoint(0, Cs, N * Ns, shmem_cpr_pe_num(me));
 
-            // shmem_barrier_all();
-            // if ( cpr_pe_role == CPR_STORAGE_ROLE )
-            // {
-            //     cpr_sig_check = 1;
-            //     shmem_cpr_checkpoint(0, NULL, 0, shmem_cpr_pe_num(me));
-            // }
-            // shmem_barrier_all();
+            shmem_barrier_all();
+            if ( cpr_pe_role == CPR_STORAGE_ROLE )
+            {
+                cpr_sig_check = 1;
+                shmem_cpr_checkpoint(0, NULL, 0, shmem_cpr_pe_num(me));
+            }
+            shmem_barrier_all();
         }
        
         if ( (*iter) == 3*frequency+5 && first_rollback == 0 ){
