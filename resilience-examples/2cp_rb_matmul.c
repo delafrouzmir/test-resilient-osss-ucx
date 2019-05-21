@@ -706,7 +706,7 @@ int shmem_cpr_checkpoint ( int id, unsigned long* mem, int count, int pe_num )
 
 int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
 {
-    printf("candid=%d storage=%d me=%d\n", candid, storage, pe_num);
+    // printf("candid=%d storage=%d me=%d\n", candid, storage, pe_num);
 
     int i, j, k, l, space_needed, last_data, q_tail;
     cpr_check_carrier *carr;
@@ -728,7 +728,7 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
         cpr_checkpoint_table = (cpr_check_carrier ****) malloc (cpr_num_active_pes * sizeof(cpr_check_carrier ***));
         cpr_table_size = (int *) malloc(cpr_num_active_pes * sizeof(int *));
         cpr_table_tail = (int *) malloc(cpr_num_active_pes * sizeof(int *));
-        printf("pe=%d cpr_num_active_pes=%d, sizeof(table)=%d\n", pe_num, cpr_num_active_pes, sizeof(cpr_checkpoint_table));
+        // printf("pe=%d cpr_num_active_pes=%d, sizeof(table)=%d\n", pe_num, cpr_num_active_pes, sizeof(cpr_checkpoint_table));
 
         for ( i =0; i< cpr_num_active_pes; ++i )
         {
@@ -740,8 +740,8 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
             cpr_checkpoint_table[i] = (cpr_check_carrier ***) malloc (cpr_table_size[i] * sizeof(cpr_check_carrier **));
             cpr_sig_table_info = 0;
             shmem_atomic_set (&cpr_sig_table_info, 1, storage );
-            printf("pe=%d git cpr_table_size[%d]=%d\n", pe_num, i, cpr_table_size[i]);
-            printf("pe=%d git cpr_table_tail[%d]=%d\n", pe_num, i, cpr_table_tail[i]);
+            // printf("pe=%d git cpr_table_size[%d]=%d\n", pe_num, i, cpr_table_size[i]);
+            // printf("pe=%d git cpr_table_tail[%d]=%d\n", pe_num, i, cpr_table_tail[i]);
 
             for ( j=0; j<cpr_table_tail[i]; ++j )
             {
@@ -750,7 +750,7 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
                 space_needed = cpr_table_info_num_carr;
                 cpr_sig_table_info = 0;
                 shmem_atomic_set (&cpr_sig_table_info, 1, storage );
-                printf("pe=%d git space_needed[%d][%d]=%d\n", pe_num, i, j, space_needed);
+                // printf("pe=%d git space_needed[%d][%d]=%d\n", pe_num, i, j, space_needed);
 
                 cpr_checkpoint_table[i][j] = (cpr_check_carrier **) malloc (space_needed * sizeof(cpr_check_carrier *));
 
@@ -783,7 +783,7 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
                             last_data = CPR_CARR_DATA_SIZE;
                     }
                     
-                    printf("pe=%d got cpr_table_size[%d][%d][%d]->id=%d adr=%d count=%d pe=%d symm=%d offset=%d last_data=%d\n",
+                    // printf("pe=%d got cpr_table_size[%d][%d][%d]->id=%d adr=%d count=%d pe=%d symm=%d offset=%d last_data=%d\n",
                         pe_num, i, j, k, cpr_checkpoint_table[i][j][k] -> id,
                         cpr_checkpoint_table[i][j][k] -> adr,
                         cpr_checkpoint_table[i][j][k] -> count,
@@ -809,8 +809,8 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
             shmem_fence();
             // setting that to one, will let "candid" know the data has been sent
             shmem_atomic_set(&cpr_sig_table_info, 1, candid);
-            printf("pe=%d sent table_size[%d]=%d\n", pe_num, i, cpr_table_size[i]);
-            printf("pe=%d sent table_tail[%d]=%d\n", pe_num, i, cpr_table_tail[i]);
+            // printf("pe=%d sent table_size[%d]=%d\n", pe_num, i, cpr_table_size[i]);
+            // printf("pe=%d sent table_tail[%d]=%d\n", pe_num, i, cpr_table_tail[i]);
 
             for ( j=0; j<cpr_table_tail[i]; ++j )
             {
@@ -819,7 +819,7 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
                 shmem_put(&cpr_table_info_num_carr, &space_needed, 1, candid);
                 shmem_fence();
                 shmem_atomic_set(&cpr_sig_table_info, 1, candid);
-                printf("pe=%d sent space_needed[%d][%d]=%d\n", pe_num, i, j, space_needed);
+                // printf("pe=%d sent space_needed[%d][%d]=%d\n", pe_num, i, j, space_needed);
 
                 for ( k=0; k<space_needed; ++k )
                 {
@@ -828,7 +828,7 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
                     shmem_putmem (&cpr_check_queue[q_tail], (void *) cpr_checkpoint_table[i][j][k], 1 * sizeof(cpr_check_carrier), candid);
                     shmem_fence();
                     shmem_atomic_set( &check_randomness[q_tail], 1, candid);
-                    printf("pe=%d sent cpr_table[%d][%d][%d] to qtail=%d\n", pe_num, i, j, k, q_tail);
+                    // printf("pe=%d sent cpr_table[%d][%d][%d] to qtail=%d\n", pe_num, i, j, k, q_tail);
                 }
             }
         }
@@ -1053,7 +1053,7 @@ int main(int argc, char const *argv[])
     spes = 4;
     
     FILE *fp;
-    fp = fopen ("2cp_1rollback_res.txt", "a");
+    fp = fopen ("2cp_correct_checkpoint_res.txt", "a");
 
     iter = (int *) shmem_malloc(sizeof(int));
     shmem_barrier_all();
@@ -1067,7 +1067,7 @@ int main(int argc, char const *argv[])
     //         printf("me=%d cpr_type_[%d]=%d cpr_role[%d]=%d\n", me, i, cpr_all_pe_type[i], i, cpr_all_pe_role[i]);
     // }
 
-    frequency = 100;
+    frequency = 400;
     num_iter = atoi(argv[argc-1]);
     const unsigned long N = atoi(argv[argc-2]);           // Size of the matrices
     const unsigned long Ns = N / cpr_num_active_pes;   // Width of the stripes
@@ -1158,10 +1158,10 @@ int main(int argc, char const *argv[])
        
         if ( (*iter) == 3*frequency+5 && first_rollback == 0 ){
             first_rollback = 1;
-            shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
-            // if ( cpr_pe_role == CPR_STORAGE_ROLE )
-            *iter = 3*frequency;
-            shmem_barrier_all();
+            // shmem_cpr_rollback(3, shmem_cpr_pe_num(me));
+            // // if ( cpr_pe_role == CPR_STORAGE_ROLE )
+            // *iter = 3*frequency;
+            // shmem_barrier_all();
             // printf("PE=%d done with rollback with iter=%d!\n", me, *iter);
             // if ( me == 11)
             // {
@@ -1178,7 +1178,7 @@ int main(int argc, char const *argv[])
 
     shmem_barrier_all();
     if ( me == 0 )
-        printf("1 rollback: npes=%d, spes=%d, array_size=%d, iter=%d, freq=%d\ntime=%f\n",
+        fprintf(fp, "0 rollback: npes=%d, spes=%d, array_size=%d, iter=%d, freq=%d\ntime=%f\n",
             npes, spes, N, num_iter, frequency, (double) (clock()-start) / CLOCKS_PER_SEC);
 
     shmem_finalize();
