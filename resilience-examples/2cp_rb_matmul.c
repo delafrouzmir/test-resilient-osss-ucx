@@ -810,6 +810,8 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
 
                 for ( k=0; k<space_needed; ++k )
                 {
+                    printf("candid=%d storage=%d check_qtail on candid availability is =%d\n", candid, storage,
+                        shmem_addr_accessible(&cpr_check_queue_tail, candid));
                     q_tail = ( shmem_atomic_fetch_inc (&cpr_check_queue_tail, candid)) % CPR_STARTING_QUEUE_LEN;
                     
                     shmem_putmem (&cpr_check_queue[q_tail], (void *) cpr_checkpoint_table[i][j][k], 1 * sizeof(cpr_check_carrier), candid);
