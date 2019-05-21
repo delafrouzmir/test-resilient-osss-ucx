@@ -940,6 +940,8 @@ int shmem_cpr_rollback ( int dead_pe, int pe_num )
                             break;
                         }
 
+                    printf("from rollback, candid=%d storage=%d\n", candid_storage, cpr_storage_pes[0]);
+                    
                     if ( candid_storage != -1 &&(pe_num == candid_storage || pe_num == cpr_storage_pes[0]) )
                         copy_table_success = shmem_cpr_copy_check_table ( candid_storage, cpr_storage_pes[0], pe_num );
                 }
