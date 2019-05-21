@@ -841,6 +841,7 @@ int shmem_cpr_rollback ( int dead_pe, int pe_num )
     */
     int i, j, k, chosen_pe, candid_storage, reading_carr, reading_data, copy_table_success;
     cpr_check_carrier *carr;
+    int npes = cpr_num_active_pes + cpr_num_spare_pes;
 
     /* TO DO:
     *  Right now, the strategy to replace a dead PE with the first remaining spare PE
@@ -950,12 +951,17 @@ int shmem_cpr_rollback ( int dead_pe, int pe_num )
         if ( cpr_checkpointing_mode == CPR_TWO_COPY_CHECKPOINT )
         {
             candid_storage = -1;
-            for ( i = 0; i < npes; ++i )
+            for ( i = cpr_num_active_pes; i < npes; ++i )
+            {
+                if ( pe_num == 8 || pe_num == 9 )
+                    printf("me=%d cpr_all_pe_type[%d]=%d cpr_all_pe_role[%d]=%d\n", 
+                        pe_num, i, cpr_all_pe_type[i], i, cpr_all_pe_role[i]);
                 if ( cpr_all_pe_type[i] == CPR_SPARE_PE && cpr_all_pe_role[i] == CPR_DORMANT_ROLE )
                 {
                     candid_storage = i;
                     break;
                 }
+            }
 
             printf("from rollback, candid=%d storage=%d\n", candid_storage, cpr_storage_pes[0]);
 
@@ -1057,11 +1063,11 @@ int main(int argc, char const *argv[])
     start = clock();
     success_init = shmem_cpr_init(me, npes, spes, CPR_TWO_COPY_CHECKPOINT);
 
-    if ( me ==0 || me == 8 || me == 9 )
-    {
-        for ( i=0; i<12; ++i )
-            printf("me=%d cpr_type_[%d]=%d cpr_role[%d]=%d\n", me, i, cpr_all_pe_type[i], i, cpr_all_pe_role[i]);
-    }
+    // if ( me ==0 || me == 8 || me == 9 )
+    // {
+    //     for ( i=0; i<12; ++i )
+    //         printf("me=%d cpr_type_[%d]=%d cpr_role[%d]=%d\n", me, i, cpr_all_pe_type[i], i, cpr_all_pe_role[i]);
+    // }
 
     frequency = 100;
     num_iter = atoi(argv[argc-1]);
