@@ -930,7 +930,8 @@ int shmem_cpr_rollback ( int dead_pe, int pe_num )
                 // 1- check for number of spares left
                 // 2- reduce the number of storage/spare PEs if necessary
                 // 3- add the new storage PE to the array of storage PEs
-
+                break;
+                
             default:
             // nothing here for now
                 break;
@@ -961,7 +962,6 @@ int shmem_cpr_rollback ( int dead_pe, int pe_num )
             if ( candid_storage != -1 && (pe_num == candid_storage || pe_num == cpr_storage_pes[0]) )
                 copy_table_success = shmem_cpr_copy_check_table ( candid_storage, cpr_storage_pes[0], pe_num );
         }
-        break;
 
         if ( cpr_checkpointing_mode == CPR_MANY_COPY_CHECKPOINT )
             cpr_num_storage_pes --;
