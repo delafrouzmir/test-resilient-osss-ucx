@@ -1057,8 +1057,11 @@ int main(int argc, char const *argv[])
     start = clock();
     success_init = shmem_cpr_init(me, npes, spes, CPR_TWO_COPY_CHECKPOINT);
 
-    printf("me=%d my_type=%d my_role=%d num_active=%d num_spare=%d num_storage=%d\n", 
-        me, cpr_pe_type, cpr_pe_role, cpr_num_active_pes, cpr_num_spare_pes, cpr_num_storage_pes);
+    if ( me ==0 || me == 8 || me == 9 )
+    {
+        for ( i=0; i<12; ++i )
+            printf("me=%d cpr_type_[%d]=%d cpr_role[%d]=%d\n", me, i, cpr_all_pe_type[i], i, cpr_all_pe_role[i]);
+    }
 
     frequency = 100;
     num_iter = atoi(argv[argc-1]);
