@@ -97,7 +97,7 @@ int cpr_checkpointing_mode, cpr_sig, cpr_start;
 int *cpr_pe, *cpr_all_pe_type, *cpr_all_pe_role, *cpr_replaced;
 
 // Part 6: necessary for copy_cpr_table in 2-copy mode
-int cpr_table_info_carr, cpr_sig_table_info;
+int cpr_table_info_size, cpr_table_info_tail, cpr_table_info_num_carr, cpr_sig_table_info;
 
 // Part 7: delarrations for the application and testing
 int me, npes;
@@ -732,24 +732,20 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
         {
             // getting the table_size for every ACTIVE_PE from "storage"
             shmem_wait_until ( &cpr_sig_table_info, SHMEM_CMP_EQ, 1 );
-            cpr_table_size[i] = cpr_table_info_carr;
+            cpr_table_size[i] = cpr_table_info_size;
+            cpr_table_tail[i] = cpr_table_info_tail;
+            
             cpr_checkpoint_table[i] = (cpr_check_carrier ***) malloc (cpr_table_size[i] * sizeof(cpr_check_carrier **));
             cpr_sig_table_info = 0;
             shmem_atomic_set (&cpr_sig_table_info, 1, storage );
             printf("pe=%d git cpr_table_size[%d]=%d\n", pe_num, i, cpr_table_size[i]);
-
-            // getting the table_tail for every ACTIVE_PE from "storage"
-            shmem_wait_until ( &cpr_sig_table_info, SHMEM_CMP_EQ, 1 );
-            cpr_table_tail[i] = cpr_table_info_carr;
-            cpr_sig_table_info = 0;
-            shmem_atomic_set (&cpr_sig_table_info, 1, storage );
             printf("pe=%d git cpr_table_tail[%d]=%d\n", pe_num, i, cpr_table_tail[i]);
 
             for ( j=0; j<cpr_table_tail[i]; ++j )
             {
                 // getting the space_needed for i^th ACTIVE_PE's j^th id, from "storage"
                 shmem_wait_until ( &cpr_sig_table_info, SHMEM_CMP_EQ, 1 );
-                space_needed = cpr_table_info_carr;
+                space_needed = cpr_table_info_num_carr;
                 cpr_sig_table_info = 0;
                 shmem_atomic_set (&cpr_sig_table_info, 1, storage );
                 printf("pe=%d git space_needed[%d][%d]=%d\n", pe_num, i, j, space_needed);
@@ -805,24 +801,20 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
         {
             // sending the table_size for every ACTIVE_PE from "storage"
             shmem_wait_until ( &cpr_sig_table_info, SHMEM_CMP_EQ, 1 );
-            shmem_put(&cpr_table_info_carr, &cpr_table_size[i], 1, candid);
+            shmem_put(&cpr_table_info_size, &cpr_table_size[i], 1, candid);
+            shmem_fence();
+            shmem_put(&cpr_table_info_tail, &cpr_table_tail[i], 1, candid);
             shmem_fence();
             // setting that to one, will let "candid" know the data has been sent
             shmem_atomic_set(&cpr_sig_table_info, 1, candid);
             printf("pe=%d sent table_size[%d]=%d\n", pe_num, i, cpr_table_size[i]);
-
-            // sending the table_tail for every ACTIVE_PE from "storage"
-            shmem_wait_until ( &cpr_sig_table_info, SHMEM_CMP_EQ, 1 );
-            shmem_put(&cpr_table_info_carr, &cpr_table_tail[i], 1, candid);
-            shmem_fence();
-            shmem_atomic_set(&cpr_sig_table_info, 1, candid);
             printf("pe=%d sent table_tail[%d]=%d\n", pe_num, i, cpr_table_tail[i]);
 
             for ( j=0; j<cpr_table_tail[i]; ++j )
             {
                 space_needed = 1 + (cpr_checkpoint_table[i][j][0]->count -1)/CPR_CARR_DATA_SIZE;
                 shmem_wait_until ( &cpr_sig_table_info, SHMEM_CMP_EQ, 1 );
-                shmem_put(&cpr_table_info_carr, &space_needed, 1, candid);
+                shmem_put(&cpr_table_info_num_carr, &space_needed, 1, candid);
                 shmem_fence();
                 shmem_atomic_set(&cpr_sig_table_info, 1, candid);
                 printf("pe=%d sent space_needed[%d][%d]=%d\n", pe_num, i, j, space_needed);
