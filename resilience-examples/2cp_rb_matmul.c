@@ -1057,6 +1057,9 @@ int main(int argc, char const *argv[])
     start = clock();
     success_init = shmem_cpr_init(me, npes, spes, CPR_TWO_COPY_CHECKPOINT);
 
+    printf("me=%d my_type=%d my_role=%d num_active=%d num_spare=%d num_storage=%d\n", 
+        me, cpr_pe_type, cpr_pe_role, cpr_num_active_pes, cpr_num_spare_pes, cpr_num_storage_pes);
+
     frequency = 100;
     num_iter = atoi(argv[argc-1]);
     const unsigned long N = atoi(argv[argc-2]);           // Size of the matrices
