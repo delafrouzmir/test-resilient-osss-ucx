@@ -784,12 +784,12 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
                     }
                     
                     // printf("pe=%d got cpr_table_size[%d][%d][%d]->id=%d adr=%d count=%d pe=%d symm=%d offset=%d last_data=%d\n",
-                        pe_num, i, j, k, cpr_checkpoint_table[i][j][k] -> id,
-                        cpr_checkpoint_table[i][j][k] -> adr,
-                        cpr_checkpoint_table[i][j][k] -> count,
-                        cpr_checkpoint_table[i][j][k] -> pe_num,
-                        cpr_checkpoint_table[i][j][k] -> is_symmetric,
-                        cpr_checkpoint_table[i][j][k] -> offset, last_data);                    
+                        // pe_num, i, j, k, cpr_checkpoint_table[i][j][k] -> id,
+                        // cpr_checkpoint_table[i][j][k] -> adr,
+                        // cpr_checkpoint_table[i][j][k] -> count,
+                        // cpr_checkpoint_table[i][j][k] -> pe_num,
+                        // cpr_checkpoint_table[i][j][k] -> is_symmetric,
+                        // cpr_checkpoint_table[i][j][k] -> offset, last_data);                    
                     for ( l=0; l< last_data; ++l)
                         cpr_checkpoint_table[i][j][k] -> data[l] = carr-> data[l];
                 }
