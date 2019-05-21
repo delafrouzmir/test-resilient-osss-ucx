@@ -754,8 +754,11 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
                 printf("pe=%d git space_needed[%d][%d]=%d\n", pe_num, i, j, space_needed);
 
                 cpr_checkpoint_table[i][j] = (cpr_check_carrier **) malloc (space_needed * sizeof(cpr_check_carrier *));
+
                 for ( k=0; k<space_needed; ++k )
                 {
+                    cpr_checkpoint_table[i][j][k] = (cpr_check_carrier *) malloc (1 * sizeof(cpr_check_carrier));
+
                     shmem_wait_until(&check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN],
                                             SHMEM_CMP_NE, 0);
                     check_randomness[cpr_check_queue_head % CPR_STARTING_QUEUE_LEN] = 0;
