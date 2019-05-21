@@ -726,6 +726,7 @@ int shmem_cpr_copy_check_table ( int candid, int storage, int pe_num )
         cpr_checkpoint_table = (cpr_check_carrier ****) malloc (cpr_num_active_pes * sizeof(cpr_check_carrier ***));
         cpr_table_size = (int *) malloc(cpr_num_active_pes * sizeof(int *));
         cpr_table_tail = (int *) malloc(cpr_num_active_pes * sizeof(int *));
+        printf("pe=%d cpr_num_active_pes=%d, sizeof(table)=%d\n", pe_num, cpr_num_active_pes, sizeof(cpr_checkpoint_table));
 
         for ( i =0; i< cpr_num_active_pes; ++i )
         {
