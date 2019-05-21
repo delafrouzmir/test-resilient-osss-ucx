@@ -189,7 +189,7 @@ void shmem_cpr_set_pe_type (int me, int npes, int spes, int cpr_mode)
                 if ( me == npes-1 || me == npes - spes )
                 {
                     cpr_pe_type = CPR_MSPE;
-                    cpr_pe_role = CPR_SPARE_PE;
+                    cpr_pe_role = CPR_STORAGE_ROLE;
                 }
                 else if ( me > npes - spes )
                 {
@@ -931,7 +931,7 @@ int shmem_cpr_rollback ( int dead_pe, int pe_num )
                 // 2- reduce the number of storage/spare PEs if necessary
                 // 3- add the new storage PE to the array of storage PEs
                 break;
-                
+
             default:
             // nothing here for now
                 break;
