@@ -349,6 +349,50 @@ int shmem_cpr_pe_num ( int pe_num)
     return -1;
 }
 
+int shmem_cpr_replaced_pe_num ( int pe_num)
+{
+    int npes = cpr_num_active_pes + cpr_num_spare_pes;
+    if ( pe_num >= 0 && pe_num < npes )
+        return cpr_replaced[pe_num];
+    return -1;
+}
+
+int shmem_cpr_get_pe_role ( int pe_num)
+{
+    int npes = cpr_num_active_pes + cpr_num_spare_pes;
+    if ( pe_num >= 0 && pe_num < npes )
+        return cpr_all_pe_role[pe_num];
+    return -1;
+}
+
+int shmem_cpr_get_pe_type ( int pe_num)
+{
+    int npes = cpr_num_active_pes + cpr_num_spare_pes;
+    if ( pe_num >= 0 && pe_num < npes )
+        return cpr_all_pe_type[pe_num];
+    return -1;
+}
+
+int shmem_cpr_get_num_active_pes ()
+{
+    return cpr_num_active_pes;
+}
+
+int shmem_cpr_get_num_storage_pes ()
+{
+    return cpr_num_storage_pes;
+}
+
+int shmem_cpr_get_num_spare_pes ()
+{
+    return cpr_num_spare_pes;
+}
+
+int *shmem_cpr_get_storage_pes ()
+{
+    return cpr_storage_pes;
+}
+
 int shmem_cpr_is_new_reservation (int id)
 {
     // TO DO: print warnings for wrong id, mem addr, or like that

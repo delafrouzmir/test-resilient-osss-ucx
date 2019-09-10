@@ -815,7 +815,7 @@ int shmem_cpr_rollback ( int dead_pe, int me )
                             candid_storage = i;
                             break;
                         }
-
+                    
                     if ( candid_storage != -1 &&(me == candid_storage || me == cpr_storage_pes[0]) )
                         shmem_cpr_copy_check_table ( candid_storage, cpr_storage_pes[0] );
                 }

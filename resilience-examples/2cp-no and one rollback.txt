@@ -1,0 +1,30 @@
+0 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=400
+time=4.370000
+0 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=400
+time=4.640000
+0 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=400
+time=4.430000
+0 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=400
+time=4.370000
+0 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=1000
+time=4.340000
+0 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=1000
+time=4.410000
+0 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=1000
+time=4.400000
+0 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=1000
+time=4.410000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=400
+time=4.400000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=400
+time=4.440000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=400
+time=4.480000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=400
+time=4.600000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=1000
+time=4.340000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=1000
+time=4.390000
+1 rollback: npes=12, spes=4, array_size=64, iter=200000, freq=1000
+time=4.400000

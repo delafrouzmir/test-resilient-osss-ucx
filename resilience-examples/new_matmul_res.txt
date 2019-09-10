@@ -24,27 +24,52 @@ time=1.730000
 no chp: npes=8, array_size=64, iter=200000
 time=3.470000
 ------------------------------------------
-no chp: npes=8, array_size=64, iter=50000
-time=1.100000
-no chp: npes=8, array_size=64, iter=100000
-time=2.070000
-no chp: npes=8, array_size=64, iter=200000
-time=3.670000
-no chp: npes=8, array_size=64, iter=50000
-time=1.050000
-no chp: npes=8, array_size=64, iter=100000
-time=1.960000
-no chp: npes=8, array_size=64, iter=200000
-time=3.650000
-no chp: npes=8, array_size=64, iter=50000
-time=1.120000
-no chp: npes=8, array_size=64, iter=100000
-time=2.040000
-no chp: npes=8, array_size=64, iter=200000
-time=3.640000
-no chp: npes=8, array_size=64, iter=50000
-time=1.070000
-no chp: npes=8, array_size=64, iter=100000
-time=2.090000
-no chp: npes=8, array_size=64, iter=200000
-time=3.630000
+------------------------------------------
+no chp: npes=4, array_size=64, iter=50000
+time=3.300000
+no chp: npes=4, array_size=64, iter=100000
+time=6.390000
+no chp: npes=4, array_size=64, iter=200000
+time=12.250000
+no chp: npes=4, array_size=64, iter=50000
+time=3.260000
+no chp: npes=4, array_size=64, iter=100000
+time=6.330000
+no chp: npes=4, array_size=64, iter=200000
+time=12.360000
+no chp: npes=4, array_size=64, iter=50000
+time=3.280000
+no chp: npes=4, array_size=64, iter=100000
+time=6.260000
+no chp: npes=4, array_size=64, iter=200000
+time=12.400000
+no chp: npes=4, array_size=64, iter=50000
+time=3.190000
+no chp: npes=4, array_size=64, iter=100000
+time=6.280000
+no chp: npes=4, array_size=64, iter=200000
+time=12.350000
+no chp: npes=4, array_size=64, iter=50000
+time=3.290000
+no chp: npes=4, array_size=64, iter=100000
+time=6.320000
+no chp: npes=4, array_size=64, iter=200000
+time=12.330000
+no chp: npes=4, array_size=64, iter=50000
+time=3.450000
+no chp: npes=4, array_size=64, iter=100000
+time=6.380000
+no chp: npes=4, array_size=64, iter=200000
+time=12.300000
+no chp: npes=4, array_size=64, iter=50000
+time=3.210000
+no chp: npes=4, array_size=64, iter=100000
+time=6.260000
+no chp: npes=4, array_size=64, iter=200000
+time=12.360000
+no chp: npes=4, array_size=64, iter=50000
+time=3.500000
+no chp: npes=4, array_size=64, iter=100000
+time=6.220000
+no chp: npes=4, array_size=64, iter=200000
+time=12.340000
